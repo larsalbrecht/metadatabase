@@ -12,9 +12,12 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.helper.InterfaceHelper;
+import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.FileItem;
+import com.lars_albrecht.mdb.main.core.models.KeyValue;
 
 /**
  * @author lalbrecht
@@ -67,6 +70,32 @@ public class TelnetRunner implements Runnable {
 						out.println("\033[31mAn Error occured.");
 					}
 
+				} else if (this.line.matches("view\\s.*")) {
+					final String viewIdStr = this.line.substring(this.line.indexOf(" ") + 1);
+					if (this.line.matches("view\\s\\d+") && (viewIdStr != null && viewIdStr.matches("\\d"))) {
+						final int viewId = Integer.parseInt(viewIdStr);
+						final FileItem fileItem = this.mainController.getDataHandler().findAllInfoForAllByFileId(viewId);
+						if (fileItem != null) {
+							out.print("\033[37m"); // white
+							out.println(fileItem.getName() + " [" + fileItem.getFiletype() + "]");
+							out.println(fileItem.getFullpath());
+							out.println(Helper.getHumanreadableFileSize(fileItem.getSize()));
+							out.println("");
+							for (final FileAttributeList attributeList : fileItem.getAttributes()) {
+								out.println("");
+								out.println(attributeList.getSectionName());
+								for (final KeyValue<String, Object> keyValue : attributeList.getKeyValues()) {
+									out.println(keyValue.getKey().getKey() + ": " + keyValue.getValue().getValue());
+								}
+							}
+
+							out.print("\033[36m"); // cyan
+						} else {
+							out.println("\033[33mID not found in database");
+						}
+					} else {
+						out.println("\033[33mNo ID found");
+					}
 				} else {
 					for (final byte beight : this.line.getBytes(Charset.forName("UTF-8"))) {
 						System.out.println(beight);

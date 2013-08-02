@@ -108,8 +108,7 @@ public class FileDetailsPage extends WebPage {
 				// for each attribute ...
 				for (final FileAttributeList attributeList : item.getAttributes()) {
 					currentSection = attributeList.getSectionName();
-					if ((currentInfoType == null)
-							|| !currentInfoType.equalsIgnoreCase(attributeList.getKeyValues().get(0).getKey().getInfoType())) {
+					if ((currentInfoType == null) || !currentInfoType.equalsIgnoreCase(attributeList.getInfoType())) {
 						if (i > 0) {
 							// finish section and add to list
 							attributeSectionList += Template.replaceMarker(attributesList, "sections", sectionList, Boolean.TRUE);
@@ -118,7 +117,7 @@ public class FileDetailsPage extends WebPage {
 						}
 
 						// create a new one for each infoType
-						currentInfoType = attributeList.getKeyValues().get(0).getKey().getInfoType();
+						currentInfoType = attributeList.getInfoType();
 						attributesList = detailViewTemplate.getSubMarkerContent("attributesList");
 						attributesList = Template.replaceMarker(attributesList, "infotype-title", currentInfoType, Boolean.FALSE);
 						attributesList = Template.replaceMarker(attributesList, "id", currentInfoType, Boolean.FALSE);
@@ -192,7 +191,9 @@ public class FileDetailsPage extends WebPage {
 						} catch (final UnsupportedEncodingException e) {
 							e.printStackTrace();
 						}
-					} else if (attributeList.getSectionName().equalsIgnoreCase("images")) {
+					} else if (attributeList.getSectionName().equalsIgnoreCase("images")) { // TODO
+																							// REMOVE
+																							// THIS!
 						String imageContainer = "";
 						String tempImageContainer = null;
 

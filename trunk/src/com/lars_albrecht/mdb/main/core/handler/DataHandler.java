@@ -400,7 +400,7 @@ public class DataHandler {
 					}
 					resultItem = (FileItem) resultItem.fromHashMap(tempMap);
 					if (resultItem.getId() != null) {
-						final ArrayList<FileAttributeList> attribList = this.findAllInfoForFileId(fileId);
+						final ArrayList<FileAttributeList> attribList = this.findAllAttributesForFileId(fileId);
 						if ((attribList != null) && (attribList.size() > 0)) {
 							resultItem.getAttributes().addAll(attribList);
 						}
@@ -436,10 +436,8 @@ public class DataHandler {
 		return resultList;
 	}
 
-	@SuppressWarnings({
-			"unchecked", "rawtypes"
-	})
-	public ArrayList<FileAttributeList> findAllInfoForFileId(final Integer fileId) {
+	@SuppressWarnings("unchecked")
+	public ArrayList<FileAttributeList> findAllAttributesForFileId(final Integer fileId) {
 		final ArrayList<FileAttributeList> resultList = new ArrayList<FileAttributeList>();
 		// ArrayList<KeyValue<Key<String>, Value<Object>>>
 		HashMap<String, Object> tempMapKey = null;
@@ -457,7 +455,7 @@ public class DataHandler {
 			final ResultSetMetaData rsmd = rs.getMetaData();
 			FileAttributeList tempFileAttributeList = null;
 			for (; rs.next();) { // for each line
-				KeyValue kv = null;
+				KeyValue<String, Object> kv = null;
 				tempMapKey = new HashMap<String, Object>();
 				tempMapValue = new HashMap<String, Object>();
 				String section = null;
@@ -490,6 +488,7 @@ public class DataHandler {
 					} else {
 						tempFileAttributeList = new FileAttributeList();
 						tempFileAttributeList.setSectionName(section);
+						tempFileAttributeList.setInfoType(infoType);
 						tempFileAttributeList.getKeyValues().add(kv);
 						resultList.add(tempFileAttributeList);
 					}

@@ -6,6 +6,7 @@ package com.lars_albrecht.mdb.main.core.exporter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.itextpdf.text.BaseColor;
@@ -15,13 +16,16 @@ import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.Font.FontFamily;
 import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.exporter.abstracts.AExporter;
+import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.FileItem;
+import com.lars_albrecht.mdb.main.core.models.KeyValue;
 
 /**
  * This is a simple PDF Export.
@@ -109,7 +113,109 @@ public class PDFExport extends AExporter {
 	 */
 	@Override
 	public void exportItem(final File file, final FileItem fileItem, final List<Object> options) {
-		System.err.println("Currently not supported");
+		try {
+			final Font headlineFont = new Font(FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.BLACK);
+			final Font defaultBoldTextFont = new Font(FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK);
+			final Font defaultTextFont = new Font(FontFamily.HELVETICA, 14, Font.NORMAL, BaseColor.BLACK);
+
+			final Document document = new Document();
+			document.setPageSize(PageSize.A4);
+			PdfWriter.getInstance(document, new FileOutputStream(file));
+			document.open();
+			document.addTitle(fileItem.getName());
+
+			// add title
+			Paragraph p = new Paragraph(fileItem.getName(), headlineFont);
+			document.add(p);
+			// add main file information
+			p = new Paragraph(fileItem.getFullpath(), defaultTextFont);
+			document.add(p);
+
+			final PdfPTable table = new PdfPTable(2);
+			table.setWidthPercentage(25);
+			table.setHorizontalAlignment(Element.ALIGN_LEFT);
+			table.setSpacingBefore(10);
+
+			// the cell object to use
+			PdfPCell cell = null;
+
+			cell = new PdfPCell(new Phrase("Size", defaultBoldTextFont));
+			cell.setBorderColor(BaseColor.WHITE);
+			table.addCell(cell);
+			cell = new PdfPCell(new Phrase(Helper.getHumanreadableFileSize(fileItem.getSize()), defaultTextFont));
+			cell.setBorderColor(BaseColor.WHITE);
+			table.addCell(cell);
+
+			document.add(table);
+
+			final ArrayList<PdfPTable> tableList = this.generateAttributeTable(fileItem);
+			if (tableList != null) {
+				for (final PdfPTable pdfPTable : tableList) {
+					if (pdfPTable != null) {
+						document.add(pdfPTable);
+					}
+				}
+			}
+
+			document.close();
+		} catch (FileNotFoundException | DocumentException e) {
+			e.printStackTrace();
+		}
+		System.exit(1);
+	}
+
+	private ArrayList<PdfPTable> generateAttributeTable(final FileItem fileItem) {
+		ArrayList<PdfPTable> tableList = null;
+		PdfPTable table = null;
+		if (fileItem.getAttributes().size() > 0) {
+			tableList = new ArrayList<PdfPTable>();
+			PdfPCell cell = null;
+			final Font headlineFont = new Font(FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.BLACK);
+			final Font defaultBoldTextFont = new Font(FontFamily.HELVETICA, 14, Font.BOLD, BaseColor.BLACK);
+			final Font defaultTextFont = new Font(FontFamily.HELVETICA, 14, Font.NORMAL, BaseColor.BLACK);
+
+			String currentInfoType = null;
+			for (final FileAttributeList attributeList : fileItem.getAttributes()) {
+				if (currentInfoType == null || !currentInfoType.equalsIgnoreCase(attributeList.getInfoType())) {
+					if (table != null) {
+						cell = new PdfPCell(new Phrase(" "));
+						cell.setColspan(2);
+						table.addCell(cell);
+						tableList.add(table);
+					}
+
+					table = new PdfPTable(2);
+					table.setSpacingBefore(25);
+					table.setHeaderRows(1);
+					table.setWidthPercentage(100);
+
+					currentInfoType = attributeList.getInfoType();
+					attributeList.getKeyValues().get(0).getKey().getInfoType();
+					cell = new PdfPCell(new Phrase(attributeList.getInfoType(), headlineFont));
+					cell.setColspan(2);
+					table.addCell(cell);
+				}
+
+				if ((attributeList.getKeyValues() != null) && (attributeList.getKeyValues().size() > 0)) {
+					cell = new PdfPCell(new Phrase(" "));
+					cell.setColspan(2);
+					table.addCell(cell);
+					cell = new PdfPCell(new Phrase(attributeList.getSectionName(), headlineFont));
+					cell.setColspan(2);
+					table.addCell(cell);
+					for (final KeyValue<String, Object> keyValue : attributeList.getKeyValues()) {
+						cell = new PdfPCell(new Phrase(keyValue.getKey().getKey(), defaultBoldTextFont));
+						table.addCell(cell);
+						cell = new PdfPCell(new Phrase((String) keyValue.getValue().getValue(), defaultTextFont));
+						table.addCell(cell);
+					}
+
+				}
+			}
+			tableList.add(table);
+		}
+
+		return tableList;
 	}
 
 	/*

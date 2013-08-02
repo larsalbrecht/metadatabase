@@ -3,6 +3,8 @@
  */
 package com.lars_albrecht.mdb.main;
 
+import java.io.File;
+
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.RessourceBundleEx;
 import com.lars_albrecht.mdb.main.core.controller.CollectorController;
@@ -37,23 +39,24 @@ public class MDB {
 			this.mdbConfig = mdbConfig;
 
 			this.init();
+			final PDFExport e = new PDFExport();
+			e.exportItem(new File("D:\\lalbrecht\\test.pdf"), this.mainController.getDataHandler().findAllInfoForAllByFileId(7), null);
+
 		} else {
 			throw new Exception("No config for mdb or null");
 		}
 	}
 
 	public void run() {
-		final String ressourceBundleName = this.mdbConfig.getRessourceBundleName();
-
-		Debug.log(Debug.LEVEL_INFO, RessourceBundleEx.getInstance(ressourceBundleName).getProperty("application.name") + " ("
-				+ RessourceBundleEx.getInstance(ressourceBundleName).getProperty("application.version") + ")");
+		Debug.log(Debug.LEVEL_INFO, RessourceBundleEx.getInstance("mdb").getProperty("application.name") + " ("
+				+ RessourceBundleEx.getInstance("mdb").getProperty("application.version") + ")");
 
 		this.mainController.run();
 	}
 
 	private void init() {
 		Debug.loglevel = this.mdbConfig.getLoglevel();
-		RessourceBundleEx.setPrefix(this.mdbConfig.getRessourceBundleName());
+		RessourceBundleEx.setPrefix("mdb");
 
 		this.initDB();
 

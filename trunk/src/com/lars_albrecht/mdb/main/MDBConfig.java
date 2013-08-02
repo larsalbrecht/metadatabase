@@ -24,8 +24,6 @@ public class MDBConfig {
 
 	private int								loglevel							= 0;
 
-	private String							ressourceBundleName					= null;
-
 	final private ArrayList<ATyper>			listOfTypers						= new ArrayList<ATyper>();
 
 	final private ArrayList<AExporter>		listOfExporter						= new ArrayList<AExporter>();
@@ -79,21 +77,6 @@ public class MDBConfig {
 	 */
 	public final void setLoglevel(final int loglevel) {
 		this.loglevel = loglevel;
-	}
-
-	/**
-	 * @return the ressourceBundleName
-	 */
-	public final String getRessourceBundleName() {
-		return this.ressourceBundleName;
-	}
-
-	/**
-	 * @param ressourceBundleName
-	 *            the ressourceBundleName to set
-	 */
-	public final void setRessourceBundleName(final String ressourceBundleName) {
-		this.ressourceBundleName = ressourceBundleName;
 	}
 
 	/**
