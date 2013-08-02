@@ -11,6 +11,7 @@ import java.util.Collection;
  * 
  * @author lalbrecht
  * 
+ *         TODO Replace / Refactor this and keyValues to a better concept.
  */
 public class FileAttributeList {
 
@@ -18,6 +19,7 @@ public class FileAttributeList {
 	private String								sectionName	= null;
 	private int									hash		= -1;
 	private Integer								fileId		= null;
+	private String								infoType	= null;
 
 	/**
 	 * 
@@ -26,41 +28,12 @@ public class FileAttributeList {
 		super();
 	}
 
-	/**
-	 * @param keyValues
-	 * @param hash
-	 */
-	public FileAttributeList(final ArrayList<KeyValue<String, Object>> keyValues, final String sectionName, final int hash,
-			final Integer fileId) {
-		super();
-		this.keyValues = keyValues;
-		this.sectionName = sectionName;
-		this.hash = hash;
-		this.fileId = fileId;
-	}
-
-	/**
-	 * @param keyValues
-	 */
-	public FileAttributeList(final ArrayList<KeyValue<String, Object>> keyValues, final String sectionName, final Integer fileId) {
-		super();
-		this.keyValues = keyValues;
+	public FileAttributeList(final ArrayList<KeyValue<String, Object>> keyValue, final String sectionName, final Integer fileId,
+			final String infoType) {
+		this.keyValues = keyValue;
 		this.sectionName = sectionName;
 		this.fileId = fileId;
-	}
-
-	/**
-	 * @param id
-	 * @param keyValues
-	 * @param hash
-	 */
-	public FileAttributeList(final Integer id, final ArrayList<KeyValue<String, Object>> keyValues, final String sectionName,
-			final int hash, final Integer fileId) {
-		super();
-		this.keyValues = keyValues;
-		this.sectionName = sectionName;
-		this.hash = hash;
-		this.fileId = fileId;
+		this.infoType = infoType;
 	}
 
 	/*
@@ -76,6 +49,7 @@ public class FileAttributeList {
 		tempList.hash = this.hash;
 		tempList.keyValues.addAll((Collection<? extends KeyValue<String, Object>>) this.keyValues.clone());
 		tempList.sectionName = this.sectionName;
+		tempList.infoType = this.infoType;
 
 		return tempList;
 	}
@@ -143,6 +117,21 @@ public class FileAttributeList {
 	 */
 	public void setSectionName(final String sectionName) {
 		this.sectionName = sectionName;
+	}
+
+	/**
+	 * @return the infoType
+	 */
+	public final String getInfoType() {
+		return this.infoType;
+	}
+
+	/**
+	 * @param infoType
+	 *            the infoType to set
+	 */
+	public final void setInfoType(final String infoType) {
+		this.infoType = infoType;
 	}
 
 	@Override

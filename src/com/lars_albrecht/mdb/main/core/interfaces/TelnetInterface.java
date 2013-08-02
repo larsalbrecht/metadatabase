@@ -3,9 +3,14 @@
  */
 package com.lars_albrecht.mdb.main.core.interfaces;
 
+import java.awt.Desktop;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import javax.swing.JOptionPane;
 
 import com.lars_albrecht.mdb.main.core.interfaces.abstracts.AInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.telnet.TelnetRunner;
@@ -35,13 +40,11 @@ public class TelnetInterface extends AInterface {
 
 			while ((i++ < maxConnections) || (maxConnections == 0)) {
 				client = server.accept();
-				System.out.println("accept");
 				final TelnetRunner runner = new TelnetRunner(this.mainController, client);
 				final Thread t = new Thread(runner);
 				t.start();
 			}
 		} catch (final IOException ioe) {
-			System.out.println("IOException on socket listen: " + ioe);
 			ioe.printStackTrace();
 		} finally {
 			try {
@@ -55,6 +58,15 @@ public class TelnetInterface extends AInterface {
 
 	@Override
 	public void openInterface() {
+		if (Desktop.isDesktopSupported()) {
+			try {
+				Desktop.getDesktop().browse(new URI("telnet://localhost:23"));
+			} catch (final IOException | URISyntaxException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Die Telnetverbindung konnte nicht geöffnet werden!", "Fehler",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
 	}
 
 }

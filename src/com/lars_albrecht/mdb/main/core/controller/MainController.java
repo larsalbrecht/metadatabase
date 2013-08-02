@@ -6,6 +6,7 @@ package com.lars_albrecht.mdb.main.core.controller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -59,13 +60,6 @@ public class MainController implements IFinderListener, ICollectorListener {
 			ex.printStackTrace();
 		}
 		this.getDataHandler().reloadData(DataHandler.RELOAD_FILEITEMS);
-
-		try {
-			this.eController.run(this.eController.getExporters().get(0), new File("D:\\lalbrecht\\test.pdf"), this.getDataHandler()
-					.getFileItems());
-		} catch (final Exception e1) {
-			e1.printStackTrace();
-		}
 
 		Debug.log(Debug.LEVEL_INFO, "Probably collect for: " + this.getDataHandler().getFileItems().size());
 		// filter filled database data to reduce runtime
@@ -266,6 +260,7 @@ public class MainController implements IFinderListener, ICollectorListener {
 		Thread.setDefaultUncaughtExceptionHandler(new Debug());
 
 		// specify folders to search for files
+		FileFinder.getInstance().addToPathList(Paths.get("").toAbsolutePath().toString(), -1);
 		FileFinder.getInstance().addToPathList(new File("."), -1);
 		FileFinder.getInstance().addToPathList(new File("web"), -1);
 		FileFinder.getInstance().addToPathList(new File("trunk"), -1);
