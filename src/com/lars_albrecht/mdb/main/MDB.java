@@ -37,8 +37,7 @@ public class MDB {
 			this.mdbConfig = mdbConfig;
 
 			this.init();
-			// final PDFExport e = new PDFExport();
-			// e.exportItem(new File("D:\\lalbrecht\\test.pdf"),
+			// new PDFExport().exportItem(new File("D:\\lalbrecht\\test.pdf"),
 			// this.mainController.getDataHandler().findAllInfoForAllByFileId(7),
 			// null);
 
