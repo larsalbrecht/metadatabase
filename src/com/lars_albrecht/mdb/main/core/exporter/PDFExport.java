@@ -161,7 +161,6 @@ public class PDFExport extends AExporter {
 		} catch (FileNotFoundException | DocumentException e) {
 			e.printStackTrace();
 		}
-		System.exit(1);
 	}
 
 	private ArrayList<PdfPTable> generateAttributeTable(final FileItem fileItem) {

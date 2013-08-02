@@ -3,8 +3,6 @@
  */
 package com.lars_albrecht.mdb.main;
 
-import java.io.File;
-
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.RessourceBundleEx;
 import com.lars_albrecht.mdb.main.core.controller.CollectorController;
@@ -39,8 +37,10 @@ public class MDB {
 			this.mdbConfig = mdbConfig;
 
 			this.init();
-			final PDFExport e = new PDFExport();
-			e.exportItem(new File("D:\\lalbrecht\\test.pdf"), this.mainController.getDataHandler().findAllInfoForAllByFileId(7), null);
+			// final PDFExport e = new PDFExport();
+			// e.exportItem(new File("D:\\lalbrecht\\test.pdf"),
+			// this.mainController.getDataHandler().findAllInfoForAllByFileId(7),
+			// null);
 
 		} else {
 			throw new Exception("No config for mdb or null");
