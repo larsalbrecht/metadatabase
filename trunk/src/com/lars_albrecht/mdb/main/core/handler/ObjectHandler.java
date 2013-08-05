@@ -69,7 +69,6 @@ public class ObjectHandler {
 	}
 
 	public static ArrayList<Tag> castObjectListToTagList(final ArrayList<Object> oList) {
-
 		final ArrayList<Tag> resultList = new ArrayList<Tag>();
 		for (final Object oItem : oList) {
 			if (oItem instanceof Tag) {
@@ -167,7 +166,7 @@ public class ObjectHandler {
 	}
 
 	public static String tagListToJSON(final ArrayList<Tag> tags) {
-		String jsonString = null;
+		String jsonString = "";
 
 		if (tags != null && tags.size() > 0) {
 			jsonString = "{";

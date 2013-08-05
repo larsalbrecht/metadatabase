@@ -31,6 +31,7 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.pages.LastFivePartial;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.SearchResultsPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.SettingsPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.ShowInfoControlPage;
+import com.lars_albrecht.mdb.main.core.models.FileTag;
 import com.lars_albrecht.mdb.main.core.models.Tag;
 
 /**
@@ -255,11 +256,15 @@ public class WebServerHelper {
 					}
 				} else if (action.equalsIgnoreCase("autocompleteTags") && request.getGetParams().get("term") != null) {
 					content = ObjectHandler.tagListToJSON(this.mainController.getDataHandler().getTags());
-				} else if (action.equalsIgnoreCase("addTag") && request.getGetParams().get("term") != null) {
+
+				} else if (action.equalsIgnoreCase("addTag") && request.getGetParams().get("value") != null
+						&& request.getGetParams().get("fileId") != null) {
 					try {
-						final Tag tempTag = new Tag(request.getGetParams().get("term"));
-						this.mainController.getDataHandler().addTag(tempTag);
+						final Tag tempTag = new Tag(request.getGetParams().get("value"));
+						final Integer fileId = Integer.parseInt(request.getGetParams().get("fileId"));
+						final Integer id = this.mainController.getDataHandler().addFileTag(new FileTag(fileId, tempTag, Boolean.TRUE));
 						final ArrayList<Tag> tempTagList = new ArrayList<Tag>();
+						tempTag.setId(id);
 						tempTagList.add(tempTag);
 						content = ObjectHandler.tagListToJSON(tempTagList);
 					} catch (final Exception e) {
