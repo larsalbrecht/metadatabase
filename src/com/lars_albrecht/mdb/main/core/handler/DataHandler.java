@@ -702,22 +702,37 @@ public class DataHandler {
 		return this.values;
 	}
 
-	public void addTag(final Tag tag) throws Exception {
-		// todo get last inserted id and return it
-		if (tag != null && !this.getTags().contains(tag)) {
-			this.persist(tag, false);
-			this.tags.add(tag);
+	public Integer addTag(final Tag tag) throws Exception {
+		if (tag != null) {
+			if (!this.getTags().contains(tag)) {
+				this.persist(tag, false);
+				this.reloadData(DataHandler.RELOAD_TAGS);
+			}
+			return this.tags.get(this.tags.indexOf(tag)).getId();
 		}
+		return null;
 	}
 
-	public void addFileTag(final FileTag fileTag) throws Exception {
-		// todo get last inserted id and return it
-		if (fileTag != null && fileTag.getTag() != null && fileTag.getFileId() != null && !this.getFileTags().contains(fileTag)) {
-			if (!this.getTags().contains(fileTag.getTag())) {
-				this.addTag(fileTag.getTag());
-			}
-			this.persist(fileTag, false);
+	public Integer addFileTag(final FileTag fileTag) throws Exception {
+		this.reloadData(DataHandler.RELOAD_FILETAGS);
+		for (final FileTag ft : this.fileTags) {
+			System.out.println(ft.getTag().getId() + " - " + ft.getTag().getName());
+			System.out.println(ft.getId() + " - " + ft.getFileId());
+			System.out.println("---");
 		}
+		if (fileTag != null && fileTag.getTag() != null && fileTag.getFileId() != null) {
+			if (!this.getFileTags().contains(fileTag)) {
+				if (!this.getTags().contains(fileTag.getTag())) {
+					this.addTag(fileTag.getTag());
+				}
+				fileTag.setTag(this.tags.get(this.tags.indexOf(fileTag.getTag())));
+				this.persist(fileTag, false);
+				this.reloadData(DataHandler.RELOAD_FILETAGS);
+			}
+			return this.fileTags.get(this.fileTags.indexOf(fileTag)).getId();
+		}
+		return null;
+
 	}
 
 	/**

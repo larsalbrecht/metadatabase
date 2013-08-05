@@ -55,6 +55,7 @@ public class FileDetailsPage extends WebPage {
 
 			detailViewTemplate.replaceMarker("title", item.getName() + " (" + item.getId() + ")", Boolean.TRUE);
 			detailViewTemplate.replaceMarker("path", item.getFullpath().replaceAll("\\\\", "\\\\\\\\\\\\\\\\"), Boolean.FALSE);
+			detailViewTemplate.replaceMarker("fileId", item.getId().toString(), Boolean.FALSE);
 
 			if (item.getSize() != null) {
 				String listWrapper = null;
