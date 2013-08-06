@@ -6,6 +6,7 @@ package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +18,7 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.FileItem;
+import com.lars_albrecht.mdb.main.core.models.FileTag;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
 
 /**
@@ -86,10 +88,31 @@ public class FileDetailsPage extends WebPage {
 			}
 
 			// add tags
-			final String tagsContainer = detailViewTemplate.getSubMarkerContent("tagsContainer");
-			if (item.getFileTags() != null && item.getFileTags().size() > 0) {
+			String tagsContainer = detailViewTemplate.getSubMarkerContent("tagsContainer");
+			String tagsList = detailViewTemplate.getSubMarkerContent("tagsList");
+			String tempTags = "";
+			final String removeLink = detailViewTemplate.getSubMarkerContent("removeLink");
 
+			final ConcurrentHashMap<String, String> tempReplacements = new ConcurrentHashMap<String, String>();
+			if (item.getFileTags() != null && item.getFileTags().size() > 0) {
+				String tempTagItem = detailViewTemplate.getSubMarkerContent("tagListItem");
+				for (final FileTag fileTag : item.getFileTags()) {
+					if (fileTag != null && fileTag.getTag() != null && fileTag.getTag().getId() != null
+							&& fileTag.getTag().getName() != null) {
+
+						tempReplacements.clear();
+
+						tempReplacements.put("tagTitle", fileTag.getTag().getName());
+						if (fileTag.getIsUser()) {
+							tempTagItem = Template.replaceMarker(tempTagItem, "removeLink", removeLink, false);
+							tempReplacements.put("fileTagId", fileTag.getId().toString());
+						}
+						tempTags += Template.replaceMarkers(tempTagItem, tempReplacements);
+					}
+				}
 			}
+			tagsList = Template.replaceMarker(tagsList, "tagList", tempTags, false);
+			tagsContainer = Template.replaceMarker(tagsContainer, "tagList", tagsList, false);
 			detailViewTemplate.replaceMarker("tags", tagsContainer, false);
 
 			// if file has attributes

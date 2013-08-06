@@ -172,7 +172,8 @@ public class ObjectHandler {
 			jsonString = "{";
 			final int i = 0;
 			for (final Tag tag : tags) {
-				jsonString += "\"" + tag.getId() + "\"" + ":" + "\"" + tag.getName() + "\"";
+				jsonString += "\"id\"" + ":" + "\"" + tag.getId() + "\",";
+				jsonString += "\"name\"" + ":" + "\"" + tag.getName() + "\"";
 				if (i < tags.size() - 1) {
 					jsonString += ",";
 				}
