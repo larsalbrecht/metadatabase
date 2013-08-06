@@ -292,7 +292,7 @@ public class DataHandler {
 		if (fileItem != null) {
 			String where = "";
 			ResultSet rs = null;
-			where = " WHERE (tiValue.value LIKE '%" + searchStr + "%')";
+			where = " WHERE ((tiValue.value LIKE '%" + searchStr + "%') OR (t.name LIKE '%" + searchStr + "%'))";
 
 			String searchResultOrderOption = (String) OptionsHandler.getOption("searchResultOrder");
 			if (searchResultOrderOption == null) {
@@ -305,7 +305,8 @@ public class DataHandler {
 			final String sql = "SELECT fi.* FROM '" + fileItem.getDatabaseTable() + "' AS fi LEFT JOIN " + " 	typeInformation as ti "
 					+ "ON " + " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	typeInformation_key AS tiKey " + "ON "
 					+ " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	typeInformation_value AS tiValue " + "ON "
-					+ "	tiValue.id = ti.value_id " + where + order;
+					+ "	tiValue.id = ti.value_id " + "LEFT JOIN fileTags AS ft ON fi.id = ft.file_id "
+					+ "LEFT JOIN tags AS t ON ft.tag_id = t.id " + where + order;
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 			try {
 				rs = DB.query(sql);
@@ -587,8 +588,28 @@ public class DataHandler {
 		resultMap.put("filetypes", this.getFiletypesFromDatabase());
 		resultMap.put("filesWithFiletype", this.getFilesWithFiletypeFromDatabase());
 		resultMap.put("missingCount", this.getMissingFileItems().size());
+		resultMap.put("tagCount", this.getRowCount(new Tag()));
+		resultMap.put("fileTagCount", this.getRowCount(new FileTag()));
 
 		return resultMap;
+	}
+
+	public ConcurrentHashMap<String, Integer> getAssociatedFileTags() {
+		final ConcurrentHashMap<String, Integer> result = new ConcurrentHashMap<String, Integer>();
+		ResultSet rs = null;
+
+		final String sql = "SELECT tags.name AS tagName, COUNT(ft.id) AS fileCount FROM tags AS tags LEFT JOIN fileTags AS ft ON ft.tag_id = tags.id GROUP BY tags.name";
+		try {
+			rs = DB.query(sql);
+			while (rs.next()) {
+				result.put(rs.getString("filetype"), rs.getInt("fileCount"));
+			}
+
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 
 	public ConcurrentHashMap<String, Integer> getFilesWithFiletypeFromDatabase() {
@@ -722,11 +743,6 @@ public class DataHandler {
 
 	public Integer addFileTag(final FileTag fileTag) throws Exception {
 		this.reloadData(DataHandler.RELOAD_FILETAGS);
-		for (final FileTag ft : this.fileTags) {
-			System.out.println(ft.getTag().getId() + " - " + ft.getTag().getName());
-			System.out.println(ft.getId() + " - " + ft.getFileId());
-			System.out.println("---");
-		}
 		if (fileTag != null && fileTag.getTag() != null && fileTag.getFileId() != null) {
 			if (!this.getFileTags().contains(fileTag)) {
 				if (!this.getTags().contains(fileTag.getTag())) {
