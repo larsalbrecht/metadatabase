@@ -271,6 +271,10 @@ public class WebServerHelper {
 						content = null;
 						e.printStackTrace();
 					}
+				} else if (action.equalsIgnoreCase("removeTagFromFile") && request.getGetParams().get("fileTagId") != null
+						&& Integer.parseInt(request.getGetParams().get("fileTagId")) > 0) {
+					this.mainController.getDataHandler().removeFileTag(Integer.parseInt(request.getGetParams().get("fileTagId")));
+					content = "success";
 				}
 			}
 		}

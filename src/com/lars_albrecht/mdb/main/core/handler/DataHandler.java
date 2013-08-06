@@ -404,6 +404,10 @@ public class DataHandler {
 						if ((attribList != null) && (attribList.size() > 0)) {
 							resultItem.getAttributes().addAll(attribList);
 						}
+						final ArrayList<FileTag> tagList = this.findAllTagsForFileId(fileId);
+						if ((tagList != null) && (tagList.size() > 0)) {
+							resultItem.getFileTags().addAll(tagList);
+						}
 					}
 				}
 			} catch (final SQLException e) {
@@ -426,9 +430,12 @@ public class DataHandler {
 			rs = DB.query(sql);
 			FileTag tempFileTag = null;
 			for (; rs.next();) { // for each line
-				tempFileTag = new FileTag(rs.getInt("fileTagId"), fileId, new Tag(rs.getInt("tagId"), rs.getString("tagName")),
-						rs.getBoolean("fileTagIsUser"));
-				resultList.add(tempFileTag);
+
+				if ((rs.getInt("fileTagId") > 0) && rs.getInt("tagId") > 0) {
+					tempFileTag = new FileTag(rs.getInt("fileTagId"), fileId, new Tag(rs.getInt("tagId"), rs.getString("tagName")),
+							rs.getBoolean("fileTagIsUser"));
+					resultList.add(tempFileTag);
+				}
 			}
 		} catch (final SQLException e) {
 			e.printStackTrace();
@@ -1150,6 +1157,16 @@ public class DataHandler {
 	 */
 	public final ArrayList<FileItem> getNewFileItems() {
 		return this.newFileItems;
+	}
+
+	public void removeFileTag(final int fileTagId) {
+		final String sql = "DELETE FROM fileTags WHERE id = '" + fileTagId + "'";
+
+		try {
+			DB.update(sql);
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

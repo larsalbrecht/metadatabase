@@ -144,4 +144,9 @@ public class Tag implements IPersistable {
 		return true;
 	}
 
+	@Override
+	public String toString() {
+		return this.id + " | " + this.name;
+	}
+
 }
