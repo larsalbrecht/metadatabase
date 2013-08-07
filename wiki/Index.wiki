@@ -2,7 +2,8 @@
 
 = Introduction =
 
-Wiki of jMovieDB
+Metadatabase is a library/framework to easy set up a database for files.
 
-  * [MainUserIndex] for users
-  * [MainDeveloperIndex] for developer
+An example application is the [https://code.google.com/p/jmovie-db/ JMovieDB] @ code.google.com. With this application, you have a database for movies and series. You can search metainformation that are stored in the database. The metainformations of JMovieDB are collected automatically from TheMovieDB (for movies), TheTVDB (for series) and MediaInfo (for both).
+
+  * [Features]
