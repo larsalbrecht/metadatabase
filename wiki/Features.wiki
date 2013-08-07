@@ -1,3 +1,5 @@
+#summary Features and upcoming features
+
 = Features =
 
 == Current Features ==
