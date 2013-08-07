@@ -146,8 +146,6 @@ public class Template {
 	}
 
 	public String replaceMarkers(final ConcurrentHashMap<String, String> markerReplacements) {
-		System.out.println("TEST");
-		System.exit(-2);
 		if (markerReplacements != null && markerReplacements.size() > 0) {
 			for (final Entry<String, String> entry : markerReplacements.entrySet()) {
 				this.replaceMarker(entry.getKey(), entry.getValue(), Boolean.FALSE);

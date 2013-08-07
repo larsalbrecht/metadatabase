@@ -254,8 +254,6 @@ public class FileDetailsPage extends WebPage {
 										"https://d3gtl9l2a4fn1j.cloudfront.net/t/p/w500" + (String) keyValue.getValue().getValue(), false);
 
 								tempGalleryItems += tempGalleryItem;
-
-								System.out.println(keyValue.getKey() + " - " + keyValue.getValue());
 							}
 						}
 						images = imageContainer;
