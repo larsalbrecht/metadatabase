@@ -457,6 +457,140 @@ public class DB implements IDatabase {
 		return lastInsertedId;
 	}
 
+	private void createTableFileInformation() throws SQLException {
+		// fileInformation
+		String sql = null;
+		sql = "CREATE TABLE IF NOT EXISTS 'fileInformation' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'name' VARCHAR(255), ";
+		sql += "'dir' VARCHAR(255), ";
+		sql += "'ext' VARCHAR(255), ";
+		sql += "'size' LONG, ";
+		sql += "'fullpath' VARCHAR(255), ";
+		sql += "'filehash' VARCHAR(255), ";
+		sql += "'filetype' INTEGER, ";
+		sql += "'createTS' DATE DEFAULT (datetime('now','localtime')), ";
+		sql += "'updateTS' DATE DEFAULT (datetime('now','localtime')), ";
+		sql += "'status' INTEGER NOT NULL DEFAULT '0' ";
+		sql += ");";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileinformation_fullpath ON fileInformation (fullpath);";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileinformation_name_size ON fileInformation (name, size);";
+		DB.update(sql);
+		sql = "CREATE INDEX IF NOT EXISTS idx_fileinformation_id ON fileInformation (id);";
+		DB.update(sql);
+		sql = "CREATE INDEX IF NOT EXISTS idx_fileinformation_name ON fileInformation (name);";
+		DB.update(sql);
+	}
+
+	private void createTableCollectorInformation() throws SQLException {
+		String sql = null;
+		// collectorInformation
+		sql = "CREATE TABLE IF NOT EXISTS 'collectorInformation' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'collectorName' VARCHAR(255), ";
+		sql += "'file_id' INTEGER, ";
+		sql += "'key' VARCHAR(255), ";
+		sql += "'value' VARCHAR(255), ";
+		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE ";
+		sql += ");";
+		DB.update(sql);
+		sql = "CREATE INDEX IF NOT EXISTS idx_collectorinformation_collectorname_file_id ON collectorInformation (collectorName, file_id);";
+		DB.update(sql);
+	}
+
+	private void createTableTypeInformationKey() throws SQLException {
+		String sql = null;
+		// typeInformation_key
+		sql = "CREATE TABLE IF NOT EXISTS 'typeInformation_key' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'key' VARCHAR(255), ";
+		sql += "'infoType' VARCHAR(255), ";
+		sql += "'section' VARCHAR(255), ";
+		sql += "'editable' INTEGER, ";
+		sql += "'searchable' INTEGER ";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_typeinformation_key ON typeInformation_key (key, infoType, section);";
+		DB.update(sql);
+	}
+
+	private void createTableTypeInformationValue() throws SQLException {
+		String sql = null;
+		// typeInformation_value
+		sql = "CREATE TABLE IF NOT EXISTS 'typeInformation_value' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'value' TEXT ";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_typeinformation_value ON typeInformation_value (value);";
+		DB.update(sql);
+	}
+
+	private void createTableTypeInformation() throws SQLException {
+		String sql = null;
+		// typeInformation
+		sql = "CREATE TABLE IF NOT EXISTS 'typeInformation' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'file_id' INTEGER, ";
+		sql += "'key_id' INTEGER, ";
+		sql += "'value_id' INTEGER, ";
+		// sql += "'value' INTEGER ";
+		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
+		sql += "FOREIGN KEY (key_id) REFERENCES typeInformation_key(id) ON DELETE CASCADE, ";
+		sql += "FOREIGN KEY (value_id) REFERENCES typeInformation_value(id) ON DELETE CASCADE ";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_typeinformation_filekey ON typeInformation (file_id, key_id, value_id);";
+		DB.update(sql);
+	}
+
+	private void createTableTags() throws SQLException {
+		String sql = null;
+		// tags
+		sql = "CREATE TABLE IF NOT EXISTS 'tags' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'name' VARCHAR(255), ";
+		sql += "'isuser' INTEGER ";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tags_name ON tags (name);";
+		DB.update(sql);
+	}
+
+	private void createTableFileTags() throws SQLException {
+		String sql = null;
+		// fileTags
+		sql = "CREATE TABLE IF NOT EXISTS 'fileTags' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'file_id' INTEGER, ";
+		sql += "'tag_id' INTEGER, ";
+		sql += "'isuser' INTEGER, ";
+		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
+		sql += "FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE ";
+		// sql += "'value' INTEGER ";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_filetags_filekey ON fileTags (file_id, tag_id, isuser);";
+		DB.update(sql);
+		sql = "CREATE INDEX IF NOT EXISTS idx_filetags_id_fileid_tagid ON fileTags (id, file_id, tag_id);";
+		DB.update(sql);
+	}
+
+	private void createTableOptions() throws SQLException {
+		String sql = null;
+		// options
+		sql = "CREATE TABLE IF NOT EXISTS 'options' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'name' VARCHAR(255), ";
+		sql += "'value' VARCHAR(255) ";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_options ON options (name);";
+		DB.update(sql);
+	}
+
 	@Override
 	public void init() throws Exception {
 		String sql = null;
@@ -464,113 +598,14 @@ public class DB implements IDatabase {
 			sql = "PRAGMA foreign_keys = ON;";
 			DB.update(sql);
 
-			// fileInformation
-			sql = "CREATE TABLE IF NOT EXISTS 'fileInformation' ( ";
-			sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-			sql += "'name' VARCHAR(255), ";
-			sql += "'dir' VARCHAR(255), ";
-			sql += "'ext' VARCHAR(255), ";
-			sql += "'size' LONG, ";
-			sql += "'fullpath' VARCHAR(255), ";
-			sql += "'filehash' VARCHAR(255), ";
-			sql += "'filetype' INTEGER, ";
-			sql += "'createTS' DATE DEFAULT (datetime('now','localtime')), ";
-			sql += "'updateTS' DATE DEFAULT (datetime('now','localtime')) ";
-			sql += ");";
-			DB.update(sql);
-			sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileinformation_fullpath ON fileInformation (fullpath);";
-			DB.update(sql);
-			sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileinformation_name_size ON fileInformation (name, size);";
-			DB.update(sql);
-			sql = "CREATE INDEX IF NOT EXISTS idx_fileinformation_id ON fileInformation (id);";
-			DB.update(sql);
-			sql = "CREATE INDEX IF NOT EXISTS idx_fileinformation_name ON fileInformation (name);";
-			DB.update(sql);
-
-			// collectorInformation
-			sql = "CREATE TABLE IF NOT EXISTS 'collectorInformation' ( ";
-			sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-			sql += "'collectorName' VARCHAR(255), ";
-			sql += "'file_id' INTEGER, ";
-			sql += "'key' VARCHAR(255), ";
-			sql += "'value' VARCHAR(255), ";
-			sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE ";
-			sql += ");";
-			DB.update(sql);
-			sql = "CREATE INDEX IF NOT EXISTS idx_collectorinformation_collectorname_file_id ON collectorInformation (collectorName, file_id);";
-			DB.update(sql);
-
-			// typeInformation_key
-			sql = "CREATE TABLE IF NOT EXISTS 'typeInformation_key' ( ";
-			sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-			sql += "'key' VARCHAR(255), ";
-			sql += "'infoType' VARCHAR(255), ";
-			sql += "'section' VARCHAR(255), ";
-			sql += "'editable' INTEGER, ";
-			sql += "'searchable' INTEGER ";
-			sql += "); ";
-			DB.update(sql);
-			sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_typeinformation_key ON typeInformation_key (key, infoType, section);";
-			DB.update(sql);
-
-			// typeInformation_value
-			sql = "CREATE TABLE IF NOT EXISTS 'typeInformation_value' ( ";
-			sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-			sql += "'value' TEXT ";
-			sql += "); ";
-			DB.update(sql);
-			sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_typeinformation_value ON typeInformation_value (value);";
-			DB.update(sql);
-
-			// typeInformation
-			sql = "CREATE TABLE IF NOT EXISTS 'typeInformation' ( ";
-			sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-			sql += "'file_id' INTEGER, ";
-			sql += "'key_id' INTEGER, ";
-			sql += "'value_id' INTEGER, ";
-			// sql += "'value' INTEGER ";
-			sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
-			sql += "FOREIGN KEY (key_id) REFERENCES typeInformation_key(id) ON DELETE CASCADE, ";
-			sql += "FOREIGN KEY (value_id) REFERENCES typeInformation_value(id) ON DELETE CASCADE ";
-			sql += "); ";
-			DB.update(sql);
-			sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_typeinformation_filekey ON typeInformation (file_id, key_id, value_id);";
-			DB.update(sql);
-
-			// tags
-			sql = "CREATE TABLE IF NOT EXISTS 'tags' ( ";
-			sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-			sql += "'name' VARCHAR(255) ";
-			sql += "); ";
-			DB.update(sql);
-			sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tags_name ON tags (name);";
-			DB.update(sql);
-
-			// fileTags
-			sql = "CREATE TABLE IF NOT EXISTS 'fileTags' ( ";
-			sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-			sql += "'file_id' INTEGER, ";
-			sql += "'tag_id' INTEGER, ";
-			sql += "'isuser' INTEGER, ";
-			sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
-			sql += "FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE ";
-			// sql += "'value' INTEGER ";
-			sql += "); ";
-			DB.update(sql);
-			sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_filetags_filekey ON fileTags (file_id, tag_id, isuser);";
-			DB.update(sql);
-			sql = "CREATE INDEX IF NOT EXISTS idx_filetags_id_fileid_tagid ON fileTags (id, file_id, tag_id);";
-			DB.update(sql);
-
-			// options
-			sql = "CREATE TABLE IF NOT EXISTS 'options' ( ";
-			sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-			sql += "'name' VARCHAR(255), ";
-			sql += "'value' VARCHAR(255) ";
-			sql += "); ";
-			DB.update(sql);
-			sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_options ON options (name);";
-			DB.update(sql);
+			this.createTableFileInformation();
+			this.createTableCollectorInformation();
+			this.createTableTypeInformationKey();
+			this.createTableTypeInformationValue();
+			this.createTableTypeInformation();
+			this.createTableTags();
+			this.createTableFileTags();
+			this.createTableOptions();
 
 			if (!this.updateDBWithVersion()) {
 				throw new Exception("Database could not be updated");
@@ -588,7 +623,7 @@ public class DB implements IDatabase {
 	 * @return
 	 */
 	private boolean updateDBWithVersion() {
-		final int newDBVersion = 1;
+		final int newDBVersion = 2;
 		// INSERT A DATABASE VERSION
 		String sql = "";
 		ResultSet rs = null;
@@ -606,30 +641,56 @@ public class DB implements IDatabase {
 			e.printStackTrace();
 		}
 
-		if (currentDBVersion < newDBVersion) {
-			try {
+		try {
+			if (currentDBVersion > -1 && currentDBVersion < newDBVersion) {
 				DB.beginTransaction();
-				sql = "REPLACE INTO options (id, name, value) VALUES (1, 'dbversion', " + newDBVersion + ")";
-				DB.update(sql);
-
-				if (currentDBVersion == -1) { // NO VERSION = -1 -> added status
-												// column
-					sql = "ALTER TABLE fileInformation ADD COLUMN status INTEGER NOT NULL DEFAULT '0'";
+				for (int i = (currentDBVersion + 1); i <= newDBVersion; i++) {
+					sql = "REPLACE INTO options (id, name, value) VALUES (1, 'dbversion', " + newDBVersion + ")";
 					DB.update(sql);
-				} else if (currentDBVersion == 1) { // VERSION = 1 -> added
-													// foreign keys
-				}
 
-				DB.endTransaction();
-			} catch (final SQLException e) {
-				try {
-					DB.rollbackTransaction();
-				} catch (final SQLException e1) {
-					e1.printStackTrace();
+					if (i == -1) { // NO VERSION = -1 -> added
+									// status
+						// column
+						sql = "ALTER TABLE fileInformation ADD COLUMN status INTEGER NOT NULL DEFAULT '0'";
+						DB.update(sql);
+					} else if (i == 1) { // VERSION = 1 -> added
+						// foreign keys
+						// rename tables
+						sql = "ALTER TABLE collectorInformation RENAME TO 'collectorInformation_old'";
+						DB.update(sql);
+						sql = "ALTER TABLE typeInformation RENAME TO 'typeInformation_old'";
+						DB.update(sql);
+						sql = "ALTER TABLE fileTags RENAME TO 'fileTags_old'";
+
+						// recreate tables
+						this.createTableCollectorInformation();
+						this.createTableTypeInformation();
+						this.createTableFileTags();
+
+						// move old entries to new tables
+						sql = "INSERT INTO 'collectorInformation' (SELECT * FROM 'collectorInformation_old')";
+						DB.update(sql);
+						sql = "INSERT INTO 'typeInformation' (SELECT * FROM 'typeInformation_old')";
+						DB.update(sql);
+						sql = "INSERT INTO 'fileTags' (SELECT * FROM 'fileTags_old')";
+
+						DB.update(sql);
+					} else if (i == 2) { // VERSION = 2 -> added tag isUser)
+						sql = "ALTER TABLE 'tags' ADD COLUMN 'isUser' INTEGER NOT NULL DEFAULT '0'";
+						DB.update(sql);
+					}
+
 				}
-				e.printStackTrace();
-				return false;
+				DB.endTransaction();
 			}
+		} catch (final SQLException e) {
+			try {
+				DB.rollbackTransaction();
+			} catch (final SQLException e1) {
+				e1.printStackTrace();
+			}
+			e.printStackTrace();
+			return false;
 		}
 		return true;
 	}

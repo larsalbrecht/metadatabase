@@ -422,7 +422,8 @@ public class DataHandler {
 		final ArrayList<FileTag> resultList = new ArrayList<FileTag>();
 		// ArrayList<KeyValue<Key<String>, Value<Object>>>
 		ResultSet rs = null;
-		final String sql = "SELECT " + " tag.id AS tagId, tag.name AS 'tagName', fTag.id AS 'fileTagId', fTag.isuser AS 'fileTagIsUser' "
+		final String sql = "SELECT "
+				+ " tag.id AS tagId, tag.name AS 'tagName', tag.isuser AS 'tagIsUser', fTag.id AS 'fileTagId', fTag.isuser AS 'fileTagIsUser' "
 				+ "FROM " + "	fileInformation as fi " + "LEFT JOIN " + " fileTags as fTag " + "ON " + " fi.id = fTag.file_id "
 				+ " LEFT JOIN " + " 	tags AS tag " + "ON " + " 	tag.id = fTag.tag_id " + "WHERE " + "	fi.id = '" + fileId
 				+ "' ORDER BY tag.name, fTag.isuser ";
@@ -433,8 +434,8 @@ public class DataHandler {
 			for (; rs.next();) { // for each line
 
 				if ((rs.getInt("fileTagId") > 0) && rs.getInt("tagId") > 0) {
-					tempFileTag = new FileTag(rs.getInt("fileTagId"), fileId, new Tag(rs.getInt("tagId"), rs.getString("tagName")),
-							rs.getBoolean("fileTagIsUser"));
+					tempFileTag = new FileTag(rs.getInt("fileTagId"), fileId, new Tag(rs.getInt("tagId"), rs.getString("tagName"),
+							rs.getBoolean("tagIsUser")), rs.getBoolean("fileTagIsUser"));
 					resultList.add(tempFileTag);
 				}
 			}
