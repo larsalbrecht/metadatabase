@@ -12,7 +12,7 @@ import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
 import com.lars_albrecht.mdb.main.core.models.persistable.Key;
 import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
-import com.lars_albrecht.mdb.main.core.models.persistable.TypeInformation;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileAttributes;
 import com.lars_albrecht.mdb.main.core.models.persistable.Value;
 
 /**
@@ -45,11 +45,11 @@ public class ObjectHandler {
 		return resultList;
 	}
 
-	public static ArrayList<TypeInformation> castObjectListToTypeInformationList(final ArrayList<Object> oList) {
-		final ArrayList<TypeInformation> resultList = new ArrayList<TypeInformation>();
+	public static ArrayList<FileAttributes> castObjectListToFileAttributesList(final ArrayList<Object> oList) {
+		final ArrayList<FileAttributes> resultList = new ArrayList<FileAttributes>();
 		for (final Object oItem : oList) {
-			if (oItem instanceof TypeInformation) {
-				resultList.add((TypeInformation) oItem);
+			if (oItem instanceof FileAttributes) {
+				resultList.add((FileAttributes) oItem);
 			}
 		}
 

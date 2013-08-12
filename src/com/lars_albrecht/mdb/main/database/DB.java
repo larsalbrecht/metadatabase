@@ -28,6 +28,8 @@ import com.lars_albrecht.mdb.main.database.interfaces.IDatabase;
  * 
  * @author lalbrecht
  * 
+ *         TODO Refactor. Move table creation to the specific model classes.
+ * 
  */
 public class DB implements IDatabase {
 
@@ -503,10 +505,10 @@ public class DB implements IDatabase {
 		DB.update(sql);
 	}
 
-	private void createTableTypeInformationKey() throws SQLException {
+	private void createTableAttributesKey() throws SQLException {
 		String sql = null;
-		// typeInformation_key
-		sql = "CREATE TABLE IF NOT EXISTS 'typeInformation_key' ( ";
+		// attributes_key
+		sql = "CREATE TABLE IF NOT EXISTS 'attributes_key' ( ";
 		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
 		sql += "'key' VARCHAR(255), ";
 		sql += "'infoType' VARCHAR(255), ";
@@ -515,37 +517,37 @@ public class DB implements IDatabase {
 		sql += "'searchable' INTEGER ";
 		sql += "); ";
 		DB.update(sql);
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_typeinformation_key ON typeInformation_key (key, infoType, section);";
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_attributes_key ON attributes_key (key, infoType, section);";
 		DB.update(sql);
 	}
 
-	private void createTableTypeInformationValue() throws SQLException {
+	private void createTableAttributesValue() throws SQLException {
 		String sql = null;
-		// typeInformation_value
-		sql = "CREATE TABLE IF NOT EXISTS 'typeInformation_value' ( ";
+		// attributes_value
+		sql = "CREATE TABLE IF NOT EXISTS 'attributes_value' ( ";
 		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
 		sql += "'value' TEXT ";
 		sql += "); ";
 		DB.update(sql);
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_typeinformation_value ON typeInformation_value (value);";
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_attributes_value ON attributes_value (value);";
 		DB.update(sql);
 	}
 
-	private void createTableTypeInformation() throws SQLException {
+	private void createTableFileAttributes() throws SQLException {
 		String sql = null;
-		// typeInformation
-		sql = "CREATE TABLE IF NOT EXISTS 'typeInformation' ( ";
+		// fileAttributes
+		sql = "CREATE TABLE IF NOT EXISTS 'fileAttributes' ( ";
 		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
 		sql += "'file_id' INTEGER, ";
 		sql += "'key_id' INTEGER, ";
 		sql += "'value_id' INTEGER, ";
 		// sql += "'value' INTEGER ";
 		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
-		sql += "FOREIGN KEY (key_id) REFERENCES typeInformation_key(id) ON DELETE CASCADE, ";
-		sql += "FOREIGN KEY (value_id) REFERENCES typeInformation_value(id) ON DELETE CASCADE ";
+		sql += "FOREIGN KEY (key_id) REFERENCES attributes_key(id) ON DELETE CASCADE, ";
+		sql += "FOREIGN KEY (value_id) REFERENCES attributes_value(id) ON DELETE CASCADE ";
 		sql += "); ";
 		DB.update(sql);
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_typeinformation_filekey ON typeInformation (file_id, key_id, value_id);";
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileattributes_filekey ON fileattributes (file_id, key_id, value_id);";
 		DB.update(sql);
 	}
 
@@ -631,20 +633,20 @@ public class DB implements IDatabase {
 			sql = "PRAGMA foreign_keys = ON;";
 			DB.update(sql);
 
+			if (!this.updateDBWithVersion()) {
+				throw new Exception("Database could not be updated");
+			}
+
 			this.createTableFileInformation();
 			this.createTableCollectorInformation();
-			this.createTableTypeInformationKey();
-			this.createTableTypeInformationValue();
-			this.createTableTypeInformation();
+			this.createTableAttributesKey();
+			this.createTableAttributesValue();
+			this.createTableFileAttributes();
 			this.createTableTags();
 			this.createTableFileTags();
 			this.createTableOptions();
 			this.createTableMediaItems();
 			this.createTableFileMedia();
-
-			if (!this.updateDBWithVersion()) {
-				throw new Exception("Database could not be updated");
-			}
 
 		} catch (final SQLException e) {
 			e.printStackTrace();
@@ -658,10 +660,12 @@ public class DB implements IDatabase {
 	 * @return
 	 */
 	private boolean updateDBWithVersion() {
-		final int newDBVersion = 2;
+		final int newDBVersion = 3;
 		// INSERT A DATABASE VERSION
 		String sql = "";
 		ResultSet rs = null;
+
+		// TODO first start, db-table is not available. SQL Error!
 		sql = "SELECT COUNT(*) AS count, value FROM options WHERE name = 'dbversion'";
 		int currentDBVersion = -1;
 
@@ -699,7 +703,7 @@ public class DB implements IDatabase {
 
 						// recreate tables
 						this.createTableCollectorInformation();
-						this.createTableTypeInformation();
+						this.createTableFileAttributes();
 						this.createTableFileTags();
 
 						// move old entries to new tables
@@ -713,8 +717,14 @@ public class DB implements IDatabase {
 					} else if (i == 2) { // VERSION = 2 -> added tag isUser)
 						sql = "ALTER TABLE 'tags' ADD COLUMN 'isUser' INTEGER NOT NULL DEFAULT '0'";
 						DB.update(sql);
+					} else if (i == 3) { // change table names
+						sql = "ALTER TABLE 'typeInformation' RENAME TO 'fileAttributes'";
+						DB.update(sql);
+						sql = "ALTER TABLE 'typeInformation_key' RENAME TO 'attributes_key'";
+						DB.update(sql);
+						sql = "ALTER TABLE 'typeInformation_value' RENAME TO 'attributes_value'";
+						DB.update(sql);
 					}
-
 				}
 				DB.endTransaction();
 			}

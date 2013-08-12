@@ -85,7 +85,7 @@ public class Value<V> implements IPersistable {
 
 	@Override
 	public String getDatabaseTable() {
-		return "typeInformation_value";
+		return "attributes_value";
 	}
 
 	@Override

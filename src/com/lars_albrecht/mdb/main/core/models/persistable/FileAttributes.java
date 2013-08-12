@@ -14,14 +14,14 @@ import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
  * @author lalbrecht
  * 
  */
-public class TypeInformation implements IPersistable {
+public class FileAttributes implements IPersistable {
 
 	private Integer	id		= null;
 	private Integer	fileId	= null;
 	private Integer	keyId	= null;
 	private Integer	valueId	= null;
 
-	public TypeInformation() {
+	public FileAttributes() {
 	}
 
 	/**
@@ -29,7 +29,7 @@ public class TypeInformation implements IPersistable {
 	 * @param keyId
 	 * @param valueId
 	 */
-	public TypeInformation(final Integer fileId, final Integer keyId, final Integer valueId) {
+	public FileAttributes(final Integer fileId, final Integer keyId, final Integer valueId) {
 		super();
 		this.fileId = fileId;
 		this.keyId = keyId;
@@ -42,7 +42,7 @@ public class TypeInformation implements IPersistable {
 	 * @param keyId
 	 * @param valueId
 	 */
-	public TypeInformation(final Integer id, final Integer fileId, final Integer keyId, final Integer valueId) {
+	public FileAttributes(final Integer id, final Integer fileId, final Integer keyId, final Integer valueId) {
 		super();
 		this.id = id;
 		this.fileId = fileId;
@@ -63,10 +63,10 @@ public class TypeInformation implements IPersistable {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof TypeInformation)) {
+		if (!(obj instanceof FileAttributes)) {
 			return false;
 		}
-		final TypeInformation other = (TypeInformation) obj;
+		final FileAttributes other = (FileAttributes) obj;
 		if ((this.id != null) && (other.id != null) && !this.id.equals(other.id)) {
 			return false;
 		}
@@ -96,7 +96,7 @@ public class TypeInformation implements IPersistable {
 
 	@Override
 	public Object fromHashMap(final HashMap<String, Object> map) {
-		final TypeInformation result = new TypeInformation();
+		final FileAttributes result = new FileAttributes();
 		if (map.containsKey("id")) {
 			result.setId((Integer) map.get("id"));
 		}
@@ -114,7 +114,7 @@ public class TypeInformation implements IPersistable {
 
 	@Override
 	public String getDatabaseTable() {
-		return "typeInformation";
+		return "fileAttributes";
 	}
 
 	/**

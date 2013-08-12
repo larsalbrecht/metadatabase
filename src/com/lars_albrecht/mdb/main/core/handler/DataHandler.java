@@ -20,11 +20,11 @@ import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
 import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileAttributes;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
 import com.lars_albrecht.mdb.main.core.models.persistable.Key;
 import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
-import com.lars_albrecht.mdb.main.core.models.persistable.TypeInformation;
 import com.lars_albrecht.mdb.main.core.models.persistable.Value;
 import com.lars_albrecht.mdb.main.database.DB;
 
@@ -43,7 +43,7 @@ public class DataHandler {
 	private ArrayList<Key<?>>								keys					= null;
 	private ArrayList<Value<?>>								values					= null;
 	private ArrayList<FileItem>								fileItems				= null;
-	private ArrayList<TypeInformation>						typeInformation			= null;
+	private ArrayList<FileAttributes>						fileAttributes			= null;
 	private ArrayList<Tag>									tags					= null;
 	private ArrayList<FileTag>								fileTags				= null;
 	private ConcurrentHashMap<String, ArrayList<FileItem>>	noInfoFileItems			= null;
@@ -53,7 +53,7 @@ public class DataHandler {
 	public static final int									RELOAD_ALL				= 0;
 	public static final int									RELOAD_KEYS				= 1;
 	public static final int									RELOAD_VALUES			= 2;
-	public static final int									RELOAD_TYPEINFO			= 3;
+	public static final int									RELOAD_FILEATTRIBUTES			= 3;
 	public static final int									RELOAD_FILEITEMS		= 4;
 	public static final int									RELOAD_NOINFOFILEITEMS	= 5;
 	public static final int									RELOAD_MISSINGFILEITEMS	= 6;
@@ -100,9 +100,9 @@ public class DataHandler {
 		if (!key.equalsIgnoreCase("")) {
 			ResultSet rs = null;
 
-			final String sql = "SELECT DISTINCT value.value AS value FROM typeInformation_key AS key "
-					+ "LEFT JOIN typeInformation AS ti ON ti.key_id = key.id "
-					+ "LEFT JOIN typeInformation_value AS value ON value.id = ti.value_id " + "WHERE key.key = ? AND value LIKE ?";
+			final String sql = "SELECT DISTINCT value.value AS value FROM attributes_key AS key "
+					+ "LEFT JOIN fileAttributes AS ti ON ti.key_id = key.id "
+					+ "LEFT JOIN attributes_value AS value ON value.id = ti.value_id " + "WHERE key.key = ? AND value LIKE ?";
 
 			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
 			values.put(1, key);
@@ -130,9 +130,9 @@ public class DataHandler {
 		if (!key.equalsIgnoreCase("")) {
 			ResultSet rs = null;
 
-			final String sql = "SELECT DISTINCT value.value AS value FROM typeInformation_key AS key "
-					+ "LEFT JOIN typeInformation AS ti ON ti.key_id = key.id "
-					+ "LEFT JOIN typeInformation_value AS value ON value.id = ti.value_id " + "WHERE key.key = ?";
+			final String sql = "SELECT DISTINCT value.value AS value FROM " + new Key<>().getDatabaseTable() + " AS key " + "LEFT JOIN "
+					+ new FileAttributes().getDatabaseTable() + " AS ti ON ti.key_id = key.id " + "LEFT JOIN "
+					+ new Value<>().getDatabaseTable() + " AS value ON value.id = ti.value_id " + "WHERE key.key = ?";
 
 			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
 			values.put(1, key);
@@ -302,11 +302,11 @@ public class DataHandler {
 
 			final String order = " ORDER BY '" + searchResultOrderOption + "'";
 
-			final String sql = "SELECT fi.* FROM '" + fileItem.getDatabaseTable() + "' AS fi LEFT JOIN " + " 	typeInformation as ti "
-					+ "ON " + " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	typeInformation_key AS tiKey " + "ON "
-					+ " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	typeInformation_value AS tiValue " + "ON "
-					+ "	tiValue.id = ti.value_id " + "LEFT JOIN fileTags AS ft ON fi.id = ft.file_id "
-					+ "LEFT JOIN tags AS t ON ft.tag_id = t.id " + where + order;
+			final String sql = "SELECT fi.* FROM '" + fileItem.getDatabaseTable() + "' AS fi LEFT JOIN " + " "
+					+ new FileAttributes().getDatabaseTable() + " as ti " + "ON " + " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	"
+					+ new Key<>().getDatabaseTable() + " AS tiKey " + "ON " + " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	"
+					+ new Value<>().getDatabaseTable() + " AS tiValue " + "ON " + "	tiValue.id = ti.value_id "
+					+ "LEFT JOIN fileTags AS ft ON fi.id = ft.file_id " + "LEFT JOIN tags AS t ON ft.tag_id = t.id " + where + order;
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 			try {
 				rs = DB.query(sql);
@@ -352,10 +352,10 @@ public class DataHandler {
 
 				final String order = " ORDER BY '" + searchResultOrderOption + "'";
 
-				final String sql = "SELECT fi.* FROM '" + fileItem.getDatabaseTable() + "' AS fi LEFT JOIN " + " 	typeInformation as ti "
-						+ "ON " + " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	typeInformation_key AS tiKey " + "ON "
-						+ " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	typeInformation_value AS tiValue " + "ON "
-						+ "	tiValue.id = ti.value_id " + where + order;
+				final String sql = "SELECT fi.* FROM '" + fileItem.getDatabaseTable() + "' AS fi LEFT JOIN " + " 	"
+						+ new FileAttributes().getDatabaseTable() + " as ti " + "ON " + " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	"
+						+ new Key<>().getDatabaseTable() + " AS tiKey " + "ON " + " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	"
+						+ new Value<>().getDatabaseTable() + " AS tiValue " + "ON " + "	tiValue.id = ti.value_id " + where + order;
 				Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 				try {
 					rs = DB.query(sql);
@@ -454,10 +454,10 @@ public class DataHandler {
 		ResultSet rs = null;
 		final String sql = "SELECT "
 				+ "	tiKey.id AS 'keyId', tiKey.Key AS 'keyKey', tiKey.infoType AS 'keyInfoType', tiKey.section AS 'keySection', tiKey.editable AS 'keyEditable', tiKey.searchable AS 'keySearchable', tiValue.id as 'valueId', tiValue.value as 'valueValue' "
-				+ "FROM " + "	fileInformation as fi " + "LEFT JOIN " + " 	typeInformation as ti " + "ON " + " 	ti.file_id = fi.id "
-				+ " LEFT JOIN " + " 	typeInformation_key AS tiKey " + "ON " + " 	tiKey.id = ti.key_id " + "LEFT JOIN "
-				+ "	typeInformation_value AS tiValue " + "ON " + "	tiValue.id = ti.value_id " + "WHERE " + "	fi.id = '" + fileId
-				+ "' ORDER BY keyInfoType, keySection ";
+				+ "FROM " + "	fileInformation as fi " + "LEFT JOIN " + " 	" + new FileAttributes().getDatabaseTable() + " as ti " + "ON "
+				+ " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	" + new Key<>().getDatabaseTable() + " AS tiKey " + "ON "
+				+ " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	" + new Value<>().getDatabaseTable() + " AS tiValue " + "ON "
+				+ "	tiValue.id = ti.value_id " + "WHERE " + "	fi.id = '" + fileId + "' ORDER BY keyInfoType, keySection ";
 		try {
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 			rs = DB.query(sql);
@@ -655,7 +655,8 @@ public class DataHandler {
 			sql = "DELETE FROM " + new FileItem().getDatabaseTable() + " WHERE status = '1';";
 			DB.update(sql);
 
-			sql = "DELETE FROM typeInformation WHERE file_id IN (" + Helper.implode(listOfMissingItems, ", ", null, null) + ")";
+			sql = "DELETE FROM " + new FileAttributes().getDatabaseTable() + " WHERE file_id IN ("
+					+ Helper.implode(listOfMissingItems, ", ", null, null) + ")";
 			DB.update(sql);
 
 			DB.endTransaction();
@@ -718,10 +719,10 @@ public class DataHandler {
 	}
 
 	/**
-	 * @return the typeInformation
+	 * @return the fileAttributes
 	 */
-	public ArrayList<TypeInformation> getTypeInformation() {
-		return this.typeInformation;
+	public ArrayList<FileAttributes> getFileAttributes() {
+		return this.fileAttributes;
 	}
 
 	/**
@@ -850,12 +851,12 @@ public class DataHandler {
 	}
 
 	/**
-	 * Reload the typeInformation.
+	 * Reload the fileAttributes.
 	 * 
 	 * @return
 	 */
-	private DataHandler loadTypeInformation() {
-		this.typeInformation = ObjectHandler.castObjectListToTypeInformationList(this.findAll(new TypeInformation(), null, null));
+	private DataHandler loadFileAttributes() {
+		this.fileAttributes = ObjectHandler.castObjectListToFileAttributesList(this.findAll(new FileAttributes(), null, null));
 		return this;
 	}
 
@@ -1118,7 +1119,7 @@ public class DataHandler {
 			case DataHandler.RELOAD_ALL:
 				this.loadKeys();
 				this.loadValues();
-				this.loadTypeInformation();
+				this.loadFileAttributes();
 				this.loadFileItems();
 				this.loadNoInfoFileItems();
 				this.loadMissingFileItems();
@@ -1134,8 +1135,8 @@ public class DataHandler {
 			case DataHandler.RELOAD_VALUES:
 				this.loadValues();
 				break;
-			case DataHandler.RELOAD_TYPEINFO:
-				this.loadTypeInformation();
+			case DataHandler.RELOAD_FILEATTRIBUTES:
+				this.loadFileAttributes();
 				break;
 			case DataHandler.RELOAD_NOINFOFILEITEMS:
 				this.loadNoInfoFileItems();
