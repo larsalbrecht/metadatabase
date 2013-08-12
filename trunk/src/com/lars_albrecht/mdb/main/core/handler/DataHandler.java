@@ -18,14 +18,14 @@ import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
-import com.lars_albrecht.mdb.main.core.models.FileItem;
-import com.lars_albrecht.mdb.main.core.models.FileTag;
-import com.lars_albrecht.mdb.main.core.models.IPersistable;
-import com.lars_albrecht.mdb.main.core.models.Key;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
-import com.lars_albrecht.mdb.main.core.models.Tag;
-import com.lars_albrecht.mdb.main.core.models.TypeInformation;
-import com.lars_albrecht.mdb.main.core.models.Value;
+import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
+import com.lars_albrecht.mdb.main.core.models.persistable.Key;
+import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
+import com.lars_albrecht.mdb.main.core.models.persistable.TypeInformation;
+import com.lars_albrecht.mdb.main.core.models.persistable.Value;
 import com.lars_albrecht.mdb.main.database.DB;
 
 /**
@@ -882,7 +882,7 @@ public class DataHandler {
 	 * @param doReplace
 	 * @throws Exception
 	 */
-	public void persist(final ArrayList<?> objects, final boolean doReplace) throws Exception {
+	public static void persist(final ArrayList<?> objects, final boolean doReplace) throws Exception {
 		if ((objects != null) && (objects.size() > 0)) {
 
 			final IPersistable tempPersistable = (IPersistable) objects.get(0);
@@ -911,7 +911,7 @@ public class DataHandler {
 			// key = ""
 			int missedItems = 0;
 			for (final Object object : objects) {
-				insertItem = this.generateSQLiteMultiInsertItem((IPersistable) object, isFirst,
+				insertItem = DataHandler.generateSQLiteMultiInsertItem((IPersistable) object, isFirst,
 						insertValues.size() > 0 ? insertValues.size() + 1 : 1);
 				if (insertItem != null && insertItem.getKey() != null && !insertItem.getKey().equalsIgnoreCase("")) {
 					if (objectItemCount == maxObjectCount || (variablesCount + insertItem.getValue().size()) >= maxVariables) {
@@ -949,7 +949,7 @@ public class DataHandler {
 	public void persist(final Object object, final boolean doReplace) throws Exception {
 		final ArrayList<Object> dummyList = new ArrayList<Object>();
 		dummyList.add(object);
-		this.persist(dummyList, doReplace);
+		DataHandler.persist(dummyList, doReplace);
 	}
 
 	private ArrayList<FileItem> getAllMissingFileItems() {
@@ -1070,7 +1070,7 @@ public class DataHandler {
 	 * @return Map.Entry<String, LinkedHashMap<Integer, Object>>
 	 * @throws Exception
 	 */
-	private Map.Entry<String, LinkedHashMap<Integer, Object>> generateSQLiteMultiInsertItem(final IPersistable object,
+	private static Map.Entry<String, LinkedHashMap<Integer, Object>> generateSQLiteMultiInsertItem(final IPersistable object,
 			final boolean isFirst,
 			final int valueStartIndex) throws Exception {
 		Map.Entry<String, LinkedHashMap<Integer, Object>> resultEntry = null;

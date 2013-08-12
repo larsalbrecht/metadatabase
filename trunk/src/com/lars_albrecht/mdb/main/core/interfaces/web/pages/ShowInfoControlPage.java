@@ -16,7 +16,7 @@ import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
-import com.lars_albrecht.mdb.main.core.models.FileItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
 /**
  * @author lalbrecht
@@ -57,9 +57,9 @@ public class ShowInfoControlPage extends WebPage {
 				Integer.toString((Integer) info.get("valueCount")), false);
 		informationContainer = Template.replaceMarker(informationContainer, "missingCount",
 				Integer.toString((Integer) info.get("missingCount")), false);
-		informationContainer = Template.replaceMarker(informationContainer, "countOfFiletypes",
-				Helper.implode((Map<?, ?>) info.get("filesWithFiletype"), ", ", null, null, " (", ")", "<span class=\"infoListEntry\">",
-						"</span>", false), false);
+		informationContainer = Template.replaceMarker(informationContainer, "countOfFiletypes", Helper.implode(
+				(Map<?, ?>) info.get("filesWithFiletype"), ", ", null, null, null, " (", ")", "<span class=\"infoListEntry\">", "</span>",
+				false), false);
 		informationContainer = Template.replaceMarker(informationContainer, "countOfTags",
 				Integer.toString((Integer) info.get("tagCount")), false);
 		informationContainer = Template.replaceMarker(informationContainer, "countOfFileTags",

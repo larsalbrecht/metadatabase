@@ -1,9 +1,11 @@
 /**
  * 
  */
-package com.lars_albrecht.mdb.main.core.models;
+package com.lars_albrecht.mdb.main.core.models.persistable;
 
 import java.util.HashMap;
+
+import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
 
 /**
  * This model class holds the value.

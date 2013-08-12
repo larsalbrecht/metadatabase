@@ -24,8 +24,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.exporter.abstracts.AExporter;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
-import com.lars_albrecht.mdb.main.core.models.FileItem;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
 /**
  * This is a simple PDF Export.

@@ -5,7 +5,7 @@ package com.lars_albrecht.mdb.main.core.controller;
 
 import java.util.ArrayList;
 
-import com.lars_albrecht.mdb.main.core.models.FileItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 import com.lars_albrecht.mdb.main.core.typer.abstracts.ATyper;
 
 /**

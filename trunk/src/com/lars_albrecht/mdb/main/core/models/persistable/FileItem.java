@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.lars_albrecht.mdb.main.core.models;
+package com.lars_albrecht.mdb.main.core.models.persistable;
 
 import java.io.File;
 import java.text.ParseException;
@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.lars_albrecht.general.utilities.ChecksumSHA1;
+import com.lars_albrecht.mdb.main.core.handler.MediaHandler;
+import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
+import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
 
 /**
  * This model class holds the FileItem itself.
@@ -26,12 +29,14 @@ public class FileItem implements IPersistable {
 	private Long							size		= null;
 	private String							ext			= null;
 	private String							filehash	= null;
-	private ArrayList<FileAttributeList>	attributes	= null;
 	private Integer							createTS	= null;
 	private Integer							status		= null;
 	private String							filetype	= null;
 	private Integer							updateTS	= null;
+
+	private ArrayList<FileAttributeList>	attributes	= null;
 	private ArrayList<FileTag>				fileTags	= null;
+	private ArrayList<MediaItem>			mediaItems	= null;
 
 	/**
 	 * 
@@ -40,6 +45,7 @@ public class FileItem implements IPersistable {
 		super();
 		this.attributes = new ArrayList<FileAttributeList>();
 		this.fileTags = new ArrayList<FileTag>();
+		this.mediaItems = new ArrayList<MediaItem>();
 	}
 
 	/**
@@ -196,56 +202,6 @@ public class FileItem implements IPersistable {
 			return false;
 		}
 		return true;
-	}
-
-	/**
-	 * Checks if a file is the same (ignore id, fullpath, created and other
-	 * runtime vars.)
-	 * 
-	 * @param obj
-	 * @return
-	 */
-	public boolean simpleEquals(final Object obj) {
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof FileItem)) {
-			return false;
-		}
-		final FileItem other = (FileItem) obj;
-		if (this.ext == null) {
-			if (other.ext != null) {
-				return false;
-			}
-		} else if (!this.ext.equals(other.ext)) {
-			return false;
-		}
-		if (this.filehash == null) {
-			if (other.filehash != null) {
-				return false;
-			}
-		} else if (!this.filehash.equals(other.filehash)) {
-			return false;
-		}
-		if (this.name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!this.name.equals(other.name)) {
-			return false;
-		}
-		if (this.size == null) {
-			if (other.size != null) {
-				return false;
-			}
-		} else if (!this.size.equals(other.size)) {
-			return false;
-		}
-		return true;
-
 	}
 
 	@Override
@@ -527,11 +483,29 @@ public class FileItem implements IPersistable {
 		this.fileTags = fileTags;
 	}
 
+	/**
+	 * @return the mediaItems
+	 */
+	public final ArrayList<MediaItem> getMediaItems() {
+		if (this.mediaItems == null) {
+			this.mediaItems = MediaHandler.getMediaItemsForFile(this);
+		}
+		return this.mediaItems;
+	}
+
+	/**
+	 * @param mediaItems
+	 *            the mediaItems to set
+	 */
+	public final void setMediaItems(final ArrayList<MediaItem> mediaItems) {
+		this.mediaItems = mediaItems;
+	}
+
 	@Override
 	public String toString() {
 		return "Id: " + this.id + " | " + "Name: " + this.name + " | " + "Fullpath: " + this.fullpath + " | " + "Dir: " + this.dir + " | "
 				+ "Size: " + this.size + " | " + "Ext: " + this.ext + " | " + "CreatedTS: " + this.createTS + " | " + "UpdatedTS: "
-				+ this.updateTS + " | " + this.getAttributes() + " | " + this.getFileTags();
+				+ this.updateTS + " | " + this.getAttributes() + " | " + this.getFileTags() + " | " + this.getMediaItems();
 	}
 
 }

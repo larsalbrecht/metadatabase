@@ -48,6 +48,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -138,6 +139,30 @@ public class Helper {
 		final String[] sParted = s.split(delim);
 		if ((sParted != null) && (sParted.length > 0)) {
 			return new ArrayList<String>(Arrays.asList(sParted));
+		}
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <K, V> Map<? extends Object, ? extends Object> explode(final String s,
+			final String entryDelimiter,
+			final String keyValueDelimiter) {
+		final String[] sParted = s.split(entryDelimiter);
+		Map<K, V> resultMap = null;
+		if (sParted != null && sParted.length > 0) {
+			resultMap = new ConcurrentHashMap<K, V>();
+			K key = null;
+			V value = null;
+			Object[] eParted = null;
+			for (final String string : sParted) {
+				eParted = string.split("\\" + keyValueDelimiter);
+				if (eParted != null && eParted.length == 2) {
+					key = ((K) eParted[0]);
+					value = ((V) eParted[1]);
+					resultMap.put(key, value);
+				}
+			}
+			return resultMap;
 		}
 		return null;
 	}
@@ -411,7 +436,7 @@ public class Helper {
 	/**
 	 * 
 	 * @param map
-	 * @param delim
+	 * @param entryDelimiter
 	 * @param keyPrefix
 	 * @param keySuffix
 	 * @param valuePrefix
@@ -422,7 +447,8 @@ public class Helper {
 	 * @return String
 	 */
 	public static String implode(final Map<?, ?> map,
-			final String delim,
+			final String entryDelimiter,
+			final String keyValueDelimiter,
 			final String keyPrefix,
 			final String keySuffix,
 			final String valuePrefix,
@@ -436,18 +462,20 @@ public class Helper {
 		for (int i = 0; i < map.entrySet().size(); i++) {
 			entry = (Entry<?, ?>) iterator.next();
 			if (i != 0) {
-				temp += delim;
+				temp += entryDelimiter;
 			}
 			if (valueFirst) {
 				temp += (entryPrefix != null ? entryPrefix : "") + (valuePrefix != null ? valuePrefix : "") + entry.getValue()
-						+ (valueSuffix != null ? valueSuffix : "") + (keyPrefix != null ? keyPrefix : "") + entry.getKey()
-						+ (keySuffix != null ? keySuffix : "") + (entrySuffix != null ? entrySuffix : "");
+						+ (valueSuffix != null ? valueSuffix : "") + (keyValueDelimiter != null ? keyValueDelimiter : "")
+						+ (keyPrefix != null ? keyPrefix : "") + entry.getKey() + (keySuffix != null ? keySuffix : "")
+						+ (entrySuffix != null ? entrySuffix : "");
 				;
 
 			} else {
 				temp += (entryPrefix != null ? entryPrefix : "") + (keyPrefix != null ? keyPrefix : "") + entry.getKey()
-						+ (keySuffix != null ? keySuffix : "") + (valuePrefix != null ? valuePrefix : "") + entry.getValue()
-						+ (valueSuffix != null ? valueSuffix : "") + (entrySuffix != null ? entrySuffix : "");
+						+ (keySuffix != null ? keySuffix : "") + (keyValueDelimiter != null ? keyValueDelimiter : "")
+						+ (valuePrefix != null ? valuePrefix : "") + entry.getValue() + (valueSuffix != null ? valueSuffix : "")
+						+ (entrySuffix != null ? entrySuffix : "");
 			}
 		}
 		return temp;

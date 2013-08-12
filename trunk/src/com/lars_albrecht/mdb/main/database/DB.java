@@ -2,6 +2,7 @@ package com.lars_albrecht.mdb.main.database;
 
 import java.awt.Image;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.Date;
@@ -93,6 +94,8 @@ public class DB implements IDatabase {
 			pst.setTimestamp(index, ((Timestamp) objectToSet));
 		} else if (objectToSet.getClass() == byte[].class) {
 			pst.setBytes(index, ((byte[]) objectToSet));
+		} else if (objectToSet instanceof URI) {
+			pst.setString(index, ((URI) objectToSet).toString());
 		} else if (objectToSet.getClass() == Object[].class) {
 			pst.setArray(index, (Array) Arrays.asList(((Object[]) objectToSet)));
 		} else {
@@ -591,6 +594,36 @@ public class DB implements IDatabase {
 		DB.update(sql);
 	}
 
+	private void createTableMediaItems() throws SQLException {
+		String sql = null;
+		// options
+		sql = "CREATE TABLE IF NOT EXISTS 'mediaItems' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'name' VARCHAR(255), ";
+		sql += "'type' INTEGER, ";
+		sql += "'uri' VARCHAR(255), ";
+		sql += "'options' TEXT ";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_mediaItems ON mediaItems (name, type, uri);";
+		DB.update(sql);
+	}
+
+	private void createTableFileMedia() throws SQLException {
+		String sql = null;
+		// options
+		sql = "CREATE TABLE IF NOT EXISTS 'fileMedia' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'file_id' INTEGER, ";
+		sql += "'media_id' INTEGER, ";
+		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
+		sql += "FOREIGN KEY (media_id) REFERENCES mediaItems(id) ON DELETE CASCADE ";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileMedia ON fileMedia (file_id, media_id);";
+		DB.update(sql);
+	}
+
 	@Override
 	public void init() throws Exception {
 		String sql = null;
@@ -606,6 +639,8 @@ public class DB implements IDatabase {
 			this.createTableTags();
 			this.createTableFileTags();
 			this.createTableOptions();
+			this.createTableMediaItems();
+			this.createTableFileMedia();
 
 			if (!this.updateDBWithVersion()) {
 				throw new Exception("Database could not be updated");

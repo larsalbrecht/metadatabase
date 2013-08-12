@@ -17,9 +17,9 @@ import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
-import com.lars_albrecht.mdb.main.core.models.FileItem;
-import com.lars_albrecht.mdb.main.core.models.FileTag;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
 
 /**
  * @author lalbrecht

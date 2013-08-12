@@ -19,11 +19,11 @@ import com.lars_albrecht.mdb.main.core.controller.interfaces.IController;
 import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.handler.OptionsHandler;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
-import com.lars_albrecht.mdb.main.core.models.FileItem;
-import com.lars_albrecht.mdb.main.core.models.Key;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
-import com.lars_albrecht.mdb.main.core.models.TypeInformation;
-import com.lars_albrecht.mdb.main.core.models.Value;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.Key;
+import com.lars_albrecht.mdb.main.core.models.persistable.TypeInformation;
+import com.lars_albrecht.mdb.main.core.models.persistable.Value;
 
 /**
  * @author lalbrecht
