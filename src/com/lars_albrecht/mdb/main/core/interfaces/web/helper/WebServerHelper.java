@@ -31,8 +31,8 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.pages.LastFivePartial;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.SearchResultsPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.SettingsPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.ShowInfoControlPage;
-import com.lars_albrecht.mdb.main.core.models.FileTag;
-import com.lars_albrecht.mdb.main.core.models.Tag;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
+import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
 
 /**
  * @author lalbrecht TODO Do better (Each "page" is an own Object/class and all

@@ -20,7 +20,7 @@ import com.lars_albrecht.mdb.main.core.finder.event.IFinderListener;
 import com.lars_albrecht.mdb.main.core.handler.ConfigurationHandler;
 import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
-import com.lars_albrecht.mdb.main.core.models.FileItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
 /**
  * @author lalbrecht

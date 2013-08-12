@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.lars_albrecht.mdb.main.core.models;
+package com.lars_albrecht.mdb.main.core.models.interfaces;
 
 import java.util.HashMap;
 

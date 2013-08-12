@@ -8,12 +8,12 @@ import java.util.ArrayList;
 
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.Helper;
-import com.lars_albrecht.mdb.main.core.models.FileItem;
-import com.lars_albrecht.mdb.main.core.models.FileTag;
-import com.lars_albrecht.mdb.main.core.models.Key;
-import com.lars_albrecht.mdb.main.core.models.Tag;
-import com.lars_albrecht.mdb.main.core.models.TypeInformation;
-import com.lars_albrecht.mdb.main.core.models.Value;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
+import com.lars_albrecht.mdb.main.core.models.persistable.Key;
+import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
+import com.lars_albrecht.mdb.main.core.models.persistable.TypeInformation;
+import com.lars_albrecht.mdb.main.core.models.persistable.Value;
 
 /**
  * @author lalbrecht

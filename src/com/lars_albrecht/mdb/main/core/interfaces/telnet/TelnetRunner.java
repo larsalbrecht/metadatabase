@@ -16,8 +16,8 @@ import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.helper.InterfaceHelper;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
-import com.lars_albrecht.mdb.main.core.models.FileItem;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
 /**
  * @author lalbrecht

@@ -10,7 +10,7 @@ import java.util.Arrays;
 import com.lars_albrecht.mdb.main.core.abstracts.ThreadEx;
 import com.lars_albrecht.mdb.main.core.controller.interfaces.IController;
 import com.lars_albrecht.mdb.main.core.exporter.abstracts.AExporter;
-import com.lars_albrecht.mdb.main.core.models.FileItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
 /**
  * @author lalbrecht
