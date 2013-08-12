@@ -22,7 +22,7 @@ import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.Key;
-import com.lars_albrecht.mdb.main.core.models.persistable.TypeInformation;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileAttributes;
 import com.lars_albrecht.mdb.main.core.models.persistable.Value;
 
 /**
@@ -37,7 +37,7 @@ public abstract class ACollector implements Runnable {
 	private ArrayList<Key<String>>										keysToAdd				= null;
 	private ArrayList<Value<?>>											valuesToAdd				= null;
 	private ConcurrentHashMap<FileItem, ArrayList<FileAttributeList>>	fileAttributeListToAdd	= null;
-	private ArrayList<TypeInformation>									typeInformationToAdd	= null;
+	private ArrayList<FileAttributes>									typeInformationToAdd	= null;
 	private CollectorEventMulticaster									collectorMulticaster	= null;
 	private ArrayList<String>											collectorTypes			= null;
 
@@ -50,7 +50,7 @@ public abstract class ACollector implements Runnable {
 	public ACollector() {
 		this.keysToAdd = new ArrayList<Key<String>>();
 		this.valuesToAdd = new ArrayList<Value<?>>();
-		this.typeInformationToAdd = new ArrayList<TypeInformation>();
+		this.typeInformationToAdd = new ArrayList<FileAttributes>();
 		this.collectorTypes = new ArrayList<String>();
 	}
 
@@ -120,10 +120,10 @@ public abstract class ACollector implements Runnable {
 	private void
 			transformToTypeInformation(final int fileItemId, final ArrayList<FileAttributeList> fileAttributeListList) throws Exception {
 		if (fileAttributeListList.size() > 0) {
-			TypeInformation tempTypeInfo = null;
+			FileAttributes tempTypeInfo = null;
 			final ArrayList<Key<?>> keys = this.mainController.getDataHandler().getKeys();
 			final ArrayList<Value<?>> values = this.mainController.getDataHandler().getValues();
-			final ArrayList<TypeInformation> typeInfo = this.mainController.getDataHandler().getTypeInformation();
+			final ArrayList<FileAttributes> typeInfo = this.mainController.getDataHandler().getFileAttributes();
 			for (final FileAttributeList fileAttributes : fileAttributeListList) {
 				for (final KeyValue<String, Object> keyValue : fileAttributes.getKeyValues()) {
 					int keyPos = -1;
@@ -138,7 +138,7 @@ public abstract class ACollector implements Runnable {
 						valueId = values.get(valuePos).getId();
 					}
 
-					tempTypeInfo = new TypeInformation(fileItemId, keyId, valueId);
+					tempTypeInfo = new FileAttributes(fileItemId, keyId, valueId);
 
 					if ((fileItemId > -1) && (keyId > -1) && (valueId > -1) && (tempTypeInfo != null) && !typeInfo.contains(tempTypeInfo)) {
 						this.typeInformationToAdd.add(tempTypeInfo);

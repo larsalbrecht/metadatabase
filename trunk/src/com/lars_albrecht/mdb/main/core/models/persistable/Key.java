@@ -176,7 +176,7 @@ public class Key<K> implements IPersistable {
 
 	@Override
 	public String getDatabaseTable() {
-		return "typeInformation_key";
+		return "attributes_key";
 	}
 
 	/**
