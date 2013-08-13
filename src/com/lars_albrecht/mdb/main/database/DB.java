@@ -655,7 +655,7 @@ public class DB implements IDatabase {
 
 	/**
 	 * Sets the database version to the options. If the version is newer at a
-	 * run, the database will be updated.
+	 * run, the database will be updated to the newer version.
 	 * 
 	 * @return
 	 */
@@ -665,16 +665,20 @@ public class DB implements IDatabase {
 		String sql = "";
 		ResultSet rs = null;
 
-		// TODO first start, db-table is not available. SQL Error!
-		sql = "SELECT COUNT(*) AS count, value FROM options WHERE name = 'dbversion'";
 		int currentDBVersion = -1;
 
 		try {
+			// check if table exists or not (first start, table does not exists)
+			sql = "SELECT count(*) AS count FROM sqlite_master WHERE type='table' AND name='options'";
 			rs = DB.query(sql);
 			if (rs.next() && rs.getInt("count") > 0) {
-				currentDBVersion = rs.getInt("value");
-			} else {
-				currentDBVersion = -1;
+				sql = "SELECT COUNT(*) AS count, value FROM options WHERE name = 'dbversion'";
+				rs = DB.query(sql);
+				if (rs.next() && rs.getInt("count") > 0) {
+					currentDBVersion = rs.getInt("value");
+				} else {
+					currentDBVersion = -1;
+				}
 			}
 		} catch (final SQLException e) {
 			e.printStackTrace();
@@ -687,12 +691,7 @@ public class DB implements IDatabase {
 					sql = "REPLACE INTO options (id, name, value) VALUES (1, 'dbversion', " + newDBVersion + ")";
 					DB.update(sql);
 
-					if (i == -1) { // NO VERSION = -1 -> added
-									// status
-						// column
-						sql = "ALTER TABLE fileInformation ADD COLUMN status INTEGER NOT NULL DEFAULT '0'";
-						DB.update(sql);
-					} else if (i == 1) { // VERSION = 1 -> added
+					if (i == 1) { // VERSION = 1 -> added
 						// foreign keys
 						// rename tables
 						sql = "ALTER TABLE collectorInformation RENAME TO 'collectorInformation_old'";
