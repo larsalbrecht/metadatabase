@@ -20,13 +20,13 @@ public class HomePage extends WebPage {
 	}
 
 	@Override
-	public String getTitle() {
-		return "Home";
+	public String getTemplateName() {
+		return "home";
 	}
 
 	@Override
-	public String getTemplateName() {
-		return "home";
+	public String getTitle() {
+		return "Home";
 	}
 
 }

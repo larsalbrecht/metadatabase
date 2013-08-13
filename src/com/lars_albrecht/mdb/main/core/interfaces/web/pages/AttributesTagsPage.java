@@ -21,12 +21,9 @@ public class AttributesTagsPage extends WebPage {
 		this.setPageTemplate(this.generateAttributesTagsView());
 	}
 
-	private Template generateAttributesTagsView() {
-		Template attributesTagsTemplate = this.getPageTemplate();
-
-		attributesTagsTemplate = this.fillAttributesContainer(attributesTagsTemplate);
-		attributesTagsTemplate = this.fillTagsContainer(attributesTagsTemplate);
-
+	private Template fillAttributesContainer(final Template attributesTagsTemplate) {
+		final String tagsContainer = attributesTagsTemplate.getSubMarkerContent("attributesContainer");
+		attributesTagsTemplate.replaceMarker("attributescontainer", tagsContainer, false);
 		return attributesTagsTemplate;
 	}
 
@@ -36,20 +33,23 @@ public class AttributesTagsPage extends WebPage {
 		return attributesTagsTemplate;
 	}
 
-	private Template fillAttributesContainer(final Template attributesTagsTemplate) {
-		final String tagsContainer = attributesTagsTemplate.getSubMarkerContent("attributesContainer");
-		attributesTagsTemplate.replaceMarker("attributescontainer", tagsContainer, false);
-		return attributesTagsTemplate;
-	}
+	private Template generateAttributesTagsView() {
+		Template attributesTagsTemplate = this.getPageTemplate();
 
-	@Override
-	public String getTitle() {
-		return "Attribute / Tags";
+		attributesTagsTemplate = this.fillAttributesContainer(attributesTagsTemplate);
+		attributesTagsTemplate = this.fillTagsContainer(attributesTagsTemplate);
+
+		return attributesTagsTemplate;
 	}
 
 	@Override
 	public String getTemplateName() {
 		return "attributestags";
+	}
+
+	@Override
+	public String getTitle() {
+		return "Attribute / Tags";
 	}
 
 }

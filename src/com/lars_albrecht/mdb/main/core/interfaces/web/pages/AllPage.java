@@ -42,12 +42,12 @@ public class AllPage extends WebPage {
 		String sortOrder = null;
 		int page = 0;
 
-		if (request.getParams().containsKey("sortorder") && request.getParams().get("sortorder") != null) {
+		if (request.getParams().containsKey("sortorder") && (request.getParams().get("sortorder") != null)) {
 			sortOrder = request.getParams().get("sortorder");
 		}
 		sortOrder = (sortOrder == null ? listOrderOption : sortOrder);
 
-		if (request.getParams().containsKey("page") && request.getParams().get("page") != null
+		if (request.getParams().containsKey("page") && (request.getParams().get("page") != null)
 				&& request.getParams().get("page").matches("(\\d){1,}")) {
 			page = Integer.parseInt(request.getParams().get("page"));
 		}
@@ -67,7 +67,7 @@ public class AllPage extends WebPage {
 		final ArrayList<FileItem> fileItems = this.mainController.getDataHandler().getFileItemsForPaging(startIndex, maxElems, sortOrder);
 
 		// pagination start
-		final boolean showPagination = fileItems.size() > 0 && maxItemsForPagingOption > -1 ? true : false;
+		final boolean showPagination = (fileItems.size() > 0) && (maxItemsForPagingOption > -1) ? true : false;
 		if (showPagination) {
 			final int pageCount = (int) Math.ceil(new Double(maxExistingElems) / new Double(maxElems));
 			final int pageFirst = 0; // ever 0
@@ -91,7 +91,7 @@ public class AllPage extends WebPage {
 			}
 			pagination = Template.replaceMarker(pagination, "pageCurrentTitle", pageCurrentTitle, false);
 
-			if (pageCount > page + 1) {
+			if (pageCount > (page + 1)) {
 				String paginationEnd = allTemplate.getSubMarkerContent("paginationEnd");
 				paginationEnd = Template.replaceMarker(paginationEnd, "pageNext", Integer.toString(pageNext), false);
 				paginationEnd = Template.replaceMarker(paginationEnd, "pageLast", Integer.toString(pageLast), false);
@@ -125,13 +125,13 @@ public class AllPage extends WebPage {
 	}
 
 	@Override
-	public String getTitle() {
-		return "Alle";
+	public String getTemplateName() {
+		return "all";
 	}
 
 	@Override
-	public String getTemplateName() {
-		return "all";
+	public String getTitle() {
+		return "Alle";
 	}
 
 }

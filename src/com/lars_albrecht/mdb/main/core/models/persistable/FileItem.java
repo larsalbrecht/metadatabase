@@ -245,7 +245,7 @@ public class FileItem implements IPersistable {
 			resultItem.setStatus((Integer) map.get("status"));
 		}
 
-		if (map.containsKey("createTS") && map.get("createTS") != null) {
+		if (map.containsKey("createTS") && (map.get("createTS") != null)) {
 			final SimpleDateFormat sdfToDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			try {
 				resultItem.setCreateTS(((Long) (sdfToDate.parse((String) map.get("createTS")).getTime() / 1000)).intValue());
@@ -254,7 +254,7 @@ public class FileItem implements IPersistable {
 			}
 		}
 
-		if (map.containsKey("updateTS") && map.get("updateTS") != null) {
+		if (map.containsKey("updateTS") && (map.get("updateTS") != null)) {
 			final SimpleDateFormat sdfToDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			try {
 				resultItem.setUpdateTS(((Long) (sdfToDate.parse((String) map.get("updateTS")).getTime() / 1000)).intValue());
@@ -305,6 +305,20 @@ public class FileItem implements IPersistable {
 		return this.filehash;
 	}
 
+	/**
+	 * @return the fileTags
+	 */
+	public final ArrayList<FileTag> getFileTags() {
+		return this.fileTags;
+	}
+
+	/**
+	 * @return the filetype
+	 */
+	public String getFiletype() {
+		return this.filetype;
+	}
+
 	public String getFullpath() {
 		return this.fullpath;
 	}
@@ -314,12 +328,36 @@ public class FileItem implements IPersistable {
 		return this.id;
 	}
 
+	/**
+	 * @return the mediaItems
+	 */
+	public final ArrayList<MediaItem> getMediaItems() {
+		if (this.mediaItems == null) {
+			this.mediaItems = MediaHandler.getMediaItemsForFile(this);
+		}
+		return this.mediaItems;
+	}
+
 	public String getName() {
 		return this.name;
 	}
 
 	public Long getSize() {
 		return this.size;
+	}
+
+	/**
+	 * @return the status
+	 */
+	public final Integer getStatus() {
+		return this.status;
+	}
+
+	/**
+	 * @return the updateTS
+	 */
+	public Integer getUpdateTS() {
+		return this.updateTS;
 	}
 
 	/*
@@ -377,6 +415,22 @@ public class FileItem implements IPersistable {
 		this.filehash = filehash;
 	}
 
+	/**
+	 * @param fileTags
+	 *            the fileTags to set
+	 */
+	public final void setFileTags(final ArrayList<FileTag> fileTags) {
+		this.fileTags = fileTags;
+	}
+
+	/**
+	 * @param filetype
+	 *            the filetype to set
+	 */
+	public void setFiletype(final String filetype) {
+		this.filetype = filetype;
+	}
+
 	public void setFullpath(final String fullpath) {
 		this.fullpath = fullpath;
 	}
@@ -384,6 +438,14 @@ public class FileItem implements IPersistable {
 	@Override
 	public void setId(final Integer id) {
 		this.id = id;
+	}
+
+	/**
+	 * @param mediaItems
+	 *            the mediaItems to set
+	 */
+	public final void setMediaItems(final ArrayList<MediaItem> mediaItems) {
+		this.mediaItems = mediaItems;
 	}
 
 	public void setName(final String name) {
@@ -395,40 +457,11 @@ public class FileItem implements IPersistable {
 	}
 
 	/**
-	 * @return the filetype
-	 */
-	public String getFiletype() {
-		return this.filetype;
-	}
-
-	/**
-	 * @param filetype
-	 *            the filetype to set
-	 */
-	public void setFiletype(final String filetype) {
-		this.filetype = filetype;
-	}
-
-	/**
-	 * @return the status
-	 */
-	public final Integer getStatus() {
-		return this.status;
-	}
-
-	/**
 	 * @param status
 	 *            the status to set
 	 */
 	public final void setStatus(final Integer status) {
 		this.status = status;
-	}
-
-	/**
-	 * @return the updateTS
-	 */
-	public Integer getUpdateTS() {
-		return this.updateTS;
 	}
 
 	/**
@@ -466,39 +499,6 @@ public class FileItem implements IPersistable {
 		}
 
 		return tempHashMap;
-	}
-
-	/**
-	 * @return the fileTags
-	 */
-	public final ArrayList<FileTag> getFileTags() {
-		return this.fileTags;
-	}
-
-	/**
-	 * @param fileTags
-	 *            the fileTags to set
-	 */
-	public final void setFileTags(final ArrayList<FileTag> fileTags) {
-		this.fileTags = fileTags;
-	}
-
-	/**
-	 * @return the mediaItems
-	 */
-	public final ArrayList<MediaItem> getMediaItems() {
-		if (this.mediaItems == null) {
-			this.mediaItems = MediaHandler.getMediaItemsForFile(this);
-		}
-		return this.mediaItems;
-	}
-
-	/**
-	 * @param mediaItems
-	 *            the mediaItems to set
-	 */
-	public final void setMediaItems(final ArrayList<MediaItem> mediaItems) {
-		this.mediaItems = mediaItems;
 	}
 
 	@Override

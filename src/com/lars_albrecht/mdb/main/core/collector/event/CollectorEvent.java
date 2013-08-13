@@ -35,16 +35,16 @@ public class CollectorEvent extends EventObject {
 		return this.collectorName;
 	}
 
+	public int getId() {
+		return this.id;
+	}
+
 	/**
 	 * @param collectorName
 	 *            the collectorName to set
 	 */
 	public void setCollectorName(final String collectorName) {
 		this.collectorName = collectorName;
-	}
-
-	public int getId() {
-		return this.id;
 	}
 
 }

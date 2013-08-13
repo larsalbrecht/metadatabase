@@ -40,8 +40,12 @@ public class CollectorController implements IController, ICollectorListener {
 		this.addCollectorEventListener(mainController);
 	}
 
+	public void addCollectorEventListener(final ICollectorListener listener) {
+		this.collectorMulticaster.add(listener);
+	}
+
 	public void collectInfos(final ArrayList<FileItem> fileItems) throws Exception {
-		if (this.collectors == null || this.collectors.size() == 0) {
+		if ((this.collectors == null) || (this.collectors.size() == 0)) {
 			throw new Exception("Collector Controller collect failed. No collectors specified");
 		}
 		ThreadEx tempThread = null;
@@ -59,19 +63,6 @@ public class CollectorController implements IController, ICollectorListener {
 	}
 
 	@Override
-	public ArrayList<ThreadEx> getThreadList() {
-		return this.threadList;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void run(final Object... params) throws Exception {
-		if ((params.length == 1) && (params[0] instanceof ArrayList<?>)) {
-			this.collectInfos((ArrayList<FileItem>) params[0]);
-		}
-	}
-
-	@Override
 	public void collectorsEndAll(final CollectorEvent e) {
 	}
 
@@ -82,12 +73,21 @@ public class CollectorController implements IController, ICollectorListener {
 		}
 	}
 
-	public void addCollectorEventListener(final ICollectorListener listener) {
-		this.collectorMulticaster.add(listener);
-	}
-
 	public CollectorEventMulticaster getCollectorMulticaster() {
 		return this.collectorMulticaster;
+	}
+
+	@Override
+	public ArrayList<ThreadEx> getThreadList() {
+		return this.threadList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void run(final Object... params) throws Exception {
+		if ((params.length == 1) && (params[0] instanceof ArrayList<?>)) {
+			this.collectInfos((ArrayList<FileItem>) params[0]);
+		}
 	}
 
 	/**

@@ -42,9 +42,75 @@ public class Debug implements UncaughtExceptionHandler {
 	private static final ConcurrentHashMap<Integer, ArrayList<String>>	logList		= new ConcurrentHashMap<Integer, ArrayList<String>>();
 	public static ConcurrentHashMap<String, Long>						timerMap	= new ConcurrentHashMap<String, Long>();
 
+	public static String getFormattedTime(final String name) {
+		final Long time = Debug.getTime(name);
+		if (time != null) {
+			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
+			final SimpleDateFormat sdfTime = new SimpleDateFormat();
+			sdfTime.applyPattern("HH:mm:ss");
+			return sdfTime.format(time);
+		} else {
+			return null;
+		}
+	}
+
+	public static ArrayList<String> getFormattedTimes() {
+		final ArrayList<String> timerList = new ArrayList<String>();
+		for (final Map.Entry<String, Long> entry : Debug.timerMap.entrySet()) {
+			if (entry.getKey().endsWith("_start")
+					&& Debug.timerMap.containsKey(entry.getKey().substring(0, entry.getKey().indexOf("_start")) + "_end")) {
+				timerList.add(Debug.getFormattedTime(entry.getKey().substring(0, entry.getKey().indexOf("_start"))) + " - "
+						+ entry.getKey().substring(0, entry.getKey().indexOf("_start")));
+			}
+		}
+
+		return timerList;
+	}
+
+	/**
+	 * Returns a list of logs for the current level. All items smaller than the
+	 * current level will be ignored.
+	 * 
+	 * @param level
+	 * @return ArrayList<String>
+	 */
+	private static ArrayList<String> getListForLogLevel(final Integer level) {
+		final ArrayList<String> resultList = new ArrayList<String>();
+		for (int i = 7; i >= level; i--) {
+			if (Debug.logList.get(i) != null) {
+				resultList.addAll(Debug.logList.get(i));
+			}
+		}
+
+		return resultList;
+	}
+
+	public static ArrayList<String> getLogForCurrentLevel() {
+		return Debug.logList.get(Debug.loglevel);
+	}
+
+	public static ArrayList<String> getLogForLevel(final Integer level) {
+		return Debug.logList.get(level);
+	}
+
+	public static Long getTime(final String name) {
+		if (Debug.timerMap.containsKey(name + "_end") && Debug.timerMap.containsKey(name + "_start")) {
+			return Debug.timerMap.get(name + "_end") - Debug.timerMap.get(name + "_start");
+		}
+		return null;
+	}
+
+	public static Debug getUncaughtExceptionHandler() {
+		return new Debug();
+	}
+
+	public static Boolean inDebugLevel(final Integer level) {
+		return level >= Debug.loglevel;
+	}
+
 	public static void log(final Integer level, final String msg) {
 		ArrayList<String> tempList = null;
-		if (Debug.logList.containsKey(level) && Debug.logList.get(level) != null) {
+		if (Debug.logList.containsKey(level) && (Debug.logList.get(level) != null)) {
 			tempList = Debug.logList.get(level);
 		} else {
 			tempList = new ArrayList<String>();
@@ -71,36 +137,6 @@ public class Debug implements UncaughtExceptionHandler {
 		}
 	}
 
-	/**
-	 * Returns a list of logs for the current level. All items smaller than the
-	 * current level will be ignored.
-	 * 
-	 * @param level
-	 * @return ArrayList<String>
-	 */
-	private static ArrayList<String> getListForLogLevel(final Integer level) {
-		final ArrayList<String> resultList = new ArrayList<String>();
-		for (int i = 7; i >= level; i--) {
-			if (Debug.logList.get(i) != null) {
-				resultList.addAll(Debug.logList.get(i));
-			}
-		}
-
-		return resultList;
-	}
-
-	public static Boolean inDebugLevel(final Integer level) {
-		return level >= Debug.loglevel;
-	}
-
-	public static ArrayList<String> getLogForCurrentLevel() {
-		return Debug.logList.get(Debug.loglevel);
-	}
-
-	public static ArrayList<String> getLogForLevel(final Integer level) {
-		return Debug.logList.get(level);
-	}
-
 	public static void printLogForCurrentLevel() {
 		for (final String s : Debug.getListForLogLevel(Debug.loglevel)) {
 			System.out.println(s);
@@ -113,46 +149,6 @@ public class Debug implements UncaughtExceptionHandler {
 		}
 	}
 
-	public static void startTimer(final String name) {
-		Debug.timerMap.put(name + "_start", System.currentTimeMillis());
-	}
-
-	public static void stopTimer(final String name) {
-		Debug.timerMap.put(name + "_end", System.currentTimeMillis());
-	}
-
-	public static String getFormattedTime(final String name) {
-		final Long time = Debug.getTime(name);
-		if (time != null) {
-			TimeZone.setDefault(TimeZone.getTimeZone("GMT"));
-			final SimpleDateFormat sdfTime = new SimpleDateFormat();
-			sdfTime.applyPattern("HH:mm:ss");
-			return sdfTime.format(time);
-		} else {
-			return null;
-		}
-	}
-
-	public static ArrayList<String> getFormattedTimes() {
-		final ArrayList<String> timerList = new ArrayList<String>();
-		for (final Map.Entry<String, Long> entry : Debug.timerMap.entrySet()) {
-			if (entry.getKey().endsWith("_start")
-					&& Debug.timerMap.containsKey(entry.getKey().substring(0, entry.getKey().indexOf("_start")) + "_end")) {
-				timerList.add(Debug.getFormattedTime(entry.getKey().substring(0, entry.getKey().indexOf("_start"))) + " - "
-						+ entry.getKey().substring(0, entry.getKey().indexOf("_start")));
-			}
-		}
-
-		return timerList;
-	}
-
-	public static Long getTime(final String name) {
-		if (Debug.timerMap.containsKey(name + "_end") && Debug.timerMap.containsKey(name + "_start")) {
-			return Debug.timerMap.get(name + "_end") - Debug.timerMap.get(name + "_start");
-		}
-		return null;
-	}
-
 	/**
 	 * 
 	 * @param level
@@ -161,11 +157,11 @@ public class Debug implements UncaughtExceptionHandler {
 		File file = null;
 		FileWriter writer = null;
 		final ArrayList<String> logList = Debug.getListForLogLevel(level);
-		if (logList != null && logList.size() > 0) {
+		if ((logList != null) && (logList.size() > 0)) {
 			file = new File("log_" + level + ".txt");
 			try {
 				writer = new FileWriter(file, true);
-				if (writer != null && logList != null && logList.size() > 0) {
+				if ((writer != null) && (logList != null) && (logList.size() > 0)) {
 					for (final String s : logList) {
 						if (s != null) {
 							writer.write(s);
@@ -181,14 +177,18 @@ public class Debug implements UncaughtExceptionHandler {
 		}
 	}
 
+	public static void startTimer(final String name) {
+		Debug.timerMap.put(name + "_start", System.currentTimeMillis());
+	}
+
+	public static void stopTimer(final String name) {
+		Debug.timerMap.put(name + "_end", System.currentTimeMillis());
+	}
+
 	@Override
 	public void uncaughtException(final Thread thread, final Throwable throwable) {
 		Debug.log(Debug.LEVEL_FATAL, "UncaughtException thrown (" + throwable.getMessage() + " - " + throwable.toString() + ") in Thread "
 				+ thread.getName() + " (" + thread.getId() + ") ");
 		throwable.printStackTrace();
-	}
-
-	public static Debug getUncaughtExceptionHandler() {
-		return new Debug();
 	}
 }

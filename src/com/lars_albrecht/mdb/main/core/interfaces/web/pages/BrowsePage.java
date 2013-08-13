@@ -28,14 +28,6 @@ public class BrowsePage extends WebPage {
 		this.setPageTemplate(this.generateBrowseView());
 	}
 
-	private Template generateBrowseView() {
-		Template browseTemplate = this.getPageTemplate();
-
-		browseTemplate = this.fillBrowseContainer(browseTemplate);
-
-		return browseTemplate;
-	}
-
 	private Template fillBrowseContainer(final Template template) {
 		final Template browseTemplateWithBrowseContainer = template;
 		String browserContainer = browseTemplateWithBrowseContainer.getSubMarkerContent("browser");
@@ -159,14 +151,22 @@ public class BrowsePage extends WebPage {
 		return browseTemplateWithBrowseContainer;
 	}
 
-	@Override
-	public String getTitle() {
-		return "Browse";
+	private Template generateBrowseView() {
+		Template browseTemplate = this.getPageTemplate();
+
+		browseTemplate = this.fillBrowseContainer(browseTemplate);
+
+		return browseTemplate;
 	}
 
 	@Override
 	public String getTemplateName() {
 		return "browser";
+	}
+
+	@Override
+	public String getTitle() {
+		return "Browse";
 	}
 
 }

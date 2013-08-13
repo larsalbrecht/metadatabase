@@ -33,6 +33,97 @@ public class WebServerRunner implements Runnable {
 		this.webInterface = webInterface;
 	}
 
+	private WebServerRequest createRequest(final Socket clientSocket) throws IOException {
+		final WebServerRequest request = new WebServerRequest();
+		final BufferedReader in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
+		String line = null;
+		boolean notNull = false;
+		String urlStr = null;
+		// read the data sent. We basically ignore it,
+		// stop reading once a blank line is hit. This
+		// blank line signals the end of the client HTTP
+		// headers.
+		if (clientSocket.isBound() && !clientSocket.isClosed() && clientSocket.isConnected()) {
+			line = in.readLine();
+			if ((line != null) && !line.equals("")) {
+				notNull = true;
+			}
+
+			// TODO CREATE HEADER OBJECT AND PARSE FULL REQUEST
+			while ((notNull || (((line = in.readLine()) != null) && (!line.equals(""))))) {
+				notNull = false;
+				// if (keyValue.length > 1) {
+				// this.headerKeyValue.put(keyValue[0].trim(),
+				// keyValue[1].trim());
+				// }
+				if (line.startsWith("GET ") || line.startsWith("POST ")) {
+					final int urlStart = line.startsWith("GET ") ? 5 : 6;
+					final int urlEnd = line.indexOf(" HTTP/1.1") > -1 ? line.indexOf(" HTTP/1.1") : line.indexOf(" HTTP/1.0");
+					if ((urlStart > -1) && (urlEnd > -1)) {
+
+						// TODO FIX: -> 08.07.2013 10:35:04 | uncaughtException
+						// MSG:
+						// UncaughtException thrown (String index out of range:
+						// -6 -
+						// java.lang.StringIndexOutOfBoundsException: String
+						// index
+						// out of range: -6) in Thread Thread-18985 (19205)
+						// java.lang.StringIndexOutOfBoundsException: String
+						// index
+						// out final of range: -6
+						// at java.lang.String.substring(String.java:1958)
+						// at
+						// com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRunner.createRequest(WebServerRunner.java:199)
+						// at
+						// com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRunner.run(WebServerRunner.java:73)
+						// at java.lang.Thread.run(Thread.java:722)
+						urlStr = line.substring(urlStart, urlEnd);
+
+						request.setMethod(line.substring(0, urlStart - 2));
+						request.setFullUrl(urlStr);
+						Debug.log(Debug.LEVEL_TRACE, "URL: (" + line.substring(0, urlStart - 2) + ")" + urlStr);
+						if (urlStr.indexOf("?") > -1) {
+							request.setGetParams(this.getQuery(urlStr));
+							urlStr = urlStr.substring(0, urlStr.indexOf("?"));
+						}
+						request.setUrl(urlStr);
+					}
+				} else {
+					final String[] asParam = this.getHeaderParam(line);
+					if (asParam != null) {
+						request.getGetParams().put(asParam[0], asParam[1]);
+						Debug.log(Debug.LEVEL_TRACE, "ELSE " + line);
+					}
+				}
+			}
+
+			String content = "";
+			int value = 0;
+			while (in.ready() && ((value = in.read()) != -1)) {
+				// converts int to character
+				final char c = (char) value;
+
+				// prints character
+				content += c;
+			}
+			request.setContent(content);
+			request.setPostParams(this.getQuery("?" + content));
+		}
+
+		return request;
+	}
+
+	private String[] getHeaderParam(final String paramLine) {
+		if (paramLine.contains(":")) {
+			final String[] param = new String[2];
+			param[0] = paramLine.substring(0, paramLine.indexOf(":"));
+			param[1] = paramLine.substring(paramLine.indexOf(":"), paramLine.length() - 1);
+			return param;
+		} else {
+			return null;
+		}
+	}
+
 	private ConcurrentHashMap<String, String> getQuery(final String url) throws UnsupportedEncodingException {
 		ConcurrentHashMap<String, String> resultList = null;
 		if (url != null) {
@@ -166,97 +257,6 @@ public class WebServerRunner implements Runnable {
 				}
 				run = false;
 			}
-		}
-	}
-
-	private WebServerRequest createRequest(final Socket clientSocket) throws IOException {
-		final WebServerRequest request = new WebServerRequest();
-		final BufferedReader in = new BufferedReader(new InputStreamReader(this.clientSocket.getInputStream()));
-		String line = null;
-		boolean notNull = false;
-		String urlStr = null;
-		// read the data sent. We basically ignore it,
-		// stop reading once a blank line is hit. This
-		// blank line signals the end of the client HTTP
-		// headers.
-		if (clientSocket.isBound() && !clientSocket.isClosed() && clientSocket.isConnected()) {
-			line = in.readLine();
-			if ((line != null) && !line.equals("")) {
-				notNull = true;
-			}
-
-			// TODO CREATE HEADER OBJECT AND PARSE FULL REQUEST
-			while ((notNull || (((line = in.readLine()) != null) && (!line.equals(""))))) {
-				notNull = false;
-				// if (keyValue.length > 1) {
-				// this.headerKeyValue.put(keyValue[0].trim(),
-				// keyValue[1].trim());
-				// }
-				if (line.startsWith("GET ") || line.startsWith("POST ")) {
-					final int urlStart = line.startsWith("GET ") ? 5 : 6;
-					final int urlEnd = line.indexOf(" HTTP/1.1") > -1 ? line.indexOf(" HTTP/1.1") : line.indexOf(" HTTP/1.0");
-					if (urlStart > -1 && urlEnd > -1) {
-
-						// TODO FIX: -> 08.07.2013 10:35:04 | uncaughtException
-						// MSG:
-						// UncaughtException thrown (String index out of range:
-						// -6 -
-						// java.lang.StringIndexOutOfBoundsException: String
-						// index
-						// out of range: -6) in Thread Thread-18985 (19205)
-						// java.lang.StringIndexOutOfBoundsException: String
-						// index
-						// out final of range: -6
-						// at java.lang.String.substring(String.java:1958)
-						// at
-						// com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRunner.createRequest(WebServerRunner.java:199)
-						// at
-						// com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRunner.run(WebServerRunner.java:73)
-						// at java.lang.Thread.run(Thread.java:722)
-						urlStr = line.substring(urlStart, urlEnd);
-
-						request.setMethod(line.substring(0, urlStart - 2));
-						request.setFullUrl(urlStr);
-						Debug.log(Debug.LEVEL_TRACE, "URL: (" + line.substring(0, urlStart - 2) + ")" + urlStr);
-						if (urlStr.indexOf("?") > -1) {
-							request.setGetParams(this.getQuery(urlStr));
-							urlStr = urlStr.substring(0, urlStr.indexOf("?"));
-						}
-						request.setUrl(urlStr);
-					}
-				} else {
-					final String[] asParam = this.getHeaderParam(line);
-					if (asParam != null) {
-						request.getGetParams().put(asParam[0], asParam[1]);
-						Debug.log(Debug.LEVEL_TRACE, "ELSE " + line);
-					}
-				}
-			}
-
-			String content = "";
-			int value = 0;
-			while (in.ready() && ((value = in.read()) != -1)) {
-				// converts int to character
-				final char c = (char) value;
-
-				// prints character
-				content += c;
-			}
-			request.setContent(content);
-			request.setPostParams(this.getQuery("?" + content));
-		}
-
-		return request;
-	}
-
-	private String[] getHeaderParam(final String paramLine) {
-		if (paramLine.contains(":")) {
-			final String[] param = new String[2];
-			param[0] = paramLine.substring(0, paramLine.indexOf(":"));
-			param[1] = paramLine.substring(paramLine.indexOf(":"), paramLine.length() - 1);
-			return param;
-		} else {
-			return null;
 		}
 	}
 }

@@ -50,7 +50,7 @@ public class FinderController implements IController {
 		}
 		// start a new thread for each given dir
 		Debug.startTimer("Finder find time");
-		if (files != null && files.size() > 0) {
+		if ((files != null) && (files.size() > 0)) {
 			final String[] info = {
 				"Finder"
 			};

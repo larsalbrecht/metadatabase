@@ -35,11 +35,18 @@ public class ConfigurationHandler {
 		}
 	}
 
-	private void readConfigFile() throws PropertiesExNotInitilizedException {
-		this.configOptionModuleFinderPath = PropertiesEx.getInstance().getProperties("module.finder.path");
-		this.configOptionModuleCollectorMediainfoPathCli = PropertiesEx.getInstance().getProperty("module.collector.mediainfo.path.cli");
-		this.configOptionModuleCollectorMediainfoPathTemplate = PropertiesEx.getInstance().getProperty(
-				"module.collector.mediainfo.path.template");
+	/**
+	 * @return the configOptionModuleCollectorMediainfoPathCli
+	 */
+	public final String getConfigOptionModuleCollectorMediainfoPathCli() {
+		return this.configOptionModuleCollectorMediainfoPathCli;
+	}
+
+	/**
+	 * @return the configOptionModuleCollectorMediainfoPathTemplate
+	 */
+	public final String getConfigOptionModuleCollectorMediainfoPathTemplate() {
+		return this.configOptionModuleCollectorMediainfoPathTemplate;
 	}
 
 	/**
@@ -49,19 +56,11 @@ public class ConfigurationHandler {
 		return this.configOptionModuleFinderPath;
 	}
 
-	/**
-	 * @param configOptionModuleFinderPath
-	 *            the configOptionModuleFinderPath to set
-	 */
-	public final void setConfigOptionModuleFinderPath(final ArrayList<String> configOptionModuleFinderPath) {
-		this.configOptionModuleFinderPath = configOptionModuleFinderPath;
-	}
-
-	/**
-	 * @return the configOptionModuleCollectorMediainfoPathCli
-	 */
-	public final String getConfigOptionModuleCollectorMediainfoPathCli() {
-		return this.configOptionModuleCollectorMediainfoPathCli;
+	private void readConfigFile() throws PropertiesExNotInitilizedException {
+		this.configOptionModuleFinderPath = PropertiesEx.getInstance().getProperties("module.finder.path");
+		this.configOptionModuleCollectorMediainfoPathCli = PropertiesEx.getInstance().getProperty("module.collector.mediainfo.path.cli");
+		this.configOptionModuleCollectorMediainfoPathTemplate = PropertiesEx.getInstance().getProperty(
+				"module.collector.mediainfo.path.template");
 	}
 
 	/**
@@ -73,18 +72,19 @@ public class ConfigurationHandler {
 	}
 
 	/**
-	 * @return the configOptionModuleCollectorMediainfoPathTemplate
-	 */
-	public final String getConfigOptionModuleCollectorMediainfoPathTemplate() {
-		return this.configOptionModuleCollectorMediainfoPathTemplate;
-	}
-
-	/**
 	 * @param configOptionModuleCollectorMediainfoPathTemplate
 	 *            the configOptionModuleCollectorMediainfoPathTemplate to set
 	 */
 	public final void setConfigOptionModuleCollectorMediainfoPathTemplate(final String configOptionModuleCollectorMediainfoPathTemplate) {
 		this.configOptionModuleCollectorMediainfoPathTemplate = configOptionModuleCollectorMediainfoPathTemplate;
+	}
+
+	/**
+	 * @param configOptionModuleFinderPath
+	 *            the configOptionModuleFinderPath to set
+	 */
+	public final void setConfigOptionModuleFinderPath(final ArrayList<String> configOptionModuleFinderPath) {
+		this.configOptionModuleFinderPath = configOptionModuleFinderPath;
 	}
 
 }

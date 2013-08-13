@@ -22,21 +22,13 @@ public abstract class AExporter {
 	public AExporter() {
 	}
 
-	public abstract void exportList(final File file, final List<FileItem> fileList, final List<Object> options);
-
 	public abstract void exportItem(final File file, final FileItem fileItem, final List<Object> options);
 
-	public abstract String getExporterName();
+	public abstract void exportList(final File file, final List<FileItem> fileList, final List<Object> options);
 
 	public abstract String getExporterDescription();
 
-	/**
-	 * @param mainController
-	 *            the mainController to set
-	 */
-	public final void setMainController(final MainController mainController) {
-		this.mainController = mainController;
-	}
+	public abstract String getExporterName();
 
 	/**
 	 * @param controller
@@ -44,6 +36,14 @@ public abstract class AExporter {
 	 */
 	public final void setController(final IController controller) {
 		this.controller = controller;
+	}
+
+	/**
+	 * @param mainController
+	 *            the mainController to set
+	 */
+	public final void setMainController(final MainController mainController) {
+		this.mainController = mainController;
 	}
 
 }

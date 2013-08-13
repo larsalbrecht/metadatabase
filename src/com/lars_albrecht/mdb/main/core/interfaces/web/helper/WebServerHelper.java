@@ -151,44 +151,6 @@ public class WebServerHelper {
 
 	/**
 	 * Returns the content of the file from the url. It is like "index.html".
-	 * The file must be in /folder/
-	 * 
-	 * @param url
-	 * @param folder
-	 * @param request
-	 * @return String
-	 */
-	public String getFileContent(String url, final String folder, final WebServerRequest request) {
-		File file = null;
-		if (url != null) {
-			if (url.equalsIgnoreCase("")) {
-				url = "index.html";
-			}
-			Debug.log(Debug.LEVEL_INFO, "Try to load file for web interface: " + url);
-			final InputStream inputStream = MDB.class.getClassLoader().getResourceAsStream(folder + "/" + url);
-			file = new File(url);
-			try {
-				String content = "";
-				if (inputStream != null) {
-					content = Helper.getInputStreamContents(inputStream, Charset.forName("UTF-8"));
-					return content;
-				} else if (file != null && (file = FileFinder.getInstance().findFile(new File(new File(url).getName()), false)) != null
-						&& file.exists() && file.isFile() && file.canRead()) {
-					content = this.generateContent(Helper.getFileContents(file), file.getName(), request);
-					return content;
-				} else {
-					Debug.log(Debug.LEVEL_ERROR, "InputStream == null && File == null: " + file);
-				}
-			} catch (final IOException e) {
-				e.printStackTrace();
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the content of the file from the url. It is like "index.html".
 	 * The file must be in /web/
 	 * 
 	 * @param url
@@ -199,8 +161,8 @@ public class WebServerHelper {
 		String content = null;
 		if (url != null) {
 			content = "";
-			if (request.getGetParams() != null && request.getGetParams().size() > 0 && request.getGetParams().containsKey("action")
-					&& request.getGetParams().get("action") != null) {
+			if ((request.getGetParams() != null) && (request.getGetParams().size() > 0) && request.getGetParams().containsKey("action")
+					&& (request.getGetParams().get("action") != null)) {
 				final String action = request.getGetParams().get("action");
 				if (action.equalsIgnoreCase("getStatus")) {
 					if (this.mainController.getfController().getThreadList().size() > 0) {
@@ -211,7 +173,7 @@ public class WebServerHelper {
 
 						int i = 0;
 						for (final ThreadEx t : this.mainController.getcController().getThreadList()) {
-							if (t.getInfo() != null && t.getInfo().length > 0 && t.getInfo()[0].equals("Collector")) {
+							if ((t.getInfo() != null) && (t.getInfo().length > 0) && t.getInfo()[0].equals("Collector")) {
 								collectorNameList[i] = t.getName();
 							}
 							i++;
@@ -224,14 +186,14 @@ public class WebServerHelper {
 					if (content.equalsIgnoreCase("")) {
 						content = "<p>Keine Aktivitäten</p>";
 					}
-				} else if (action.equalsIgnoreCase("autocompleteSearch") && request.getGetParams().get("term") != null) {
+				} else if (action.equalsIgnoreCase("autocompleteSearch") && (request.getGetParams().get("term") != null)) {
 					if (request.getGetParams().get("term").contains("=")) {
 						ArrayList<String> keyList = null;
 						final String searchKey = request.getGetParams().get("term")
 								.substring(0, request.getGetParams().get("term").indexOf("="));
 						final String searchValue = request.getGetParams().get("term")
 								.substring(request.getGetParams().get("term").indexOf("=") + 1);
-						if (searchValue != null && !searchValue.equalsIgnoreCase("")) {
+						if ((searchValue != null) && !searchValue.equalsIgnoreCase("")) {
 							keyList = this.mainController.getDataHandler().findAllValuesForKeyWithValuePart(searchKey, searchValue);
 						} else {
 							keyList = this.mainController.getDataHandler().findAllValuesForKey(searchKey);
@@ -254,11 +216,11 @@ public class WebServerHelper {
 					if (content == null) {
 						content = "";
 					}
-				} else if (action.equalsIgnoreCase("autocompleteTags") && request.getGetParams().get("term") != null) {
+				} else if (action.equalsIgnoreCase("autocompleteTags") && (request.getGetParams().get("term") != null)) {
 					content = ObjectHandler.tagListToJSON(this.mainController.getDataHandler().getTags());
 
-				} else if (action.equalsIgnoreCase("addTag") && request.getGetParams().get("value") != null
-						&& request.getGetParams().get("fileId") != null) {
+				} else if (action.equalsIgnoreCase("addTag") && (request.getGetParams().get("value") != null)
+						&& (request.getGetParams().get("fileId") != null)) {
 					try {
 						final Tag tempTag = new Tag(request.getGetParams().get("value"));
 						final Integer fileId = Integer.parseInt(request.getGetParams().get("fileId"));
@@ -271,8 +233,8 @@ public class WebServerHelper {
 						content = null;
 						e.printStackTrace();
 					}
-				} else if (action.equalsIgnoreCase("removeTagFromFile") && request.getGetParams().get("fileTagId") != null
-						&& Integer.parseInt(request.getGetParams().get("fileTagId")) > 0) {
+				} else if (action.equalsIgnoreCase("removeTagFromFile") && (request.getGetParams().get("fileTagId") != null)
+						&& (Integer.parseInt(request.getGetParams().get("fileTagId")) > 0)) {
 					this.mainController.getDataHandler().removeFileTag(Integer.parseInt(request.getGetParams().get("fileTagId")));
 					content = "success";
 				}
@@ -280,5 +242,43 @@ public class WebServerHelper {
 		}
 
 		return content;
+	}
+
+	/**
+	 * Returns the content of the file from the url. It is like "index.html".
+	 * The file must be in /folder/
+	 * 
+	 * @param url
+	 * @param folder
+	 * @param request
+	 * @return String
+	 */
+	public String getFileContent(String url, final String folder, final WebServerRequest request) {
+		File file = null;
+		if (url != null) {
+			if (url.equalsIgnoreCase("")) {
+				url = "index.html";
+			}
+			Debug.log(Debug.LEVEL_INFO, "Try to load file for web interface: " + url);
+			final InputStream inputStream = MDB.class.getClassLoader().getResourceAsStream(folder + "/" + url);
+			file = new File(url);
+			try {
+				String content = "";
+				if (inputStream != null) {
+					content = Helper.getInputStreamContents(inputStream, Charset.forName("UTF-8"));
+					return content;
+				} else if ((file != null) && ((file = FileFinder.getInstance().findFile(new File(new File(url).getName()), false)) != null)
+						&& file.exists() && file.isFile() && file.canRead()) {
+					content = this.generateContent(Helper.getFileContents(file), file.getName(), request);
+					return content;
+				} else {
+					Debug.log(Debug.LEVEL_ERROR, "InputStream == null && File == null: " + file);
+				}
+			} catch (final IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return null;
 	}
 }

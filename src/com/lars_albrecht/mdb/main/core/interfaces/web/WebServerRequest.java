@@ -25,33 +25,10 @@ public class WebServerRequest {
 	}
 
 	/**
-	 * @return the headerValues
-	 */
-	public final ConcurrentHashMap<String, Object> getHeaderValues() {
-		return this.headerValues;
-	}
-
-	/**
-	 * @param headerValues
-	 *            the headerValues to set
-	 */
-	public final void setHeaderValues(final ConcurrentHashMap<String, Object> headerValues) {
-		this.headerValues = headerValues;
-	}
-
-	/**
 	 * @return the content
 	 */
 	public final String getContent() {
 		return this.content;
-	}
-
-	/**
-	 * @param content
-	 *            the content to set
-	 */
-	public final void setContent(final String content) {
-		this.content = content;
 	}
 
 	/**
@@ -62,29 +39,6 @@ public class WebServerRequest {
 	}
 
 	/**
-	 * @param fullUrl
-	 *            the fullUrl to set
-	 */
-	public final void setFullUrl(final String fullUrl) {
-		this.fullUrl = fullUrl;
-	}
-
-	/**
-	 * @return the method
-	 */
-	public final String getMethod() {
-		return this.method;
-	}
-
-	/**
-	 * @param method
-	 *            the method to set
-	 */
-	public final void setMethod(final String method) {
-		this.method = method;
-	}
-
-	/**
 	 * @return the getParams
 	 */
 	public final ConcurrentHashMap<String, String> getGetParams() {
@@ -92,33 +46,17 @@ public class WebServerRequest {
 	}
 
 	/**
-	 * @param getParams
-	 *            the getParams to set
+	 * @return the headerValues
 	 */
-	public final void setGetParams(final ConcurrentHashMap<String, String> getParams) {
-		this.getParams = getParams;
+	public final ConcurrentHashMap<String, Object> getHeaderValues() {
+		return this.headerValues;
 	}
 
 	/**
-	 * @return the url
+	 * @return the method
 	 */
-	public final String getUrl() {
-		return this.url;
-	}
-
-	/**
-	 * @param url
-	 *            the url to set
-	 */
-	public final void setUrl(final String url) {
-		this.url = url;
-	}
-
-	/**
-	 * @return the postParams
-	 */
-	public final ConcurrentHashMap<String, String> getPostParams() {
-		return this.postParams;
+	public final String getMethod() {
+		return this.method;
 	}
 
 	/**
@@ -132,11 +70,73 @@ public class WebServerRequest {
 	}
 
 	/**
+	 * @return the postParams
+	 */
+	public final ConcurrentHashMap<String, String> getPostParams() {
+		return this.postParams;
+	}
+
+	/**
+	 * @return the url
+	 */
+	public final String getUrl() {
+		return this.url;
+	}
+
+	/**
+	 * @param content
+	 *            the content to set
+	 */
+	public final void setContent(final String content) {
+		this.content = content;
+	}
+
+	/**
+	 * @param fullUrl
+	 *            the fullUrl to set
+	 */
+	public final void setFullUrl(final String fullUrl) {
+		this.fullUrl = fullUrl;
+	}
+
+	/**
+	 * @param getParams
+	 *            the getParams to set
+	 */
+	public final void setGetParams(final ConcurrentHashMap<String, String> getParams) {
+		this.getParams = getParams;
+	}
+
+	/**
+	 * @param headerValues
+	 *            the headerValues to set
+	 */
+	public final void setHeaderValues(final ConcurrentHashMap<String, Object> headerValues) {
+		this.headerValues = headerValues;
+	}
+
+	/**
+	 * @param method
+	 *            the method to set
+	 */
+	public final void setMethod(final String method) {
+		this.method = method;
+	}
+
+	/**
 	 * @param postParams
 	 *            the postParams to set
 	 */
 	public final void setPostParams(final ConcurrentHashMap<String, String> postParams) {
 		this.postParams = postParams;
+	}
+
+	/**
+	 * @param url
+	 *            the url to set
+	 */
+	public final void setUrl(final String url) {
+		this.url = url;
 	}
 
 }

@@ -20,10 +20,6 @@ public class ThreadEx extends Thread {
 		super(target);
 	}
 
-	public ThreadEx(final String name) {
-		super(name);
-	}
-
 	public ThreadEx(final Runnable target, final String name) {
 		super(target, name);
 	}
@@ -31,6 +27,10 @@ public class ThreadEx extends Thread {
 	public ThreadEx(final Runnable target, final String name, final Object[] info) {
 		super(target, name);
 		this.info = info;
+	}
+
+	public ThreadEx(final String name) {
+		super(name);
 	}
 
 	/**

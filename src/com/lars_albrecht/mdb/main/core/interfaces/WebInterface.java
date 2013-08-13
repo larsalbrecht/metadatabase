@@ -30,25 +30,18 @@ public class WebInterface extends AInterface {
 		this.canOpened = true;
 	}
 
-	@Override
-	public void startInterface() {
-		this.threadList.add(new Thread(new WebServerInterface(this.mainController, this)));
-		this.threadList.get(this.threadList.size() - 1).start();
-	}
-
-	/**
-	 * 
-	 * @param fileDetailsOutputItem
-	 */
-	public void setFileDetailsOutputItem(final AbstractFileDetailsOutputItem fileDetailsOutputItem) {
-		this.fileDetailsOutputItem = fileDetailsOutputItem;
-	}
-
 	/**
 	 * @return the fileDetailsOutputItem
 	 */
 	public final AbstractFileDetailsOutputItem getFileDetailsOutputItem() {
 		return this.fileDetailsOutputItem;
+	}
+
+	/**
+	 * @return the port
+	 */
+	public final int getPort() {
+		return this.port;
 	}
 
 	@Override
@@ -63,10 +56,11 @@ public class WebInterface extends AInterface {
 	}
 
 	/**
-	 * @return the port
+	 * 
+	 * @param fileDetailsOutputItem
 	 */
-	public final int getPort() {
-		return this.port;
+	public void setFileDetailsOutputItem(final AbstractFileDetailsOutputItem fileDetailsOutputItem) {
+		this.fileDetailsOutputItem = fileDetailsOutputItem;
 	}
 
 	/**
@@ -75,6 +69,12 @@ public class WebInterface extends AInterface {
 	 */
 	public final void setPort(final int port) {
 		this.port = port;
+	}
+
+	@Override
+	public void startInterface() {
+		this.threadList.add(new Thread(new WebServerInterface(this.mainController, this)));
+		this.threadList.get(this.threadList.size() - 1).start();
 	}
 
 }

@@ -32,18 +32,6 @@ public class ShowInfoControlPage extends WebPage {
 
 	}
 
-	private Template generateInfoControlView() {
-		Template infoControlTemplate = this.getPageTemplate();
-
-		infoControlTemplate = this.fillBasicInfoContainer(infoControlTemplate);
-		infoControlTemplate = this.fillControlContainer(infoControlTemplate);
-		infoControlTemplate = this.fillDuplicateContainer(infoControlTemplate);
-		infoControlTemplate = this.fillNoInfoContainer(infoControlTemplate);
-		infoControlTemplate = this.fillMissingContainer(infoControlTemplate);
-
-		return infoControlTemplate;
-	}
-
 	private Template fillBasicInfoContainer(final Template template) {
 		final Template templateWithBasicInfoContainer = template;
 		final ConcurrentHashMap<String, Object> info = this.mainController.getDataHandler().getInfoFromDatabase();
@@ -156,6 +144,36 @@ public class ShowInfoControlPage extends WebPage {
 		return templateWithDuplicateContainer;
 	}
 
+	private Template fillMissingContainer(final Template template) {
+		final Template templateWithMissingFileItemsContainer = template;
+		this.mainController.getDataHandler().reloadData(DataHandler.RELOAD_MISSINGFILEITEMS);
+		final ArrayList<FileItem> missingFilesList = this.mainController.getDataHandler().getMissingFileItems();
+		if (missingFilesList.size() > 0) {
+			String missingContainer = template.getSubMarkerContent("missing");
+
+			String missingItemList = "";
+			String tempMissingItemList = null;
+
+			int missingCounter = 0;
+			// TODO create method replaceAllMarker to replace a bunch of
+			// marker
+			for (final FileItem fileItem : missingFilesList) {
+				tempMissingItemList = template.getSubMarkerContent("missingItem");
+				tempMissingItemList = Template.replaceMarker(tempMissingItemList, "noInfoItemId", fileItem.getId().toString(), true);
+				tempMissingItemList = Template.replaceMarker(tempMissingItemList, "noInfoItemTitle", fileItem.getName(), false);
+				tempMissingItemList = Template.replaceMarker(tempMissingItemList, "oddeven", ((missingCounter % 2) == 0 ? "even" : "odd"),
+						false);
+				missingItemList += tempMissingItemList;
+				missingCounter++;
+			}
+			missingContainer = Template.replaceMarker(missingContainer, "missingItems", missingItemList, false);
+			missingContainer = Template.replaceMarker(missingContainer, "missingcounter", Integer.toString(missingCounter), false);
+			templateWithMissingFileItemsContainer.replaceMarker("missingcontainer", missingContainer, false);
+		}
+
+		return templateWithMissingFileItemsContainer;
+	}
+
 	private Template fillNoInfoContainer(final Template template) {
 		final Template templateWithNoInfoContainer = template;
 		final ConcurrentHashMap<String, ArrayList<FileItem>> noInfoList = this.mainController.getDataHandler().getNoInfoFileItems(null);
@@ -197,44 +215,26 @@ public class ShowInfoControlPage extends WebPage {
 		return templateWithNoInfoContainer;
 	}
 
-	private Template fillMissingContainer(final Template template) {
-		final Template templateWithMissingFileItemsContainer = template;
-		this.mainController.getDataHandler().reloadData(DataHandler.RELOAD_MISSINGFILEITEMS);
-		final ArrayList<FileItem> missingFilesList = this.mainController.getDataHandler().getMissingFileItems();
-		if (missingFilesList.size() > 0) {
-			String missingContainer = template.getSubMarkerContent("missing");
+	private Template generateInfoControlView() {
+		Template infoControlTemplate = this.getPageTemplate();
 
-			String missingItemList = "";
-			String tempMissingItemList = null;
+		infoControlTemplate = this.fillBasicInfoContainer(infoControlTemplate);
+		infoControlTemplate = this.fillControlContainer(infoControlTemplate);
+		infoControlTemplate = this.fillDuplicateContainer(infoControlTemplate);
+		infoControlTemplate = this.fillNoInfoContainer(infoControlTemplate);
+		infoControlTemplate = this.fillMissingContainer(infoControlTemplate);
 
-			int missingCounter = 0;
-			// TODO create method replaceAllMarker to replace a bunch of
-			// marker
-			for (final FileItem fileItem : missingFilesList) {
-				tempMissingItemList = template.getSubMarkerContent("missingItem");
-				tempMissingItemList = Template.replaceMarker(tempMissingItemList, "noInfoItemId", fileItem.getId().toString(), true);
-				tempMissingItemList = Template.replaceMarker(tempMissingItemList, "noInfoItemTitle", fileItem.getName(), false);
-				tempMissingItemList = Template.replaceMarker(tempMissingItemList, "oddeven", ((missingCounter % 2) == 0 ? "even" : "odd"),
-						false);
-				missingItemList += tempMissingItemList;
-				missingCounter++;
-			}
-			missingContainer = Template.replaceMarker(missingContainer, "missingItems", missingItemList, false);
-			missingContainer = Template.replaceMarker(missingContainer, "missingcounter", Integer.toString(missingCounter), false);
-			templateWithMissingFileItemsContainer.replaceMarker("missingcontainer", missingContainer, false);
-		}
-
-		return templateWithMissingFileItemsContainer;
-	}
-
-	@Override
-	public String getTitle() {
-		return "Info / Control";
+		return infoControlTemplate;
 	}
 
 	@Override
 	public String getTemplateName() {
 		return "infocontrol";
+	}
+
+	@Override
+	public String getTitle() {
+		return "Info / Control";
 	}
 
 }

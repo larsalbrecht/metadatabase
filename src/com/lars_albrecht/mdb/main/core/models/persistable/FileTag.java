@@ -47,134 +47,6 @@ public class FileTag implements IPersistable {
 		this.isUser = isUser;
 	}
 
-	/**
-	 * @return the id
-	 */
-	@Override
-	public final Integer getId() {
-		return this.id;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	@Override
-	public final void setId(final Integer id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the fileId
-	 */
-	public final Integer getFileId() {
-		return this.fileId;
-	}
-
-	/**
-	 * @param fileId
-	 *            the fileId to set
-	 */
-	public final void setFileId(final Integer fileId) {
-		this.fileId = fileId;
-	}
-
-	/**
-	 * @return the tag
-	 */
-	public final Tag getTag() {
-		return this.tag;
-	}
-
-	/**
-	 * @param tag
-	 *            the tag to set
-	 */
-	public final void setTag(final Tag tag) {
-		this.tag = tag;
-	}
-
-	/**
-	 * @return the isUser
-	 */
-	public final Boolean getIsUser() {
-		return this.isUser;
-	}
-
-	/**
-	 * @param isUser
-	 *            the isUser to set
-	 */
-	public final void setIsUser(final Boolean isUser) {
-		this.isUser = isUser;
-	}
-
-	@Override
-	public Object fromHashMap(final HashMap<String, Object> map) {
-		final FileTag result = new FileTag();
-		if (map.containsKey("id")) {
-			result.setId((Integer) map.get("id"));
-		}
-		if (map.containsKey("file_id")) {
-			result.setFileId((Integer) map.get("file_id"));
-		}
-		if (map.containsKey("tag_id") && map.containsKey("tag_name")) {
-			result.setTag(new Tag((Integer) map.get("tag_id"), (String) map.get("tag_name")));
-		} else if (map.containsKey("tag_name")) {
-			result.setTag(new Tag((String) map.get("tag_name")));
-		} else if (map.containsKey("tag_id")) {
-			result.setTag(new Tag((Integer) map.get("tag_id")));
-		}
-		if (map.containsKey("isuser")) {
-			result.setIsUser(map.get("isuser") instanceof Integer ? (Integer) map.get("isuser") == 0 ? false : true : (Boolean) map
-					.get("isuser"));
-		}
-
-		return result;
-	}
-
-	@Override
-	public String getDatabaseTable() {
-		return "fileTags";
-	}
-
-	@Override
-	public HashMap<String, Object> toHashMap() {
-		final HashMap<String, Object> tempHashMap = new HashMap<String, Object>();
-		if (this.getId() != null) {
-			tempHashMap.put("id", this.getId());
-		}
-		tempHashMap.put("file_id", this.getFileId());
-		tempHashMap.put("tag_id", this.getTag().getId());
-		tempHashMap.put("isuser", this.getIsUser());
-
-		return tempHashMap;
-	}
-
-	@Override
-	public String toString() {
-		return this.id + " | " + this.fileId + " | " + this.tag + " | " + this.isUser;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		if (this.id == null) {
-			result = prime * result + ((this.fileId == null) ? 0 : this.fileId.hashCode());
-			result = prime * result + ((this.isUser == null) ? 0 : this.isUser.hashCode());
-			result = prime * result + ((this.tag == null) ? 0 : this.tag.hashCode());
-		} else {
-			result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
-		}
-		return result;
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -219,6 +91,134 @@ public class FileTag implements IPersistable {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public Object fromHashMap(final HashMap<String, Object> map) {
+		final FileTag result = new FileTag();
+		if (map.containsKey("id")) {
+			result.setId((Integer) map.get("id"));
+		}
+		if (map.containsKey("file_id")) {
+			result.setFileId((Integer) map.get("file_id"));
+		}
+		if (map.containsKey("tag_id") && map.containsKey("tag_name")) {
+			result.setTag(new Tag((Integer) map.get("tag_id"), (String) map.get("tag_name")));
+		} else if (map.containsKey("tag_name")) {
+			result.setTag(new Tag((String) map.get("tag_name")));
+		} else if (map.containsKey("tag_id")) {
+			result.setTag(new Tag((Integer) map.get("tag_id")));
+		}
+		if (map.containsKey("isuser")) {
+			result.setIsUser(map.get("isuser") instanceof Integer ? (Integer) map.get("isuser") == 0 ? false : true : (Boolean) map
+					.get("isuser"));
+		}
+
+		return result;
+	}
+
+	@Override
+	public String getDatabaseTable() {
+		return "fileTags";
+	}
+
+	/**
+	 * @return the fileId
+	 */
+	public final Integer getFileId() {
+		return this.fileId;
+	}
+
+	/**
+	 * @return the id
+	 */
+	@Override
+	public final Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * @return the isUser
+	 */
+	public final Boolean getIsUser() {
+		return this.isUser;
+	}
+
+	/**
+	 * @return the tag
+	 */
+	public final Tag getTag() {
+		return this.tag;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		if (this.id == null) {
+			result = (prime * result) + ((this.fileId == null) ? 0 : this.fileId.hashCode());
+			result = (prime * result) + ((this.isUser == null) ? 0 : this.isUser.hashCode());
+			result = (prime * result) + ((this.tag == null) ? 0 : this.tag.hashCode());
+		} else {
+			result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		}
+		return result;
+	}
+
+	/**
+	 * @param fileId
+	 *            the fileId to set
+	 */
+	public final void setFileId(final Integer fileId) {
+		this.fileId = fileId;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	@Override
+	public final void setId(final Integer id) {
+		this.id = id;
+	}
+
+	/**
+	 * @param isUser
+	 *            the isUser to set
+	 */
+	public final void setIsUser(final Boolean isUser) {
+		this.isUser = isUser;
+	}
+
+	/**
+	 * @param tag
+	 *            the tag to set
+	 */
+	public final void setTag(final Tag tag) {
+		this.tag = tag;
+	}
+
+	@Override
+	public HashMap<String, Object> toHashMap() {
+		final HashMap<String, Object> tempHashMap = new HashMap<String, Object>();
+		if (this.getId() != null) {
+			tempHashMap.put("id", this.getId());
+		}
+		tempHashMap.put("file_id", this.getFileId());
+		tempHashMap.put("tag_id", this.getTag().getId());
+		tempHashMap.put("isuser", this.getIsUser());
+
+		return tempHashMap;
+	}
+
+	@Override
+	public String toString() {
+		return this.id + " | " + this.fileId + " | " + this.tag + " | " + this.isUser;
 	}
 
 }

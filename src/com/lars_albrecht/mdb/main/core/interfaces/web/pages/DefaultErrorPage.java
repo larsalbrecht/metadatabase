@@ -20,20 +20,20 @@ public class DefaultErrorPage extends WebPage {
 	}
 
 	@Override
-	public String getTitle() {
-		if (this.actionname.equalsIgnoreCase("404")) {
-			return "Page not found";
-		} else {
-			return "Server error";
-		}
-	}
-
-	@Override
 	public String getTemplateName() {
 		if (this.actionname.equalsIgnoreCase("404")) {
 			return "404";
 		} else {
 			return "500";
+		}
+	}
+
+	@Override
+	public String getTitle() {
+		if (this.actionname.equalsIgnoreCase("404")) {
+			return "Page not found";
+		} else {
+			return "Server error";
 		}
 	}
 

@@ -32,14 +32,6 @@ public abstract class WebPage {
 		}
 	}
 
-	final protected void set404Error() {
-		this.setPageTemplate(new Template("404"));
-	}
-
-	final protected void set500Error() {
-		this.setPageTemplate(new Template("500"));
-	}
-
 	final public String getGeneratedContent() {
 		return this.pageTemplate.getClearedContent();
 	}
@@ -48,11 +40,19 @@ public abstract class WebPage {
 		return this.pageTemplate;
 	}
 
-	final protected void setPageTemplate(final Template pageTemplate) {
-		this.pageTemplate = pageTemplate;
-	}
+	public abstract String getTemplateName();
 
 	public abstract String getTitle();
 
-	public abstract String getTemplateName();
+	final protected void set404Error() {
+		this.setPageTemplate(new Template("404"));
+	}
+
+	final protected void set500Error() {
+		this.setPageTemplate(new Template("500"));
+	}
+
+	final protected void setPageTemplate(final Template pageTemplate) {
+		this.pageTemplate = pageTemplate;
+	}
 }

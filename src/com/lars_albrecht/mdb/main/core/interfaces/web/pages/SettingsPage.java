@@ -41,32 +41,6 @@ public class SettingsPage extends WebPage {
 		this.setPageTemplate(this.generateSettingsView(this.getPageTemplate()));
 	}
 
-	/**
-	 * Save settings from post params to database.
-	 * 
-	 * @param request
-	 */
-	private void saveSettings(final WebServerRequest request) {
-		for (final Entry<String, String> entry : request.getPostParams().entrySet()) {
-			OptionsHandler.setOption(entry.getKey(), entry.getValue());
-		}
-	}
-
-	private Template generateSettingsView(final Template settingsTemplate) {
-		String settingsFieldsContainer = settingsTemplate.getSubMarkerContent("settingsFields");
-
-		// replace searchSettings
-		settingsFieldsContainer = Template.replaceMarker(settingsFieldsContainer, "searchSettings",
-				this.generateSearchSettingsView(settingsTemplate), false);
-		settingsFieldsContainer = Template.replaceMarker(settingsFieldsContainer, "listSettings",
-				this.generateListSettingsView(settingsTemplate), false);
-
-		// fill settings in contentmarker
-		settingsTemplate.replaceMarker("content", settingsFieldsContainer, false);
-
-		return settingsTemplate;
-	}
-
 	private String generateListSettingsView(final Template settingsTemplate) {
 		String listOrderOption = (String) OptionsHandler.getOption("listSortOption");
 		if (listOrderOption == null) {
@@ -146,14 +120,40 @@ public class SettingsPage extends WebPage {
 		return searchSettingsContainer;
 	}
 
-	@Override
-	public String getTitle() {
-		return "Einstellungen";
+	private Template generateSettingsView(final Template settingsTemplate) {
+		String settingsFieldsContainer = settingsTemplate.getSubMarkerContent("settingsFields");
+
+		// replace searchSettings
+		settingsFieldsContainer = Template.replaceMarker(settingsFieldsContainer, "searchSettings",
+				this.generateSearchSettingsView(settingsTemplate), false);
+		settingsFieldsContainer = Template.replaceMarker(settingsFieldsContainer, "listSettings",
+				this.generateListSettingsView(settingsTemplate), false);
+
+		// fill settings in contentmarker
+		settingsTemplate.replaceMarker("content", settingsFieldsContainer, false);
+
+		return settingsTemplate;
 	}
 
 	@Override
 	public String getTemplateName() {
 		return "settings";
+	}
+
+	@Override
+	public String getTitle() {
+		return "Einstellungen";
+	}
+
+	/**
+	 * Save settings from post params to database.
+	 * 
+	 * @param request
+	 */
+	private void saveSettings(final WebServerRequest request) {
+		for (final Entry<String, String> entry : request.getPostParams().entrySet()) {
+			OptionsHandler.setOption(entry.getKey(), entry.getValue());
+		}
 	}
 
 }

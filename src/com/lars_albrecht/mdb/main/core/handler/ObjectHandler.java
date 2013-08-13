@@ -8,11 +8,11 @@ import java.util.ArrayList;
 
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.Helper;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileAttributes;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
 import com.lars_albrecht.mdb.main.core.models.persistable.Key;
 import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
-import com.lars_albrecht.mdb.main.core.models.persistable.FileAttributes;
 import com.lars_albrecht.mdb.main.core.models.persistable.Value;
 
 /**
@@ -20,6 +20,17 @@ import com.lars_albrecht.mdb.main.core.models.persistable.Value;
  * 
  */
 public class ObjectHandler {
+
+	public static ArrayList<FileAttributes> castObjectListToFileAttributesList(final ArrayList<Object> oList) {
+		final ArrayList<FileAttributes> resultList = new ArrayList<FileAttributes>();
+		for (final Object oItem : oList) {
+			if (oItem instanceof FileAttributes) {
+				resultList.add((FileAttributes) oItem);
+			}
+		}
+
+		return resultList;
+	}
 
 	public static ArrayList<FileItem> castObjectListToFileItemList(final ArrayList<Object> oList) {
 		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
@@ -30,6 +41,18 @@ public class ObjectHandler {
 				}
 			}
 		}
+		return resultList;
+	}
+
+	public static ArrayList<FileTag> castObjectListToFileTagList(final ArrayList<Object> oList) {
+
+		final ArrayList<FileTag> resultList = new ArrayList<FileTag>();
+		for (final Object oItem : oList) {
+			if (oItem instanceof FileTag) {
+				resultList.add((FileTag) oItem);
+			}
+		}
+
 		return resultList;
 	}
 
@@ -45,11 +68,11 @@ public class ObjectHandler {
 		return resultList;
 	}
 
-	public static ArrayList<FileAttributes> castObjectListToFileAttributesList(final ArrayList<Object> oList) {
-		final ArrayList<FileAttributes> resultList = new ArrayList<FileAttributes>();
+	public static ArrayList<Tag> castObjectListToTagList(final ArrayList<Object> oList) {
+		final ArrayList<Tag> resultList = new ArrayList<Tag>();
 		for (final Object oItem : oList) {
-			if (oItem instanceof FileAttributes) {
-				resultList.add((FileAttributes) oItem);
+			if (oItem instanceof Tag) {
+				resultList.add((Tag) oItem);
 			}
 		}
 
@@ -68,29 +91,6 @@ public class ObjectHandler {
 		return resultList;
 	}
 
-	public static ArrayList<Tag> castObjectListToTagList(final ArrayList<Object> oList) {
-		final ArrayList<Tag> resultList = new ArrayList<Tag>();
-		for (final Object oItem : oList) {
-			if (oItem instanceof Tag) {
-				resultList.add((Tag) oItem);
-			}
-		}
-
-		return resultList;
-	}
-
-	public static ArrayList<FileTag> castObjectListToFileTagList(final ArrayList<Object> oList) {
-
-		final ArrayList<FileTag> resultList = new ArrayList<FileTag>();
-		for (final Object oItem : oList) {
-			if (oItem instanceof FileTag) {
-				resultList.add((FileTag) oItem);
-			}
-		}
-
-		return resultList;
-	}
-
 	public static ArrayList<File> castStringListToFileList(final ArrayList<String> oList) {
 		final ArrayList<File> resultList = new ArrayList<File>();
 		if (oList != null) {
@@ -102,6 +102,27 @@ public class ObjectHandler {
 		}
 
 		return resultList;
+	}
+
+	public static String fileItemListToJSON(final ArrayList<FileItem> fileItemList) {
+		String jsonString = null;
+
+		if ((fileItemList != null) && (fileItemList.size() > 0)) {
+			jsonString = "{";
+			// "{\"BigBuckBunny\" : \"BigBuckBunny\"}"
+			int i = 0;
+			for (final FileItem fileItem : fileItemList) {
+				jsonString += "\"" + fileItem.getName() + "\"" + ":" + "\"" + fileItem.getName() + "\"";
+				if (i < (fileItemList.size() - 1)) {
+					jsonString += ",";
+				}
+				i++;
+			}
+			jsonString += "}";
+
+		}
+
+		return jsonString;
 	}
 
 	/**
@@ -124,36 +145,15 @@ public class ObjectHandler {
 		return tempFileItemList;
 	}
 
-	public static String fileItemListToJSON(final ArrayList<FileItem> fileItemList) {
-		String jsonString = null;
-
-		if (fileItemList != null && fileItemList.size() > 0) {
-			jsonString = "{";
-			// "{\"BigBuckBunny\" : \"BigBuckBunny\"}"
-			int i = 0;
-			for (final FileItem fileItem : fileItemList) {
-				jsonString += "\"" + fileItem.getName() + "\"" + ":" + "\"" + fileItem.getName() + "\"";
-				if (i < fileItemList.size() - 1) {
-					jsonString += ",";
-				}
-				i++;
-			}
-			jsonString += "}";
-
-		}
-
-		return jsonString;
-	}
-
 	public static String stringListToJSON(final ArrayList<String> stringList) {
 		String jsonString = null;
 
-		if (stringList != null && stringList.size() > 0) {
+		if ((stringList != null) && (stringList.size() > 0)) {
 			jsonString = "{";
 			int i = 0;
 			for (final String string : stringList) {
 				jsonString += "\"" + string + "\"" + ":" + "\"" + string + "\"";
-				if (i < stringList.size() - 1) {
+				if (i < (stringList.size() - 1)) {
 					jsonString += ",";
 				}
 				i++;
@@ -168,13 +168,13 @@ public class ObjectHandler {
 	public static String tagListToJSON(final ArrayList<Tag> tags) {
 		String jsonString = "";
 
-		if (tags != null && tags.size() > 0) {
+		if ((tags != null) && (tags.size() > 0)) {
 			jsonString = "{";
 			final int i = 0;
 			for (final Tag tag : tags) {
 				jsonString += "\"id\"" + ":" + "\"" + tag.getId() + "\",";
 				jsonString += "\"name\"" + ":" + "\"" + tag.getName() + "\"";
-				if (i < tags.size() - 1) {
+				if (i < (tags.size() - 1)) {
 					jsonString += ",";
 				}
 			}

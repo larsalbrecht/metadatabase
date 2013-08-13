@@ -35,6 +35,29 @@ public class TelnetRunner implements Runnable {
 		System.out.println("created new runner");
 	}
 
+	private void printHelp(final PrintWriter out) {
+		out.print("\033[37m"); // white
+		out.println("Following commands are available:");
+		out.println("- search <search-word>");
+		out.println("- view <item-id> (work in progress)");
+		out.println("");
+		out.println("- help");
+		out.println("- exit");
+		out.println("");
+		out.println("What do you want to do?");
+		out.print("\033[36m"); // cyan
+		out.flush();
+	}
+
+	private void printWelcome(final PrintWriter out) {
+		out.print("\033[33m"); // yellow
+		out.println("***********************************************");
+		out.println("* Welcome to the MDB Telnet Interface - MDBTI *");
+		out.println("***********************************************");
+		out.flush();
+		this.printHelp(out);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void run() {
@@ -45,7 +68,7 @@ public class TelnetRunner implements Runnable {
 
 			this.printWelcome(out);
 
-			while ((this.line = in.readLine()) != null && !this.line.equals(".")) {
+			while (((this.line = in.readLine()) != null) && !this.line.equals(".")) {
 				if (this.line.equalsIgnoreCase("exit")) {
 					out.println("\033[32mSystem will shut down");
 					this.mainController.exitProgram();
@@ -72,7 +95,7 @@ public class TelnetRunner implements Runnable {
 
 				} else if (this.line.matches("view\\s.*")) {
 					final String viewIdStr = this.line.substring(this.line.indexOf(" ") + 1);
-					if (this.line.matches("view\\s\\d+") && (viewIdStr != null && viewIdStr.matches("\\d"))) {
+					if (this.line.matches("view\\s\\d+") && ((viewIdStr != null) && viewIdStr.matches("\\d"))) {
 						final int viewId = Integer.parseInt(viewIdStr);
 						final FileItem fileItem = this.mainController.getDataHandler().findAllInfoForAllByFileId(viewId);
 						if (fileItem != null) {
@@ -112,28 +135,5 @@ public class TelnetRunner implements Runnable {
 			System.out.println("IOException on socket listen: " + ioe);
 			ioe.printStackTrace();
 		}
-	}
-
-	private void printWelcome(final PrintWriter out) {
-		out.print("\033[33m"); // yellow
-		out.println("***********************************************");
-		out.println("* Welcome to the MDB Telnet Interface - MDBTI *");
-		out.println("***********************************************");
-		out.flush();
-		this.printHelp(out);
-	}
-
-	private void printHelp(final PrintWriter out) {
-		out.print("\033[37m"); // white
-		out.println("Following commands are available:");
-		out.println("- search <search-word>");
-		out.println("- view <item-id> (work in progress)");
-		out.println("");
-		out.println("- help");
-		out.println("- exit");
-		out.println("");
-		out.println("What do you want to do?");
-		out.print("\033[36m"); // cyan
-		out.flush();
 	}
 }
