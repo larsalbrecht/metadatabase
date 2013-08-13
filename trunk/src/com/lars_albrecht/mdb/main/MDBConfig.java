@@ -42,41 +42,10 @@ public class MDBConfig {
 	}
 
 	/**
-	 * @param finderFileFilter
-	 *            the finderFileFilter to set
+	 * @return the listOfCollectors
 	 */
-	public final void setFinderFileFilter(final FileFilter finderFileFilter) {
-		this.finderFileFilter = finderFileFilter;
-	}
-
-	/**
-	 * @return the webInterfaceFileDetailsOutputItem
-	 */
-	public final AbstractFileDetailsOutputItem getWebInterfaceFileDetailsOutputItem() {
-		return this.webInterfaceFileDetailsOutputItem;
-	}
-
-	/**
-	 * @param webInterfaceFileDetailsOutputItem
-	 *            the webInterfaceFileDetailsOutputItem to set
-	 */
-	public final void setWebInterfaceFileDetailsOutputItem(final AbstractFileDetailsOutputItem webInterfaceFileDetailsOutputItem) {
-		this.webInterfaceFileDetailsOutputItem = webInterfaceFileDetailsOutputItem;
-	}
-
-	/**
-	 * @return the loglevel
-	 */
-	public final int getLoglevel() {
-		return this.loglevel;
-	}
-
-	/**
-	 * @param loglevel
-	 *            the loglevel to set
-	 */
-	public final void setLoglevel(final int loglevel) {
-		this.loglevel = loglevel;
+	public final ArrayList<ACollector> getListOfCollectors() {
+		return this.listOfCollectors;
 	}
 
 	/**
@@ -94,10 +63,47 @@ public class MDBConfig {
 	}
 
 	/**
-	 * @return the listOfCollectors
+	 * @return the listOfTypers
 	 */
-	public final ArrayList<ACollector> getListOfCollectors() {
-		return this.listOfCollectors;
+	public final ArrayList<ATyper> getListOfTypers() {
+		return this.listOfTypers;
+	}
+
+	/**
+	 * @return the loglevel
+	 */
+	public final int getLoglevel() {
+		return this.loglevel;
+	}
+
+	/**
+	 * @return the systemTrayInterfaceIconImageFile
+	 */
+	public final File getSystemTrayInterfaceIconImageFile() {
+		return this.systemTrayInterfaceIconImageFile;
+	}
+
+	/**
+	 * @return the webInterfaceFileDetailsOutputItem
+	 */
+	public final AbstractFileDetailsOutputItem getWebInterfaceFileDetailsOutputItem() {
+		return this.webInterfaceFileDetailsOutputItem;
+	}
+
+	/**
+	 * @param finderFileFilter
+	 *            the finderFileFilter to set
+	 */
+	public final void setFinderFileFilter(final FileFilter finderFileFilter) {
+		this.finderFileFilter = finderFileFilter;
+	}
+
+	/**
+	 * @param loglevel
+	 *            the loglevel to set
+	 */
+	public final void setLoglevel(final int loglevel) {
+		this.loglevel = loglevel;
 	}
 
 	/**
@@ -109,17 +115,11 @@ public class MDBConfig {
 	}
 
 	/**
-	 * @return the systemTrayInterfaceIconImageFile
+	 * @param webInterfaceFileDetailsOutputItem
+	 *            the webInterfaceFileDetailsOutputItem to set
 	 */
-	public final File getSystemTrayInterfaceIconImageFile() {
-		return this.systemTrayInterfaceIconImageFile;
-	}
-
-	/**
-	 * @return the listOfTypers
-	 */
-	public final ArrayList<ATyper> getListOfTypers() {
-		return this.listOfTypers;
+	public final void setWebInterfaceFileDetailsOutputItem(final AbstractFileDetailsOutputItem webInterfaceFileDetailsOutputItem) {
+		this.webInterfaceFileDetailsOutputItem = webInterfaceFileDetailsOutputItem;
 	}
 
 }

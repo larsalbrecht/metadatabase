@@ -25,11 +25,6 @@ public class Tag implements IPersistable {
 		this.id = id;
 	}
 
-	public Tag(final String name) {
-		super();
-		this.name = name;
-	}
-
 	public Tag(final Integer id, final String name) {
 		super();
 		this.id = id;
@@ -43,103 +38,9 @@ public class Tag implements IPersistable {
 		this.isUser = isUser;
 	}
 
-	/**
-	 * @return the id
-	 */
-	@Override
-	public final Integer getId() {
-		return this.id;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	@Override
-	public final void setId(final Integer id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the name
-	 */
-	public final String getName() {
-		return this.name;
-	}
-
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public final void setName(final String name) {
+	public Tag(final String name) {
+		super();
 		this.name = name;
-	}
-
-	/**
-	 * @return the isUser
-	 */
-	public final Boolean getIsUser() {
-		return this.isUser;
-	}
-
-	/**
-	 * @param isUser
-	 *            the isUser to set
-	 */
-	public final void setIsUser(final Boolean isUser) {
-		this.isUser = isUser;
-	}
-
-	@Override
-	public Object fromHashMap(final HashMap<String, Object> map) {
-		final Tag result = new Tag();
-		if (map.containsKey("id")) {
-			result.setId((Integer) map.get("id"));
-		}
-		if (map.containsKey("name")) {
-			result.setName((String) map.get("name"));
-		}
-		if (map.containsKey("isuser")) {
-			result.setIsUser((Boolean) map.get("isuser"));
-		}
-
-		return result;
-	}
-
-	@Override
-	public String getDatabaseTable() {
-		return "tags";
-	}
-
-	@Override
-	public HashMap<String, Object> toHashMap() {
-		final HashMap<String, Object> tempHashMap = new HashMap<String, Object>();
-		if (this.getId() != null) {
-			tempHashMap.put("id", this.getId());
-		}
-		tempHashMap.put("name", this.getName());
-		tempHashMap.put("isuser", this.getIsUser());
-
-		return tempHashMap;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		if (this.id == null) {
-			result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
-			result = prime * result + ((this.isUser == null) ? 0 : this.isUser.hashCode());
-		} else {
-			result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
-		}
-
-		return result;
 	}
 
 	/*
@@ -179,6 +80,105 @@ public class Tag implements IPersistable {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public Object fromHashMap(final HashMap<String, Object> map) {
+		final Tag result = new Tag();
+		if (map.containsKey("id")) {
+			result.setId((Integer) map.get("id"));
+		}
+		if (map.containsKey("name")) {
+			result.setName((String) map.get("name"));
+		}
+		if (map.containsKey("isuser")) {
+			result.setIsUser((Boolean) map.get("isuser"));
+		}
+
+		return result;
+	}
+
+	@Override
+	public String getDatabaseTable() {
+		return "tags";
+	}
+
+	/**
+	 * @return the id
+	 */
+	@Override
+	public final Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * @return the isUser
+	 */
+	public final Boolean getIsUser() {
+		return this.isUser;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public final String getName() {
+		return this.name;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		if (this.id == null) {
+			result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
+			result = (prime * result) + ((this.isUser == null) ? 0 : this.isUser.hashCode());
+		} else {
+			result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		}
+
+		return result;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	@Override
+	public final void setId(final Integer id) {
+		this.id = id;
+	}
+
+	/**
+	 * @param isUser
+	 *            the isUser to set
+	 */
+	public final void setIsUser(final Boolean isUser) {
+		this.isUser = isUser;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public final void setName(final String name) {
+		this.name = name;
+	}
+
+	@Override
+	public HashMap<String, Object> toHashMap() {
+		final HashMap<String, Object> tempHashMap = new HashMap<String, Object>();
+		if (this.getId() != null) {
+			tempHashMap.put("id", this.getId());
+		}
+		tempHashMap.put("name", this.getName());
+		tempHashMap.put("isuser", this.getIsUser());
+
+		return tempHashMap;
 	}
 
 	@Override

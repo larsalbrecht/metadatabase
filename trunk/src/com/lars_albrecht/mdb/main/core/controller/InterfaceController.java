@@ -25,6 +25,13 @@ public class InterfaceController implements IController {
 		this.interfaces = new ArrayList<AInterface>();
 	}
 
+	/**
+	 * @return the interfaces
+	 */
+	public final ArrayList<AInterface> getInterfaces() {
+		return this.interfaces;
+	}
+
 	@Override
 	public ArrayList<ThreadEx> getThreadList() {
 		return this.threadList;
@@ -36,7 +43,7 @@ public class InterfaceController implements IController {
 	}
 
 	private void runInterfaces() throws Exception {
-		if (this.interfaces == null || this.interfaces.size() == 0) {
+		if ((this.interfaces == null) || (this.interfaces.size() == 0)) {
 			throw new Exception("Interface Controller run failed. No interfaces specified");
 		}
 		for (final AInterface interfaze : this.interfaces) {
@@ -53,13 +60,6 @@ public class InterfaceController implements IController {
 	 */
 	public final void setInterfaces(final ArrayList<AInterface> interfaces) {
 		this.interfaces = interfaces;
-	}
-
-	/**
-	 * @return the interfaces
-	 */
-	public final ArrayList<AInterface> getInterfaces() {
-		return this.interfaces;
 	}
 
 }

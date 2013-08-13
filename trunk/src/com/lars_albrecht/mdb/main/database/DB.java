@@ -106,6 +106,10 @@ public class DB implements IDatabase {
 		return pst;
 	}
 
+	public static synchronized void beginTransaction() throws SQLException {
+		DB.update("BEGIN TRANSACTION;");
+	}
+
 	/**
 	 * Close the DB connection.
 	 * 
@@ -186,6 +190,10 @@ public class DB implements IDatabase {
 			// Debug.log(Debug.LEVEL_DEBUG, " ");
 			System.out.println(" ");
 		}
+	}
+
+	public static synchronized void endTransaction() throws SQLException {
+		DB.update("END TRANSACTION;");
 	}
 
 	/**
@@ -360,6 +368,10 @@ public class DB implements IDatabase {
 		return resultSet;
 	}
 
+	public static synchronized void rollbackTransaction() throws SQLException {
+		DB.update("ROLLBACK TRANSACTION;");
+	}
+
 	public static void setDBType(final Integer dbType) throws Exception {
 		if (dbType != DB.DBTYPE_SQLITE) {
 			throw new Exception("Unsupported database type");
@@ -412,18 +424,6 @@ public class DB implements IDatabase {
 		return lastInsertedId;
 	}
 
-	public static synchronized void beginTransaction() throws SQLException {
-		DB.update("BEGIN TRANSACTION;");
-	}
-
-	public static synchronized void endTransaction() throws SQLException {
-		DB.update("END TRANSACTION;");
-	}
-
-	public static synchronized void rollbackTransaction() throws SQLException {
-		DB.update("ROLLBACK TRANSACTION;");
-	}
-
 	/**
 	 * use for SQL commands CREATE, DROP, INSERT and UPDATE
 	 * 
@@ -433,7 +433,7 @@ public class DB implements IDatabase {
 	 */
 	public static synchronized int updatePS(final String expression, final Map<Integer, Object> values) throws Exception {
 		int lastInsertedId = -1;
-		if (expression != null && values != null && values.size() > 0) {
+		if ((expression != null) && (values != null) && (values.size() > 0)) {
 			PreparedStatement st = null;
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + expression);
 			Debug.log(Debug.LEVEL_DEBUG, "SQL VALUES: " + values);
@@ -460,49 +460,6 @@ public class DB implements IDatabase {
 			}
 		}
 		return lastInsertedId;
-	}
-
-	private void createTableFileInformation() throws SQLException {
-		// fileInformation
-		String sql = null;
-		sql = "CREATE TABLE IF NOT EXISTS 'fileInformation' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'name' VARCHAR(255), ";
-		sql += "'dir' VARCHAR(255), ";
-		sql += "'ext' VARCHAR(255), ";
-		sql += "'size' LONG, ";
-		sql += "'fullpath' VARCHAR(255), ";
-		sql += "'filehash' VARCHAR(255), ";
-		sql += "'filetype' INTEGER, ";
-		sql += "'createTS' DATE DEFAULT (datetime('now','localtime')), ";
-		sql += "'updateTS' DATE DEFAULT (datetime('now','localtime')), ";
-		sql += "'status' INTEGER NOT NULL DEFAULT '0' ";
-		sql += ");";
-		DB.update(sql);
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileinformation_fullpath ON fileInformation (fullpath);";
-		DB.update(sql);
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileinformation_name_size ON fileInformation (name, size);";
-		DB.update(sql);
-		sql = "CREATE INDEX IF NOT EXISTS idx_fileinformation_id ON fileInformation (id);";
-		DB.update(sql);
-		sql = "CREATE INDEX IF NOT EXISTS idx_fileinformation_name ON fileInformation (name);";
-		DB.update(sql);
-	}
-
-	private void createTableCollectorInformation() throws SQLException {
-		String sql = null;
-		// collectorInformation
-		sql = "CREATE TABLE IF NOT EXISTS 'collectorInformation' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'collectorName' VARCHAR(255), ";
-		sql += "'file_id' INTEGER, ";
-		sql += "'key' VARCHAR(255), ";
-		sql += "'value' VARCHAR(255), ";
-		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE ";
-		sql += ");";
-		DB.update(sql);
-		sql = "CREATE INDEX IF NOT EXISTS idx_collectorinformation_collectorname_file_id ON collectorInformation (collectorName, file_id);";
-		DB.update(sql);
 	}
 
 	private void createTableAttributesKey() throws SQLException {
@@ -533,6 +490,22 @@ public class DB implements IDatabase {
 		DB.update(sql);
 	}
 
+	private void createTableCollectorInformation() throws SQLException {
+		String sql = null;
+		// collectorInformation
+		sql = "CREATE TABLE IF NOT EXISTS 'collectorInformation' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'collectorName' VARCHAR(255), ";
+		sql += "'file_id' INTEGER, ";
+		sql += "'key' VARCHAR(255), ";
+		sql += "'value' VARCHAR(255), ";
+		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE ";
+		sql += ");";
+		DB.update(sql);
+		sql = "CREATE INDEX IF NOT EXISTS idx_collectorinformation_collectorname_file_id ON collectorInformation (collectorName, file_id);";
+		DB.update(sql);
+	}
+
 	private void createTableFileAttributes() throws SQLException {
 		String sql = null;
 		// fileAttributes
@@ -551,16 +524,45 @@ public class DB implements IDatabase {
 		DB.update(sql);
 	}
 
-	private void createTableTags() throws SQLException {
+	private void createTableFileInformation() throws SQLException {
+		// fileInformation
 		String sql = null;
-		// tags
-		sql = "CREATE TABLE IF NOT EXISTS 'tags' ( ";
+		sql = "CREATE TABLE IF NOT EXISTS 'fileInformation' ( ";
 		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
 		sql += "'name' VARCHAR(255), ";
-		sql += "'isuser' INTEGER ";
+		sql += "'dir' VARCHAR(255), ";
+		sql += "'ext' VARCHAR(255), ";
+		sql += "'size' LONG, ";
+		sql += "'fullpath' VARCHAR(255), ";
+		sql += "'filehash' VARCHAR(255), ";
+		sql += "'filetype' INTEGER, ";
+		sql += "'createTS' DATE DEFAULT (datetime('now','localtime')), ";
+		sql += "'updateTS' DATE DEFAULT (datetime('now','localtime')), ";
+		sql += "'status' INTEGER NOT NULL DEFAULT '0' ";
+		sql += ");";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileinformation_fullpath ON fileInformation (fullpath);";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileinformation_name_size ON fileInformation (name, size);";
+		DB.update(sql);
+		sql = "CREATE INDEX IF NOT EXISTS idx_fileinformation_id ON fileInformation (id);";
+		DB.update(sql);
+		sql = "CREATE INDEX IF NOT EXISTS idx_fileinformation_name ON fileInformation (name);";
+		DB.update(sql);
+	}
+
+	private void createTableFileMedia() throws SQLException {
+		String sql = null;
+		// options
+		sql = "CREATE TABLE IF NOT EXISTS 'fileMedia' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'file_id' INTEGER, ";
+		sql += "'media_id' INTEGER, ";
+		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
+		sql += "FOREIGN KEY (media_id) REFERENCES mediaItems(id) ON DELETE CASCADE ";
 		sql += "); ";
 		DB.update(sql);
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tags_name ON tags (name);";
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileMedia ON fileMedia (file_id, media_id);";
 		DB.update(sql);
 	}
 
@@ -583,19 +585,6 @@ public class DB implements IDatabase {
 		DB.update(sql);
 	}
 
-	private void createTableOptions() throws SQLException {
-		String sql = null;
-		// options
-		sql = "CREATE TABLE IF NOT EXISTS 'options' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'name' VARCHAR(255), ";
-		sql += "'value' VARCHAR(255) ";
-		sql += "); ";
-		DB.update(sql);
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_options ON options (name);";
-		DB.update(sql);
-	}
-
 	private void createTableMediaItems() throws SQLException {
 		String sql = null;
 		// options
@@ -611,18 +600,29 @@ public class DB implements IDatabase {
 		DB.update(sql);
 	}
 
-	private void createTableFileMedia() throws SQLException {
+	private void createTableOptions() throws SQLException {
 		String sql = null;
 		// options
-		sql = "CREATE TABLE IF NOT EXISTS 'fileMedia' ( ";
+		sql = "CREATE TABLE IF NOT EXISTS 'options' ( ";
 		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'file_id' INTEGER, ";
-		sql += "'media_id' INTEGER, ";
-		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
-		sql += "FOREIGN KEY (media_id) REFERENCES mediaItems(id) ON DELETE CASCADE ";
+		sql += "'name' VARCHAR(255), ";
+		sql += "'value' VARCHAR(255) ";
 		sql += "); ";
 		DB.update(sql);
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileMedia ON fileMedia (file_id, media_id);";
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_options ON options (name);";
+		DB.update(sql);
+	}
+
+	private void createTableTags() throws SQLException {
+		String sql = null;
+		// tags
+		sql = "CREATE TABLE IF NOT EXISTS 'tags' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'name' VARCHAR(255), ";
+		sql += "'isuser' INTEGER ";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tags_name ON tags (name);";
 		DB.update(sql);
 	}
 
@@ -671,10 +671,10 @@ public class DB implements IDatabase {
 			// check if table exists or not (first start, table does not exists)
 			sql = "SELECT count(*) AS count FROM sqlite_master WHERE type='table' AND name='options'";
 			rs = DB.query(sql);
-			if (rs.next() && rs.getInt("count") > 0) {
+			if (rs.next() && (rs.getInt("count") > 0)) {
 				sql = "SELECT COUNT(*) AS count, value FROM options WHERE name = 'dbversion'";
 				rs = DB.query(sql);
-				if (rs.next() && rs.getInt("count") > 0) {
+				if (rs.next() && (rs.getInt("count") > 0)) {
 					currentDBVersion = rs.getInt("value");
 				} else {
 					currentDBVersion = -1;
@@ -685,7 +685,7 @@ public class DB implements IDatabase {
 		}
 
 		try {
-			if (currentDBVersion > -1 && currentDBVersion < newDBVersion) {
+			if ((currentDBVersion > -1) && (currentDBVersion < newDBVersion)) {
 				DB.beginTransaction();
 				for (int i = (currentDBVersion + 1); i <= newDBVersion; i++) {
 					sql = "REPLACE INTO options (id, name, value) VALUES (1, 'dbversion', " + newDBVersion + ")";

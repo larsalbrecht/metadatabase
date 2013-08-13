@@ -20,6 +20,8 @@ public abstract class AInterface implements Runnable {
 	public AInterface() {
 	}
 
+	public abstract void openInterface();
+
 	@Override
 	public final void run() {
 		this.startInterface();
@@ -27,11 +29,12 @@ public abstract class AInterface implements Runnable {
 	}
 
 	/**
-	 * Starts the interface.
+	 * @param controller
+	 *            the controller to set
 	 */
-	public abstract void startInterface();
-
-	public abstract void openInterface();
+	public final void setController(final IController controller) {
+		this.controller = controller;
+	}
 
 	/**
 	 * @param mainController
@@ -42,11 +45,8 @@ public abstract class AInterface implements Runnable {
 	}
 
 	/**
-	 * @param controller
-	 *            the controller to set
+	 * Starts the interface.
 	 */
-	public final void setController(final IController controller) {
-		this.controller = controller;
-	}
+	public abstract void startInterface();
 
 }

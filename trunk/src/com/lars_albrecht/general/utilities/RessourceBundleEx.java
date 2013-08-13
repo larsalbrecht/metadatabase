@@ -51,13 +51,29 @@ public final class RessourceBundleEx {
 		if (RessourceBundleEx.instances == null) {
 			RessourceBundleEx.instances = new ConcurrentHashMap<String, RessourceBundleEx>();
 		}
-		if (!RessourceBundleEx.instances.containsKey(key) || RessourceBundleEx.instances.get(key) == null) {
+		if (!RessourceBundleEx.instances.containsKey(key) || (RessourceBundleEx.instances.get(key) == null)) {
 			RessourceBundleEx.instances.put(key, new RessourceBundleEx());
 			RessourceBundleEx.instances.get(key);
 			RessourceBundleEx.setPrefix(key);
 		}
 
 		return RessourceBundleEx.instances.get(key);
+	}
+
+	/**
+	 * @param locale
+	 *            the locale to set
+	 */
+	public static synchronized final void setLocale(final Locale locale) {
+		RessourceBundleEx.locale = locale;
+	}
+
+	/**
+	 * @param prefix
+	 *            the prefix to set
+	 */
+	public static synchronized final void setPrefix(final String prefix) {
+		RessourceBundleEx.prefix = prefix;
 	}
 
 	/**
@@ -110,22 +126,6 @@ public final class RessourceBundleEx {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	/**
-	 * @param locale
-	 *            the locale to set
-	 */
-	public static synchronized final void setLocale(final Locale locale) {
-		RessourceBundleEx.locale = locale;
-	}
-
-	/**
-	 * @param prefix
-	 *            the prefix to set
-	 */
-	public static synchronized final void setPrefix(final String prefix) {
-		RessourceBundleEx.prefix = prefix;
 	}
 
 }

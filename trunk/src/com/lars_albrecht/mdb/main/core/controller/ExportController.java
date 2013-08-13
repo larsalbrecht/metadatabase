@@ -27,6 +27,13 @@ public class ExportController implements IController {
 		this.mainController = mainController;
 	}
 
+	/**
+	 * @return the exporters
+	 */
+	public final ArrayList<AExporter> getExporters() {
+		return this.exporters;
+	}
+
 	@Override
 	public ArrayList<ThreadEx> getThreadList() {
 		return this.threadList;
@@ -67,13 +74,6 @@ public class ExportController implements IController {
 	 */
 	public final void setExporters(final ArrayList<AExporter> exporters) {
 		this.exporters = exporters;
-	}
-
-	/**
-	 * @return the exporters
-	 */
-	public final ArrayList<AExporter> getExporters() {
-		return this.exporters;
 	}
 
 }

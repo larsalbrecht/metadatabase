@@ -25,6 +25,30 @@ public class InterfaceHelper {
 	public final static int	SEARCHTYPE_TEXTALL		= 1;
 	public final static int	SEARCHTYPE_ATTRIBUTE	= 2;
 
+	private static Entry<String, String> getRealSearchValues(final String input) {
+		Entry<String, String> output = null;
+		String key = null;
+		String value = null;
+
+		String[] keyValue = null;
+		if (input.contains("=")) {
+			keyValue = input.split("=");
+
+			keyValue[1] = keyValue[1].replaceAll("\"", "");
+
+			key = keyValue[0];
+			value = keyValue[1];
+		} else if (input.contains("\"")) {
+			value = input.replaceAll("\"", "");
+		} else {
+			value = input;
+		}
+
+		output = new SimpleEntry<String, String>(key, value);
+
+		return output;
+	}
+
 	/**
 	 * 
 	 * @param searchText
@@ -35,7 +59,7 @@ public class InterfaceHelper {
 	public static ConcurrentHashMap<String, Object> searchItems(final String searchText, final DataHandler dataHandler) {
 		ConcurrentHashMap<String, Object> resultMap = null;
 		ArrayList<FileItem> resultList = null;
-		if (searchText != null && !searchText.equalsIgnoreCase("") && dataHandler != null) {
+		if ((searchText != null) && !searchText.equalsIgnoreCase("") && (dataHandler != null)) {
 			resultMap = new ConcurrentHashMap<String, Object>();
 			resultList = new ArrayList<FileItem>();
 
@@ -97,30 +121,6 @@ public class InterfaceHelper {
 		}
 
 		return resultMap;
-	}
-
-	private static Entry<String, String> getRealSearchValues(final String input) {
-		Entry<String, String> output = null;
-		String key = null;
-		String value = null;
-
-		String[] keyValue = null;
-		if (input.contains("=")) {
-			keyValue = input.split("=");
-
-			keyValue[1] = keyValue[1].replaceAll("\"", "");
-
-			key = keyValue[0];
-			value = keyValue[1];
-		} else if (input.contains("\"")) {
-			value = input.replaceAll("\"", "");
-		} else {
-			value = input;
-		}
-
-		output = new SimpleEntry<String, String>(key, value);
-
-		return output;
 	}
 
 }

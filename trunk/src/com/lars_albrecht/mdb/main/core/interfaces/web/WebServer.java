@@ -162,21 +162,6 @@ public class WebServer {
 		}
 	}
 
-	private boolean startServerSocket(final int socketPort) {
-		try {
-			// create the main server socket
-			this.serverSocket = new ServerSocket(socketPort);
-			this.webInterface.setPort(socketPort);
-			return true;
-		} catch (final BindException e) {
-			System.out.println("Socket already in use. Try another one.");
-			return false;
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-		return false;
-	}
-
 	/**
 	 * WebServer constructor.
 	 */
@@ -205,6 +190,21 @@ public class WebServer {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private boolean startServerSocket(final int socketPort) {
+		try {
+			// create the main server socket
+			this.serverSocket = new ServerSocket(socketPort);
+			this.webInterface.setPort(socketPort);
+			return true;
+		} catch (final BindException e) {
+			System.out.println("Socket already in use. Try another one.");
+			return false;
+		} catch (final IOException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 }

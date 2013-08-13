@@ -46,13 +46,6 @@ public class MDB {
 		}
 	}
 
-	public void run() {
-		Debug.log(Debug.LEVEL_INFO, RessourceBundleEx.getInstance("mdb").getProperty("application.name") + " ("
-				+ RessourceBundleEx.getInstance("mdb").getProperty("application.version") + ")");
-
-		this.mainController.run();
-	}
-
 	private void init() {
 		Debug.loglevel = this.mdbConfig.getLoglevel();
 		RessourceBundleEx.setPrefix("mdb");
@@ -76,14 +69,19 @@ public class MDB {
 		this.mainController.setcController(this.cController);
 	}
 
-	private void initTypeController() {
-		this.tController = new TypeController(this.mainController);
-		this.tController.setTypers(this.mdbConfig.getListOfTypers());
+	private void initCollectorController() {
+		this.cController = new CollectorController(this.mainController);
+		this.cController.setCollectors(this.mdbConfig.getListOfCollectors());
 	}
 
-	private void initFinderController() {
-		this.fController = new FinderController(this.mainController);
-		this.fController.setFileFilter(this.mdbConfig.getFinderFileFilter());
+	private void initDB() {
+		try {
+			new DB().init();
+		} catch (final Exception e) {
+			e.printStackTrace();
+			System.err.println("SYSTEM SHUT DOWN");
+			System.exit(-1);
+		}
 	}
 
 	private void initExporterController() {
@@ -93,6 +91,11 @@ public class MDB {
 		this.mdbConfig.getListOfExporter().add(new PDFExport());
 
 		this.eController.setExporters(this.mdbConfig.getListOfExporter());
+	}
+
+	private void initFinderController() {
+		this.fController = new FinderController(this.mainController);
+		this.fController.setFileFilter(this.mdbConfig.getFinderFileFilter());
 	}
 
 	private void initInterfaceController() {
@@ -121,19 +124,16 @@ public class MDB {
 		}
 	}
 
-	private void initCollectorController() {
-		this.cController = new CollectorController(this.mainController);
-		this.cController.setCollectors(this.mdbConfig.getListOfCollectors());
+	private void initTypeController() {
+		this.tController = new TypeController(this.mainController);
+		this.tController.setTypers(this.mdbConfig.getListOfTypers());
 	}
 
-	private void initDB() {
-		try {
-			new DB().init();
-		} catch (final Exception e) {
-			e.printStackTrace();
-			System.err.println("SYSTEM SHUT DOWN");
-			System.exit(-1);
-		}
+	public void run() {
+		Debug.log(Debug.LEVEL_INFO, RessourceBundleEx.getInstance("mdb").getProperty("application.name") + " ("
+				+ RessourceBundleEx.getInstance("mdb").getProperty("application.version") + ")");
+
+		this.mainController.run();
 	}
 
 }

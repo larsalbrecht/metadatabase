@@ -18,6 +18,85 @@ import java.util.regex.Pattern;
  */
 public class Template {
 
+	public static Boolean containsMarker(final String content, final String marker) {
+		Pattern pattern = null;
+		if (marker == null) {
+			pattern = Pattern.compile("\\{(.*)\\}");
+		} else {
+			pattern = Pattern.compile("\\{" + marker + "\\}");
+		}
+		final Matcher matcher = pattern.matcher(content);
+		return matcher.find();
+	}
+
+	public static String getClearedContent(String content) {
+		content = content.replaceAll("(\\{([a-zA-Z0-9]+?-start)\\})(.*?)(\\{([a-zA-Z0-9]+?-end)\\})", "");
+		content = content.replaceAll("(\\{(.*?)\\})", "");
+
+		return content;
+	}
+
+	/**
+	 * Returns the first markername.
+	 * 
+	 * @param content
+	 * @return String
+	 */
+	public static String getNextMarkername(final String content) {
+		final Pattern pattern = Pattern.compile("\\{(.*)\\}");
+		final Matcher matcher = pattern.matcher(content);
+		String name = null;
+		if (matcher.find()) {
+			name = matcher.group(1);
+		}
+		return name;
+	}
+
+	public static String getSubMarkerContent(final String content, final String markername) {
+		String markerContent = null;
+
+		final String markerStart = "{" + markername + "-start}";
+		final String markerEnd = "{" + markername + "-end}";
+		final Pattern pattern = Pattern.compile(Pattern.quote(markerStart) + "(.*)?" + Pattern.quote(markerEnd));
+		final Matcher matcher = pattern.matcher(content);
+		if (matcher.find()) {
+			markerContent = matcher.group(1);
+		}
+
+		return markerContent;
+	}
+
+	/**
+	 * Replace a marker "markername" in "content" with "replacement".
+	 * 
+	 * @param content
+	 * @param markername
+	 * @param replacement
+	 * @param replaceAll
+	 * @return String
+	 */
+	public static String replaceMarker(String content, final String markername, final String replacement, final boolean replaceAll) {
+		if ((content != null) && (markername != null) && (replacement != null)) {
+			if (replaceAll) {
+				content = content.replaceAll("(\\{" + markername + "\\})+", replacement);
+			} else {
+				content = content.replaceFirst("(\\{" + markername + "\\})+", replacement);
+			}
+		}
+		return content;
+	}
+
+	public static String replaceMarkers(final String content, final ConcurrentHashMap<String, String> markerReplacements) {
+		String resultContent = content;
+		if ((resultContent != null) && (markerReplacements != null) && (markerReplacements.size() > 0)) {
+			for (final Entry<String, String> entry : markerReplacements.entrySet()) {
+
+				resultContent = Template.replaceMarker(resultContent, entry.getKey(), entry.getValue(), false);
+			}
+		}
+		return resultContent;
+	}
+
 	private String	content	= null;
 
 	public Template() {
@@ -30,11 +109,26 @@ public class Template {
 
 	public Template(final String templateName, final ConcurrentHashMap<String, String> markerReplacements) {
 		this.loadTemplateFile(templateName);
-		if (this.content != null && markerReplacements != null && markerReplacements.size() > 0) {
+		if ((this.content != null) && (markerReplacements != null) && (markerReplacements.size() > 0)) {
 			for (final Entry<String, String> entry : markerReplacements.entrySet()) {
 				this.replaceMarker(entry.getKey(), entry.getValue(), Boolean.FALSE);
 			}
 		}
+	}
+
+	public Boolean containsMarker(final String marker) {
+		return Template.containsMarker(this.content, marker);
+	}
+
+	public String getClearedContent() {
+		return Template.getClearedContent(this.content);
+	}
+
+	/**
+	 * @return the content
+	 */
+	public final String getContent() {
+		return this.content;
 	}
 
 	/**
@@ -67,7 +161,7 @@ public class Template {
 				if (inputStream != null) {
 					content = Helper.getInputStreamContents(inputStream, Charset.forName("UTF-8"));
 					return content;
-				} else if (file != null && (file = FileFinder.getInstance().findFile(new File(new File(url).getName()), false)) != null
+				} else if ((file != null) && ((file = FileFinder.getInstance().findFile(new File(new File(url).getName()), false)) != null)
 						&& file.exists() && file.isFile() && file.canRead()) {
 					content = Helper.getFileContents(file);
 					return content;
@@ -82,8 +176,16 @@ public class Template {
 		return null;
 	}
 
+	public String getNextMarkername() {
+		return Template.getNextMarkername(this.content);
+	}
+
+	public String getSubMarkerContent(final String markername) {
+		return Template.getSubMarkerContent(this.content, markername);
+	}
+
 	public final void loadTemplateFile(final String templateName) {
-		if (templateName != null && !templateName.equalsIgnoreCase("")) {
+		if ((templateName != null) && !templateName.equalsIgnoreCase("")) {
 			this.content = this.getFileContent(templateName + ".page", "web");
 			if (this.content == null) {
 				this.content = this.getFileContent(templateName + ".partial", "web");
@@ -98,120 +200,18 @@ public class Template {
 		}
 	}
 
-	/**
-	 * @return the content
-	 */
-	public final String getContent() {
-		return this.content;
-	}
-
-	public Boolean containsMarker(final String marker) {
-		return Template.containsMarker(this.content, marker);
-	}
-
-	public static Boolean containsMarker(final String content, final String marker) {
-		Pattern pattern = null;
-		if (marker == null) {
-			pattern = Pattern.compile("\\{(.*)\\}");
-		} else {
-			pattern = Pattern.compile("\\{" + marker + "\\}");
-		}
-		final Matcher matcher = pattern.matcher(content);
-		return matcher.find();
-	}
-
-	public String getNextMarkername() {
-		return Template.getNextMarkername(this.content);
-	}
-
-	/**
-	 * Returns the first markername.
-	 * 
-	 * @param content
-	 * @return String
-	 */
-	public static String getNextMarkername(final String content) {
-		final Pattern pattern = Pattern.compile("\\{(.*)\\}");
-		final Matcher matcher = pattern.matcher(content);
-		String name = null;
-		if (matcher.find()) {
-			name = matcher.group(1);
-		}
-		return name;
-	}
-
 	public String replaceMarker(final String markername, final String replacement, final boolean replaceAll) {
 		this.content = Template.replaceMarker(this.content, markername, replacement, replaceAll);
 		return this.content;
 	}
 
 	public String replaceMarkers(final ConcurrentHashMap<String, String> markerReplacements) {
-		if (markerReplacements != null && markerReplacements.size() > 0) {
+		if ((markerReplacements != null) && (markerReplacements.size() > 0)) {
 			for (final Entry<String, String> entry : markerReplacements.entrySet()) {
 				this.replaceMarker(entry.getKey(), entry.getValue(), Boolean.FALSE);
 			}
 		}
 		return this.content;
-	}
-
-	/**
-	 * Replace a marker "markername" in "content" with "replacement".
-	 * 
-	 * @param content
-	 * @param markername
-	 * @param replacement
-	 * @param replaceAll
-	 * @return String
-	 */
-	public static String replaceMarker(String content, final String markername, final String replacement, final boolean replaceAll) {
-		if (content != null && markername != null && replacement != null) {
-			if (replaceAll) {
-				content = content.replaceAll("(\\{" + markername + "\\})+", replacement);
-			} else {
-				content = content.replaceFirst("(\\{" + markername + "\\})+", replacement);
-			}
-		}
-		return content;
-	}
-
-	public static String replaceMarkers(final String content, final ConcurrentHashMap<String, String> markerReplacements) {
-		String resultContent = content;
-		if (resultContent != null && markerReplacements != null && markerReplacements.size() > 0) {
-			for (final Entry<String, String> entry : markerReplacements.entrySet()) {
-
-				resultContent = Template.replaceMarker(resultContent, entry.getKey(), entry.getValue(), false);
-			}
-		}
-		return resultContent;
-	}
-
-	public String getSubMarkerContent(final String markername) {
-		return Template.getSubMarkerContent(this.content, markername);
-	}
-
-	public static String getSubMarkerContent(final String content, final String markername) {
-		String markerContent = null;
-
-		final String markerStart = "{" + markername + "-start}";
-		final String markerEnd = "{" + markername + "-end}";
-		final Pattern pattern = Pattern.compile(Pattern.quote(markerStart) + "(.*)?" + Pattern.quote(markerEnd));
-		final Matcher matcher = pattern.matcher(content);
-		if (matcher.find()) {
-			markerContent = matcher.group(1);
-		}
-
-		return markerContent;
-	}
-
-	public String getClearedContent() {
-		return Template.getClearedContent(this.content);
-	}
-
-	public static String getClearedContent(String content) {
-		content = content.replaceAll("(\\{([a-zA-Z0-9]+?-start)\\})(.*?)(\\{([a-zA-Z0-9]+?-end)\\})", "");
-		content = content.replaceAll("(\\{(.*?)\\})", "");
-
-		return content;
 	}
 
 }

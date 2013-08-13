@@ -27,9 +27,29 @@ import com.lars_albrecht.mdb.main.core.interfaces.abstracts.AInterface;
  */
 public class SystemTrayInterface extends AInterface implements ActionListener {
 
+	// Obtain the image URL
+	protected static final Image createImage(final String path, final String description) {
+		final URL imageURL = SystemTrayInterface.class.getResource(path);
+		if (imageURL != null) {
+			return (new ImageIcon(imageURL, description)).getImage();
+		}
+
+		final File f = new File(path);
+		if (f.exists() && f.isFile() && f.canRead()) {
+			final Image image = Helper.readImage(new File(path));
+			if (image != null) {
+				return (new ImageIcon(image, description)).getImage();
+			}
+		}
+
+		System.err.println("Resource not found: " + path);
+		return null;
+	}
+
 	private MenuItem	exitItem			= null;
 	private MenuItem	startFinderItem		= null;
 	private MenuItem	openInterface		= null;
+
 	private String		trayIconImagePath	= null;
 
 	public SystemTrayInterface() {
@@ -37,16 +57,12 @@ public class SystemTrayInterface extends AInterface implements ActionListener {
 		this.canOpened = false;
 	}
 
-	/**
-	 * @param trayIconImagePath
-	 *            the trayIconImagePath to set
-	 * @throws Exception
-	 */
-	public final void setTrayIconImagePath(final File trayIconImageFile) throws Exception {
-		if (trayIconImageFile != null && trayIconImageFile.exists() && trayIconImageFile.canRead()) {
-			this.trayIconImagePath = trayIconImageFile.getAbsolutePath();
-		} else {
-			throw new Exception("Tray Icon Image does not exists or is not specified.");
+	@Override
+	public void actionPerformed(final ActionEvent e) {
+		if (e.getSource() == this.exitItem) {
+			this.mainController.exitProgram();
+		} else if (e.getSource() == this.startFinderItem) {
+			this.mainController.startSearch();
 		}
 	}
 
@@ -64,7 +80,7 @@ public class SystemTrayInterface extends AInterface implements ActionListener {
 		// Take every interface and check if it is openable and add a button to
 		// the popupmenu/tray.
 		for (final AInterface interfaze : this.mainController.getiController().getInterfaces()) {
-			if (interfaze != null && interfaze.getClass() != this.getClass() && interfaze.canOpened) {
+			if ((interfaze != null) && (interfaze.getClass() != this.getClass()) && interfaze.canOpened) {
 				this.openInterface = new MenuItem("Open " + interfaze.getClass().getSimpleName());
 				this.openInterface.addActionListener(new ActionListener() {
 					@Override
@@ -89,6 +105,25 @@ public class SystemTrayInterface extends AInterface implements ActionListener {
 	}
 
 	@Override
+	public void openInterface() {
+		// TODO Auto-generated method stub
+
+	}
+
+	/**
+	 * @param trayIconImagePath
+	 *            the trayIconImagePath to set
+	 * @throws Exception
+	 */
+	public final void setTrayIconImagePath(final File trayIconImageFile) throws Exception {
+		if ((trayIconImageFile != null) && trayIconImageFile.exists() && trayIconImageFile.canRead()) {
+			this.trayIconImagePath = trayIconImageFile.getAbsolutePath();
+		} else {
+			throw new Exception("Tray Icon Image does not exists or is not specified.");
+		}
+	}
+
+	@Override
 	public void startInterface() {
 		if (!SystemTray.isSupported()) {
 			System.out.println("SystemTray is not supported");
@@ -100,39 +135,5 @@ public class SystemTrayInterface extends AInterface implements ActionListener {
 		} catch (final AWTException e) {
 			System.out.println("TrayIcon could not be added.");
 		}
-	}
-
-	// Obtain the image URL
-	protected static final Image createImage(final String path, final String description) {
-		final URL imageURL = SystemTrayInterface.class.getResource(path);
-		if (imageURL != null) {
-			return (new ImageIcon(imageURL, description)).getImage();
-		}
-
-		final File f = new File(path);
-		if (f.exists() && f.isFile() && f.canRead()) {
-			final Image image = Helper.readImage(new File(path));
-			if (image != null) {
-				return (new ImageIcon(image, description)).getImage();
-			}
-		}
-
-		System.err.println("Resource not found: " + path);
-		return null;
-	}
-
-	@Override
-	public void actionPerformed(final ActionEvent e) {
-		if (e.getSource() == this.exitItem) {
-			this.mainController.exitProgram();
-		} else if (e.getSource() == this.startFinderItem) {
-			this.mainController.startSearch();
-		}
-	}
-
-	@Override
-	public void openInterface() {
-		// TODO Auto-generated method stub
-
 	}
 }

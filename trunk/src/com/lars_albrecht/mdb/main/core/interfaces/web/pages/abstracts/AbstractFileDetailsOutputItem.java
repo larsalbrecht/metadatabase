@@ -13,6 +13,10 @@ import com.lars_albrecht.mdb.main.core.models.KeyValue;
  */
 public abstract class AbstractFileDetailsOutputItem {
 
+	protected final String getDefaultKey(final String infoType, final String sectionName, final KeyValue<String, Object> keyValue) {
+		return keyValue.getKey().getKey();
+	}
+
 	protected final String getDefaultValue(final String infoType,
 			final String sectionName,
 			final KeyValue<String, Object> keyValue,
@@ -20,17 +24,13 @@ public abstract class AbstractFileDetailsOutputItem {
 		return value;
 	}
 
+	public abstract String getKey(final String infoType, final String sectionName, final KeyValue<String, Object> keyValue);
+
 	public abstract String getValue(final String infoType,
 			final String sectionName,
 			final KeyValue<String, Object> keyValue,
 			final String value);
 
 	public abstract boolean keyAllowed(final String infoType, final String sectionName, final KeyValue<String, Object> keyValue);
-
-	protected final String getDefaultKey(final String infoType, final String sectionName, final KeyValue<String, Object> keyValue) {
-		return keyValue.getKey().getKey();
-	}
-
-	public abstract String getKey(final String infoType, final String sectionName, final KeyValue<String, Object> keyValue);
 
 }

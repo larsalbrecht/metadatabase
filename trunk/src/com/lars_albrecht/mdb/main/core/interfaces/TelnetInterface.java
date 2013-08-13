@@ -27,6 +27,19 @@ public class TelnetInterface extends AInterface {
 	}
 
 	@Override
+	public void openInterface() {
+		if (Desktop.isDesktopSupported()) {
+			try {
+				Desktop.getDesktop().browse(new URI("telnet://localhost:23"));
+			} catch (final IOException | URISyntaxException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Die Telnetverbindung konnte nicht geöffnet werden!", "Fehler",
+						JOptionPane.ERROR_MESSAGE);
+			}
+		}
+	}
+
+	@Override
 	public void startInterface() {
 		final int port = 23;
 		final int maxConnections = 100;
@@ -54,19 +67,6 @@ public class TelnetInterface extends AInterface {
 			}
 		}
 
-	}
-
-	@Override
-	public void openInterface() {
-		if (Desktop.isDesktopSupported()) {
-			try {
-				Desktop.getDesktop().browse(new URI("telnet://localhost:23"));
-			} catch (final IOException | URISyntaxException e) {
-				e.printStackTrace();
-				JOptionPane.showMessageDialog(null, "Die Telnetverbindung konnte nicht geöffnet werden!", "Fehler",
-						JOptionPane.ERROR_MESSAGE);
-			}
-		}
 	}
 
 }

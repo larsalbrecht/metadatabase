@@ -74,6 +74,13 @@ public class FileAttributeList {
 	}
 
 	/**
+	 * @return the infoType
+	 */
+	public final String getInfoType() {
+		return this.infoType;
+	}
+
+	/**
 	 * @return the keyValues
 	 */
 	public ArrayList<KeyValue<String, Object>> getKeyValues() {
@@ -104,6 +111,14 @@ public class FileAttributeList {
 	}
 
 	/**
+	 * @param infoType
+	 *            the infoType to set
+	 */
+	public final void setInfoType(final String infoType) {
+		this.infoType = infoType;
+	}
+
+	/**
 	 * @param keyValues
 	 *            the keyValues to set
 	 */
@@ -117,21 +132,6 @@ public class FileAttributeList {
 	 */
 	public void setSectionName(final String sectionName) {
 		this.sectionName = sectionName;
-	}
-
-	/**
-	 * @return the infoType
-	 */
-	public final String getInfoType() {
-		return this.infoType;
-	}
-
-	/**
-	 * @param infoType
-	 *            the infoType to set
-	 */
-	public final void setInfoType(final String infoType) {
-		this.infoType = infoType;
 	}
 
 	@Override

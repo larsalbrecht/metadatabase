@@ -129,17 +129,17 @@ public class SearchResultsPage extends WebPage {
 	}
 
 	@Override
+	public String getTemplateName() {
+		return "searchresults";
+	}
+
+	@Override
 	public String getTitle() {
 		String searchStr = "";
 		if (this.request.getGetParams().containsKey("searchStr") && (this.request.getGetParams().get("searchStr") != null)) {
 			searchStr = this.request.getGetParams().get("searchStr");
 		}
 		return "Suchergebnisse für: " + searchStr;
-	}
-
-	@Override
-	public String getTemplateName() {
-		return "searchresults";
 	}
 
 }

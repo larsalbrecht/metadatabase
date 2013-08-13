@@ -42,58 +42,6 @@ public class FileMediaItem implements IPersistable {
 		this.mediaId = mediaId;
 	}
 
-	/**
-	 * @return the id
-	 */
-	@Override
-	public final Integer getId() {
-		return this.id;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	@Override
-	public final void setId(final Integer id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the fileId
-	 */
-	public final Integer getFileId() {
-		return this.fileId;
-	}
-
-	/**
-	 * @return the mediaId
-	 */
-	public final Integer getMediaId() {
-		return this.mediaId;
-	}
-
-	/**
-	 * @param mediaId
-	 *            the mediaId to set
-	 */
-	public final void setMediaId(final Integer mediaId) {
-		this.mediaId = mediaId;
-	}
-
-	/**
-	 * @param fileId
-	 *            the fileId to set
-	 */
-	public final void setFileId(final Integer fileId) {
-		this.fileId = fileId;
-	}
-
-	@Override
-	public String getDatabaseTable() {
-		return "fileMedia";
-	}
-
 	@Override
 	public Object fromHashMap(final HashMap<String, Object> map) {
 		final FileMediaItem result = new FileMediaItem();
@@ -107,6 +55,58 @@ public class FileMediaItem implements IPersistable {
 			result.setMediaId((Integer) map.get("media_id"));
 		}
 		return result;
+	}
+
+	@Override
+	public String getDatabaseTable() {
+		return "fileMedia";
+	}
+
+	/**
+	 * @return the fileId
+	 */
+	public final Integer getFileId() {
+		return this.fileId;
+	}
+
+	/**
+	 * @return the id
+	 */
+	@Override
+	public final Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * @return the mediaId
+	 */
+	public final Integer getMediaId() {
+		return this.mediaId;
+	}
+
+	/**
+	 * @param fileId
+	 *            the fileId to set
+	 */
+	public final void setFileId(final Integer fileId) {
+		this.fileId = fileId;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	@Override
+	public final void setId(final Integer id) {
+		this.id = id;
+	}
+
+	/**
+	 * @param mediaId
+	 *            the mediaId to set
+	 */
+	public final void setMediaId(final Integer mediaId) {
+		this.mediaId = mediaId;
 	}
 
 	@Override

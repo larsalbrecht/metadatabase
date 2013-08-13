@@ -17,17 +17,17 @@ public class FileFinder {
 
 	private static FileFinder	instance	= new FileFinder();
 
-	private ArrayList<File>		pathList	= null;
-
-	private FileFinder() {
-	}
-
 	/**
 	 * 
 	 * @return FileFinder
 	 */
 	public static FileFinder getInstance() {
 		return FileFinder.instance;
+	}
+
+	private ArrayList<File>	pathList	= null;
+
+	private FileFinder() {
 	}
 
 	public void addToPathList(final File path, final int position) {
@@ -50,10 +50,6 @@ public class FileFinder {
 
 	public void addToPathList(final String path, final int position) {
 		this.addToPathList(new File(path), position);
-	}
-
-	public ArrayList<File> getPathList() {
-		return this.pathList;
 	}
 
 	public File findFile(final File fileToFind, final boolean recursive) throws IOException {
@@ -83,10 +79,10 @@ public class FileFinder {
 		File returnFile = null;
 		for (final File file : files) {
 			Debug.log(Debug.LEVEL_DEBUG, "Search file " + fileToFind.getName() + " in " + file.getAbsolutePath());
-			if ((file.isDirectory() && (returnFile = new File(file.getCanonicalPath() + File.separator + fileToFind.getName())) != null
+			if ((file.isDirectory() && ((returnFile = new File(file.getCanonicalPath() + File.separator + fileToFind.getName())) != null)
 					&& returnFile.exists() && returnFile.isFile())
-					|| (file.isFile() && file.getName().equalsIgnoreCase(fileToFind.getName()) && (returnFile = file) != null)
-					&& returnFile.exists()) {
+					|| ((file.isFile() && file.getName().equalsIgnoreCase(fileToFind.getName()) && ((returnFile = file) != null)) && returnFile
+							.exists())) {
 				Debug.log(Debug.LEVEL_INFO, "Found File " + fileToFind.getName() + " in " + file.getAbsolutePath());
 				return new File(returnFile.getAbsolutePath());
 			} else if (file.isDirectory() && file.exists() && recursive) {
@@ -97,5 +93,9 @@ public class FileFinder {
 			}
 		}
 		return null;
+	}
+
+	public ArrayList<File> getPathList() {
+		return this.pathList;
 	}
 }

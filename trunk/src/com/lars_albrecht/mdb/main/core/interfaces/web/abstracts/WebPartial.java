@@ -38,9 +38,9 @@ public abstract class WebPartial {
 		return this.pageTemplate;
 	}
 
+	public abstract String getTemplateName();
+
 	final protected void setPageTemplate(final Template pageTemplate) {
 		this.pageTemplate = pageTemplate;
 	}
-
-	public abstract String getTemplateName();
 }

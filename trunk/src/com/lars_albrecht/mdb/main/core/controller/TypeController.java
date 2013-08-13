@@ -55,7 +55,7 @@ public class TypeController {
 	private void initTyper() {
 		for (final ATyper typer : this.typers) {
 			final ArrayList<String> tempTypes = typer.getTypes();
-			if (tempTypes != null && tempTypes.size() > 0) {
+			if ((tempTypes != null) && (tempTypes.size() > 0)) {
 				this.availableTypes.addAll(tempTypes);
 			}
 		}

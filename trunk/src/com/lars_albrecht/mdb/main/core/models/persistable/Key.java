@@ -62,19 +62,21 @@ public class Key<K> implements IPersistable {
 		this.searchable = searchable;
 	}
 
-	/**
-	 * @return the searchable
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#clone()
 	 */
-	public Boolean getSearchable() {
-		return this.searchable;
-	}
-
-	/**
-	 * @param searchable
-	 *            the searchable to set
-	 */
-	public void setSearchable(final Boolean searchable) {
-		this.searchable = searchable;
+	@Override
+	protected Object clone() throws CloneNotSupportedException {
+		final Key<K> tempKey = new Key<K>();
+		tempKey.editable = this.editable;
+		tempKey.id = this.id;
+		tempKey.infoType = this.infoType;
+		tempKey.key = this.key;
+		tempKey.searchable = this.searchable;
+		tempKey.section = this.section;
+		return tempKey;
 	}
 
 	/*
@@ -206,6 +208,13 @@ public class Key<K> implements IPersistable {
 	}
 
 	/**
+	 * @return the searchable
+	 */
+	public Boolean getSearchable() {
+		return this.searchable;
+	}
+
+	/**
 	 * @return the section
 	 */
 	public String getSection() {
@@ -264,6 +273,14 @@ public class Key<K> implements IPersistable {
 	}
 
 	/**
+	 * @param searchable
+	 *            the searchable to set
+	 */
+	public void setSearchable(final Boolean searchable) {
+		this.searchable = searchable;
+	}
+
+	/**
 	 * @param section
 	 *            the section to set
 	 */
@@ -290,23 +307,6 @@ public class Key<K> implements IPersistable {
 	public String toString() {
 		return "Id: " + this.id + " | " + "Key: " + this.key + " | " + "InfoType: " + this.infoType + " | " + "Section: " + this.section
 				+ " | " + "Editable: " + this.editable + " | " + "Searchable: " + this.searchable;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#clone()
-	 */
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
-		final Key<K> tempKey = new Key<K>();
-		tempKey.editable = this.editable;
-		tempKey.id = this.id;
-		tempKey.infoType = this.infoType;
-		tempKey.key = this.key;
-		tempKey.searchable = this.searchable;
-		tempKey.section = this.section;
-		return tempKey;
 	}
 
 }

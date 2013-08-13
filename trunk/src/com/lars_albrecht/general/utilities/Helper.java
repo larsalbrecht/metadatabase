@@ -65,6 +65,8 @@ public class Helper {
 
 	final static String	WRITEIMAGE_GIF	= "jpeg";
 
+	static final String	HEXES			= "0123456789ABCDEF";
+
 	/**
 	 * 
 	 * @param bi
@@ -149,14 +151,14 @@ public class Helper {
 			final String keyValueDelimiter) {
 		final String[] sParted = s.split(entryDelimiter);
 		Map<K, V> resultMap = null;
-		if (sParted != null && sParted.length > 0) {
+		if ((sParted != null) && (sParted.length > 0)) {
 			resultMap = new ConcurrentHashMap<K, V>();
 			K key = null;
 			V value = null;
 			Object[] eParted = null;
 			for (final String string : sParted) {
 				eParted = string.split("\\" + keyValueDelimiter);
-				if (eParted != null && eParted.length == 2) {
+				if ((eParted != null) && (eParted.length == 2)) {
 					key = ((K) eParted[0]);
 					value = ((V) eParted[1]);
 					resultMap.put(key, value);
@@ -261,23 +263,6 @@ public class Helper {
 		return content;
 	}
 
-	public static String getInputStreamContents(final InputStream inputStream, final Charset charset) throws IOException {
-		String content = "";
-		if (inputStream != null) {
-			String line = "";
-			final BufferedReader buReader = new BufferedReader(charset == null ? new InputStreamReader(inputStream)
-					: new InputStreamReader(inputStream, charset));
-			line = buReader.readLine();
-
-			while (line != null) {
-				content += line;
-				line = buReader.readLine();
-			}
-			buReader.close();
-		}
-		return content;
-	}
-
 	/**
 	 * Returns file extension.
 	 * 
@@ -320,6 +305,17 @@ public class Helper {
 		return dfmt.format(new Date(timestamp * 1000));
 	}
 
+	public static String getHex(final byte[] raw) {
+		if (raw == null) {
+			return null;
+		}
+		final StringBuilder hex = new StringBuilder(2 * raw.length);
+		for (final byte b : raw) {
+			hex.append(Helper.HEXES.charAt((b & 0xF0) >> 4)).append(Helper.HEXES.charAt((b & 0x0F)));
+		}
+		return hex.toString();
+	}
+
 	/**
 	 * Returns a human readable string with the filesize.
 	 * 
@@ -338,6 +334,23 @@ public class Helper {
 		};
 		final int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
 		return new DecimalFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+	}
+
+	public static String getInputStreamContents(final InputStream inputStream, final Charset charset) throws IOException {
+		String content = "";
+		if (inputStream != null) {
+			String line = "";
+			final BufferedReader buReader = new BufferedReader(charset == null ? new InputStreamReader(inputStream)
+					: new InputStreamReader(inputStream, charset));
+			line = buReader.readLine();
+
+			while (line != null) {
+				content += line;
+				line = buReader.readLine();
+			}
+			buReader.close();
+		}
+		return content;
 	}
 
 	/**
@@ -435,6 +448,28 @@ public class Helper {
 
 	/**
 	 * 
+	 * @param collection
+	 * @param delim
+	 * @param prefix
+	 * @param suffix
+	 * @return String
+	 */
+	public static String implode(final Collection<?> collection, final String delim, final String prefix, final String suffix) {
+		String temp = "";
+		int i = 0;
+		for (final Object object : collection) {
+			if (i != 0) {
+				temp += delim;
+			}
+			temp += (prefix != null ? prefix : "") + object + (suffix != null ? suffix : "");
+
+			i++;
+		}
+		return temp;
+	}
+
+	/**
+	 * 
 	 * @param map
 	 * @param entryDelimiter
 	 * @param keyPrefix
@@ -483,28 +518,6 @@ public class Helper {
 
 	/**
 	 * 
-	 * @param collection
-	 * @param delim
-	 * @param prefix
-	 * @param suffix
-	 * @return String
-	 */
-	public static String implode(final Collection<?> collection, final String delim, final String prefix, final String suffix) {
-		String temp = "";
-		int i = 0;
-		for (final Object object : collection) {
-			if (i != 0) {
-				temp += delim;
-			}
-			temp += (prefix != null ? prefix : "") + object + (suffix != null ? suffix : "");
-
-			i++;
-		}
-		return temp;
-	}
-
-	/**
-	 * 
 	 * @param list
 	 * @param delim
 	 * @param prefix
@@ -513,9 +526,9 @@ public class Helper {
 	 */
 	public static String implode(final String[] list, final String delim, final String prefix, final String suffix) {
 		String temp = "";
-		if (list != null && list.length > 0) {
+		if ((list != null) && (list.length > 0)) {
 			for (int i = 0; i < list.length; i++) {
-				if (delim != null && i != 0) {
+				if ((delim != null) && (i != 0)) {
 					temp += delim;
 				}
 				temp += (prefix != null ? prefix : "") + list[i] + (suffix != null ? suffix : "");
@@ -608,6 +621,23 @@ public class Helper {
 			tempStr += s;
 		}
 		return tempStr;
+	}
+
+	/**
+	 * @see "http://stackoverflow.com/questions/2282728/java-replacelast"
+	 * 
+	 * @param string
+	 * @param toReplace
+	 * @param replacement
+	 * @return String
+	 */
+	public static String replaceLast(final String string, final String toReplace, final String replacement) {
+		final int pos = string.lastIndexOf(toReplace);
+		if (pos > -1) {
+			return string.substring(0, pos) + replacement + string.substring(pos + toReplace.length(), string.length());
+		} else {
+			return string;
+		}
 	}
 
 	/**
@@ -743,36 +773,6 @@ public class Helper {
 	public static void writeImage(final Image image, final String type, final File newFile, final Boolean overWrite) throws IOException {
 		if ((overWrite == Boolean.TRUE) || ((overWrite == Boolean.FALSE) && (newFile.exists() == Boolean.FALSE))) {
 			ImageIO.write(Helper.toBufferedImage(image), type, newFile);
-		}
-	}
-
-	static final String	HEXES	= "0123456789ABCDEF";
-
-	public static String getHex(final byte[] raw) {
-		if (raw == null) {
-			return null;
-		}
-		final StringBuilder hex = new StringBuilder(2 * raw.length);
-		for (final byte b : raw) {
-			hex.append(Helper.HEXES.charAt((b & 0xF0) >> 4)).append(Helper.HEXES.charAt((b & 0x0F)));
-		}
-		return hex.toString();
-	}
-
-	/**
-	 * @see "http://stackoverflow.com/questions/2282728/java-replacelast"
-	 * 
-	 * @param string
-	 * @param toReplace
-	 * @param replacement
-	 * @return String
-	 */
-	public static String replaceLast(final String string, final String toReplace, final String replacement) {
-		final int pos = string.lastIndexOf(toReplace);
-		if (pos > -1) {
-			return string.substring(0, pos) + replacement + string.substring(pos + toReplace.length(), string.length());
-		} else {
-			return string;
 		}
 	}
 

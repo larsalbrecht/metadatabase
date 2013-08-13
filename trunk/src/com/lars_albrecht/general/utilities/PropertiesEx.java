@@ -18,11 +18,6 @@ public class PropertiesEx {
 
 	private static PropertiesEx	instance	= new PropertiesEx();
 
-	private Properties			properties	= null;
-
-	private PropertiesEx() {
-	}
-
 	/**
 	 * 
 	 * @return PropertiesEx
@@ -31,20 +26,14 @@ public class PropertiesEx {
 		return PropertiesEx.instance;
 	}
 
-	public boolean isInit() {
-		return (this.properties == null ? false : true);
+	private Properties	properties	= null;
+
+	private PropertiesEx() {
 	}
 
-	public void init(final File configFile) throws FileNotFoundException, IOException {
-		if (configFile != null && configFile.exists() && configFile.isFile() && configFile.canRead()) {
-			this.properties = new Properties();
-			this.properties.load(new FileInputStream(configFile));
-		}
-	}
-
-	public String getProperty(final String key) throws PropertiesExNotInitilizedException {
+	public Boolean contains(final String key) throws PropertiesExNotInitilizedException {
 		if (this.isInit()) {
-			return this.properties.getProperty(key);
+			return this.properties.containsKey(key);
 		} else {
 			throw new PropertiesExNotInitilizedException("PropertiesEx not initilized");
 		}
@@ -64,12 +53,23 @@ public class PropertiesEx {
 		}
 	}
 
-	public Boolean contains(final String key) throws PropertiesExNotInitilizedException {
+	public String getProperty(final String key) throws PropertiesExNotInitilizedException {
 		if (this.isInit()) {
-			return this.properties.containsKey(key);
+			return this.properties.getProperty(key);
 		} else {
 			throw new PropertiesExNotInitilizedException("PropertiesEx not initilized");
 		}
+	}
+
+	public void init(final File configFile) throws FileNotFoundException, IOException {
+		if ((configFile != null) && configFile.exists() && configFile.isFile() && configFile.canRead()) {
+			this.properties = new Properties();
+			this.properties.load(new FileInputStream(configFile));
+		}
+	}
+
+	public boolean isInit() {
+		return (this.properties == null ? false : true);
 	}
 
 }

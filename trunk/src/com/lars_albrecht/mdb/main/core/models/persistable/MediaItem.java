@@ -62,80 +62,6 @@ public class MediaItem implements IPersistable {
 		this.options = options;
 	}
 
-	/**
-	 * @return the id
-	 */
-	@Override
-	public final Integer getId() {
-		return this.id;
-	}
-
-	/**
-	 * @param id
-	 *            the id to set
-	 */
-	@Override
-	public final void setId(final Integer id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the name
-	 */
-	public final String getName() {
-		return this.name;
-	}
-
-	/**
-	 * @param name
-	 *            the name to set
-	 */
-	public final void setName(final String name) {
-		this.name = name;
-	}
-
-	/**
-	 * @return the type
-	 */
-	public final Integer getType() {
-		return this.type;
-	}
-
-	/**
-	 * @param type
-	 *            the type to set
-	 */
-	public final void setType(final Integer type) {
-		this.type = type;
-	}
-
-	/**
-	 * @return the options
-	 */
-	public final ConcurrentHashMap<Integer, Object> getOptions() {
-		return this.options;
-	}
-
-	/**
-	 * @return the uri
-	 */
-	public final URI getUri() {
-		return this.uri;
-	}
-
-	/**
-	 * @param uri
-	 *            the uri to set
-	 */
-	public final void setUri(final URI uri) {
-		this.uri = uri;
-	}
-
-	@Override
-	public String getDatabaseTable() {
-		return "mediaItems";
-	}
-
 	@SuppressWarnings("unchecked")
 	@Override
 	public Object fromHashMap(final HashMap<String, Object> map) {
@@ -150,7 +76,7 @@ public class MediaItem implements IPersistable {
 			result.setType((Integer) map.get("type"));
 		}
 
-		if (map.containsKey("uri") && map.get("uri") instanceof String) {
+		if (map.containsKey("uri") && (map.get("uri") instanceof String)) {
 			try {
 				result.setUri(new URI((String) map.get("uri")));
 			} catch (final URISyntaxException e) {
@@ -166,6 +92,80 @@ public class MediaItem implements IPersistable {
 	}
 
 	@Override
+	public String getDatabaseTable() {
+		return "mediaItems";
+	}
+
+	/**
+	 * @return the id
+	 */
+	@Override
+	public final Integer getId() {
+		return this.id;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public final String getName() {
+		return this.name;
+	}
+
+	/**
+	 * @return the options
+	 */
+	public final ConcurrentHashMap<Integer, Object> getOptions() {
+		return this.options;
+	}
+
+	/**
+	 * @return the type
+	 */
+	public final Integer getType() {
+		return this.type;
+	}
+
+	/**
+	 * @return the uri
+	 */
+	public final URI getUri() {
+		return this.uri;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	@Override
+	public final void setId(final Integer id) {
+		this.id = id;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public final void setName(final String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @param type
+	 *            the type to set
+	 */
+	public final void setType(final Integer type) {
+		this.type = type;
+	}
+
+	/**
+	 * @param uri
+	 *            the uri to set
+	 */
+	public final void setUri(final URI uri) {
+		this.uri = uri;
+	}
+
+	@Override
 	public HashMap<String, Object> toHashMap() {
 		final HashMap<String, Object> tempHashMap = new HashMap<String, Object>();
 
@@ -176,7 +176,7 @@ public class MediaItem implements IPersistable {
 		tempHashMap.put("name", this.name);
 		tempHashMap.put("type", this.type);
 		tempHashMap.put("uri", this.uri);
-		if (this.options != null && this.options.size() > 0) {
+		if ((this.options != null) && (this.options.size() > 0)) {
 			tempHashMap.put("options", Helper.implode(this.options, ";", "|", null, null, null, null, null, null, false));
 		}
 

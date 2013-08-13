@@ -94,11 +94,11 @@ public class FileDetailsPage extends WebPage {
 			final String removeLink = detailViewTemplate.getSubMarkerContent("removeLink");
 
 			final ConcurrentHashMap<String, String> tempReplacements = new ConcurrentHashMap<String, String>();
-			if (item.getFileTags() != null && item.getFileTags().size() > 0) {
+			if ((item.getFileTags() != null) && (item.getFileTags().size() > 0)) {
 				String tempTagItem = detailViewTemplate.getSubMarkerContent("tagListItem");
 				for (final FileTag fileTag : item.getFileTags()) {
-					if (fileTag != null && fileTag.getTag() != null && fileTag.getTag().getId() != null
-							&& fileTag.getTag().getName() != null) {
+					if ((fileTag != null) && (fileTag.getTag() != null) && (fileTag.getTag().getId() != null)
+							&& (fileTag.getTag().getName() != null)) {
 
 						tempReplacements.clear();
 
@@ -116,7 +116,7 @@ public class FileDetailsPage extends WebPage {
 			detailViewTemplate.replaceMarker("tags", tagsContainer, false);
 
 			// if file has attributes
-			if (item.getAttributes() != null && item.getAttributes().size() > 0) {
+			if ((item.getAttributes() != null) && (item.getAttributes().size() > 0)) {
 				// get marker for attributes
 				String attributes = detailViewTemplate.getSubMarkerContent("attributes");
 
@@ -165,8 +165,8 @@ public class FileDetailsPage extends WebPage {
 							String rows = "";
 							// fill rows
 							for (final KeyValue<String, Object> keyValue : attributeList.getKeyValues()) {
-								if (keyValue != null
-										&& keyValue.getKey() != null
+								if ((keyValue != null)
+										&& (keyValue.getKey() != null)
 										&& attributeListCpy.getKeyValues().contains(keyValue)
 										&& this.webInterface.getFileDetailsOutputItem().keyAllowed(currentInfoType,
 												attributeList.getSectionName(), keyValue)) {
@@ -282,6 +282,32 @@ public class FileDetailsPage extends WebPage {
 		return detailViewTemplate;
 	}
 
+	@Override
+	public String getTemplateName() {
+		return "filedetails";
+	}
+
+	@Override
+	public String getTitle() {
+		String title;
+		if (this.request.getGetParams().containsKey("fileId") && (this.request.getGetParams().get("fileId") != null)) {
+			final Integer fileId = Integer.parseInt(this.request.getGetParams().get("fileId"));
+			if ((fileId != null) && (fileId > 0)) {
+				final FileItem tempFileItem = this.mainController.getDataHandler().findAllInfoForAllByFileId(fileId);
+				if (tempFileItem != null) {
+					title = "Detailansicht: " + tempFileItem.getName();
+				} else {
+					title = "Detailansicht: Keine gültige Datei gewählt";
+				}
+			} else {
+				title = "Detailansicht: Keine gültige Datei gewählt";
+			}
+		} else {
+			title = "Detailansicht: Keine Datei gewählt";
+		}
+		return title;
+	}
+
 	private ArrayList<Object> getValuesForKey(final FileAttributeList list, final String key) {
 		final ArrayList<Object> resultList = new ArrayList<Object>();
 		if ((list != null) && (list.getKeyValues().size() > 0) && (key != null)) {
@@ -307,32 +333,6 @@ public class FileDetailsPage extends WebPage {
 			}
 		}
 		return resultList;
-	}
-
-	@Override
-	public String getTitle() {
-		String title;
-		if (this.request.getGetParams().containsKey("fileId") && (this.request.getGetParams().get("fileId") != null)) {
-			final Integer fileId = Integer.parseInt(this.request.getGetParams().get("fileId"));
-			if ((fileId != null) && (fileId > 0)) {
-				final FileItem tempFileItem = this.mainController.getDataHandler().findAllInfoForAllByFileId(fileId);
-				if (tempFileItem != null) {
-					title = "Detailansicht: " + tempFileItem.getName();
-				} else {
-					title = "Detailansicht: Keine gültige Datei gewählt";
-				}
-			} else {
-				title = "Detailansicht: Keine gültige Datei gewählt";
-			}
-		} else {
-			title = "Detailansicht: Keine Datei gewählt";
-		}
-		return title;
-	}
-
-	@Override
-	public String getTemplateName() {
-		return "filedetails";
 	}
 
 }
