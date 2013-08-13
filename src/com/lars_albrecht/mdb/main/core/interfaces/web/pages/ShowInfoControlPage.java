@@ -117,8 +117,8 @@ public class ShowInfoControlPage extends WebPage {
 		controlViewContainer = Template.replaceMarker(controlViewContainer, "collectorHref", collectorHrefString, false);
 		controlViewContainer = Template.replaceMarker(controlViewContainer, "collectorClass", collectorClassString, false);
 
-		controlViewContainer = Template.replaceMarker(controlViewContainer, "removeMissingClass", removeMissingHrefString, false);
-		controlViewContainer = Template.replaceMarker(controlViewContainer, "removeMissingHref", removeMissingClassString, false);
+		controlViewContainer = Template.replaceMarker(controlViewContainer, "removeMissingHref", removeMissingHrefString, false);
+		controlViewContainer = Template.replaceMarker(controlViewContainer, "removeMissingClass", removeMissingClassString, false);
 
 		String statusMessagesContainer = "";
 		if (statusMessages.size() > 0) {

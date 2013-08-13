@@ -272,7 +272,7 @@ public class WebServerHelper {
 					content = this.generateContent(Helper.getFileContents(file), file.getName(), request);
 					return content;
 				} else {
-					Debug.log(Debug.LEVEL_ERROR, "InputStream == null && File == null: " + file);
+					Debug.log(Debug.LEVEL_ERROR, "InputStream == null && File == null: " + url + " - " + folder);
 				}
 			} catch (final IOException e) {
 				e.printStackTrace();

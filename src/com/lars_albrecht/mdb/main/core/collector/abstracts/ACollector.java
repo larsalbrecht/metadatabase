@@ -37,7 +37,7 @@ public abstract class ACollector implements Runnable {
 	private ArrayList<Key<String>>										keysToAdd				= null;
 	private ArrayList<Value<?>>											valuesToAdd				= null;
 	private ConcurrentHashMap<FileItem, ArrayList<FileAttributeList>>	fileAttributeListToAdd	= null;
-	private ArrayList<FileAttributes>									typeInformationToAdd	= null;
+	private ArrayList<FileAttributes>									fileAttributesToAdd		= null;
 	private CollectorEventMulticaster									collectorMulticaster	= null;
 	private ArrayList<String>											collectorTypes			= null;
 
@@ -50,7 +50,7 @@ public abstract class ACollector implements Runnable {
 	public ACollector() {
 		this.keysToAdd = new ArrayList<Key<String>>();
 		this.valuesToAdd = new ArrayList<Value<?>>();
-		this.typeInformationToAdd = new ArrayList<FileAttributes>();
+		this.fileAttributesToAdd = new ArrayList<FileAttributes>();
 		this.collectorTypes = new ArrayList<String>();
 	}
 
@@ -135,12 +135,12 @@ public abstract class ACollector implements Runnable {
 	}
 
 	/**
-	 * Persist attributes (typeInformation). Take this.fileAttributeListToAdd
+	 * Persist attributes (fileAttributes). Take this.fileAttributeListToAdd
 	 * which contains the fileItem and an ArrayList of FileAttributeList
-	 * (ArrayList<FileAttributeList>). To persist the typeInformation, a new
-	 * method called "persistTypeInformation" was created. In this method here,
-	 * a method called "prepareAttributes" was created to add specific items to
-	 * a general list.
+	 * (ArrayList<FileAttributeList>). To persist the fileAttributes, a new
+	 * method called "persistFileAttributes" was created. In this method here, a
+	 * method called "prepareAttributes" was created to add specific items to a
+	 * general list.
 	 * 
 	 */
 	private void persistAttributes() {
@@ -150,7 +150,7 @@ public abstract class ACollector implements Runnable {
 				if ((entry.getValue() != null) && (entry.getValue().size() > 0)) {
 					try {
 						if (((fileItemId = this.getFileItemId(entry.getKey())) > -1)) {
-							this.transformToTypeInformation(fileItemId, entry.getValue());
+							this.transformToFileAttributes(fileItemId, entry.getValue());
 							this.mainController.getDataHandler().updateUpdateTSForFileItem(fileItemId);
 						}
 					} catch (final Exception e) {
@@ -162,7 +162,19 @@ public abstract class ACollector implements Runnable {
 			}
 		}
 		this.mainController.getDataHandler().reloadData(DataHandler.RELOAD_NOINFOFILEITEMS);
-		this.persistTypeInformation();
+		this.persistFileAttributes();
+	}
+
+	/**
+	 * Persist fileAttributes.
+	 */
+	private void persistFileAttributes() {
+		try {
+			this.mainController.getDataHandler();
+			DataHandler.persist(this.fileAttributesToAdd, false);
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void persistKeys() {
@@ -170,18 +182,6 @@ public abstract class ACollector implements Runnable {
 			this.mainController.getDataHandler();
 			DataHandler.persist(this.keysToAdd, false);
 			this.mainController.getDataHandler().reloadData(DataHandler.RELOAD_KEYS);
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	/**
-	 * Persist typeInformation.
-	 */
-	private void persistTypeInformation() {
-		try {
-			this.mainController.getDataHandler();
-			DataHandler.persist(this.typeInformationToAdd, false);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -321,8 +321,7 @@ public abstract class ACollector implements Runnable {
 	 * @param fileAttributeListList
 	 * @throws Exception
 	 */
-	private void
-			transformToTypeInformation(final int fileItemId, final ArrayList<FileAttributeList> fileAttributeListList) throws Exception {
+	private void transformToFileAttributes(final int fileItemId, final ArrayList<FileAttributeList> fileAttributeListList) throws Exception {
 		if (fileAttributeListList.size() > 0) {
 			FileAttributes tempTypeInfo = null;
 			final ArrayList<Key<?>> keys = this.mainController.getDataHandler().getKeys();
@@ -345,7 +344,7 @@ public abstract class ACollector implements Runnable {
 					tempTypeInfo = new FileAttributes(fileItemId, keyId, valueId);
 
 					if ((fileItemId > -1) && (keyId > -1) && (valueId > -1) && (tempTypeInfo != null) && !typeInfo.contains(tempTypeInfo)) {
-						this.typeInformationToAdd.add(tempTypeInfo);
+						this.fileAttributesToAdd.add(tempTypeInfo);
 					}
 				}
 			}
