@@ -39,10 +39,23 @@ public class MediaItem implements IPersistable {
 	private Integer								type						= null;
 	private URI									uri							= null;
 
-	private ConcurrentHashMap<Integer, Object>	options						= null;
+	private ConcurrentHashMap<Integer, Object>	options						= new ConcurrentHashMap<Integer, Object>();
 
 	public MediaItem() {
-		this.options = new ConcurrentHashMap<Integer, Object>();
+	}
+
+	/**
+	 * @param id
+	 * @param name
+	 * @param type
+	 * @param uri
+	 */
+	public MediaItem(final Integer id, final String name, final Integer type, final URI uri) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.type = type;
+		this.uri = uri;
 	}
 
 	/**
@@ -59,7 +72,90 @@ public class MediaItem implements IPersistable {
 		this.name = name;
 		this.type = type;
 		this.uri = uri;
-		this.options = options;
+		if (options != null) {
+			this.options = options;
+		}
+	}
+
+	/**
+	 * @param name
+	 * @param type
+	 * @param uri
+	 */
+	public MediaItem(final String name, final Integer type, final URI uri) {
+		super();
+		this.name = name;
+		this.type = type;
+		this.uri = uri;
+	}
+
+	/**
+	 * @param name
+	 * @param type
+	 * @param uri
+	 * @param options
+	 */
+	public MediaItem(final String name, final Integer type, final URI uri, final ConcurrentHashMap<Integer, Object> options) {
+		super();
+		this.name = name;
+		this.type = type;
+		this.uri = uri;
+		if (options != null) {
+			this.options = options;
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof MediaItem)) {
+			return false;
+		}
+		final MediaItem other = (MediaItem) obj;
+		if ((this.id != null) && (other.id != null) && !this.id.equals(other.id)) {
+			return false;
+		} else if ((this.id != null) && (other.id != null) && this.id.equals(other.id)) {
+			return true;
+		}
+		if (this.name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!this.name.equals(other.name)) {
+			return false;
+		}
+		if (this.options == null) {
+			if (other.options != null) {
+				return false;
+			}
+		} else if (!this.options.equals(other.options)) {
+			return false;
+		}
+		if (this.type == null) {
+			if (other.type != null) {
+				return false;
+			}
+		} else if (!this.type.equals(other.type)) {
+			return false;
+		}
+		if (this.uri == null) {
+			if (other.uri != null) {
+				return false;
+			}
+		} else if (!this.uri.equals(other.uri)) {
+			return false;
+		}
+		return true;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -84,7 +180,7 @@ public class MediaItem implements IPersistable {
 			}
 		}
 
-		if (map.containsKey("options")) {
+		if (map.containsKey("options") && (map.get("options") != null)) {
 			result.getOptions().putAll((Map<? extends Integer, ? extends Object>) Helper.explode((String) map.get("options"), ";", "|"));
 		}
 
@@ -130,6 +226,28 @@ public class MediaItem implements IPersistable {
 	 */
 	public final URI getUri() {
 		return this.uri;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+
+		if (this.id == null) {
+			result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
+			result = (prime * result) + ((this.options == null) ? 0 : this.options.hashCode());
+			result = (prime * result) + ((this.type == null) ? 0 : this.type.hashCode());
+			result = (prime * result) + ((this.uri == null) ? 0 : this.uri.hashCode());
+		} else {
+			result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		}
+
+		return result;
 	}
 
 	/**
@@ -185,7 +303,7 @@ public class MediaItem implements IPersistable {
 
 	@Override
 	public String toString() {
-		return this.id + " | " + this.name + " | " + this.type + " | " + this.uri;
+		return this.id + " | " + this.name + " | " + this.type + " | " + this.uri + " | " + this.options;
 	}
 
 }

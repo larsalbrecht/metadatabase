@@ -8,6 +8,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.Helper;
@@ -27,9 +28,12 @@ import com.lars_albrecht.mdb.main.database.DB;
 public class AttributeHandler<E> extends ADataHandler<E> {
 
 	public AttributeHandler() {
-		this.data.put("keys", new ArrayList<Key<String>>());
-		this.data.put("values", new ArrayList<Value<?>>());
-		this.data.put("attributes", new ArrayList<FileAttributeList>());
+		this.data.put("keys", new ConcurrentHashMap<FileItem, ArrayList<?>>());
+		this.data.put("values", new ConcurrentHashMap<FileItem, ArrayList<?>>());
+		this.data.put("attributes", new ConcurrentHashMap<FileItem, ArrayList<?>>());
+		// this.data.put("keys", new ArrayList<Key<String>>());
+		// this.data.put("values", new ArrayList<Value<?>>());
+		// this.data.put("attributes", new ArrayList<FileAttributeList>());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -126,5 +130,10 @@ public class AttributeHandler<E> extends ADataHandler<E> {
 		}
 
 		return -1;
+	}
+
+	@Override
+	protected void persistData() throws Exception {
+		// TODO fill persistData with live
 	}
 }

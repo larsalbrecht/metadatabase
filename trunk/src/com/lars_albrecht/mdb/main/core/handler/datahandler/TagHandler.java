@@ -6,6 +6,7 @@ package com.lars_albrecht.mdb.main.core.handler.datahandler;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
@@ -21,7 +22,8 @@ import com.lars_albrecht.mdb.main.database.DB;
 public class TagHandler<E> extends ADataHandler<E> {
 
 	public TagHandler() {
-		this.data.put("tags", new ArrayList<FileTag>());
+		this.data.put("tags", new ConcurrentHashMap<FileItem, ArrayList<?>>());
+		// this.data.put("tags", new ArrayList<FileTag>());
 	}
 
 	@Override
@@ -50,6 +52,11 @@ public class TagHandler<E> extends ADataHandler<E> {
 			e.printStackTrace();
 		}
 		return resultList;
+	}
+
+	@Override
+	protected void persistData() throws Exception {
+		// TODO fill persistData with live
 	}
 
 }

@@ -4,6 +4,7 @@
 package com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
@@ -72,45 +73,72 @@ public abstract class ADataHandler<E> {
 		return false;
 	}
 
+	public static final void persistAllDataHandler() throws Exception {
+		for (final ADataHandler<?> dataHandler : ADataHandler.dataHandlers) {
+			dataHandler.persistData();
+		}
+	}
+
 	public static final boolean removeDataHandler(final ADataHandler<?> dataHandler) {
 		return ADataHandler.dataHandlers.remove(dataHandler);
 	}
 
-	protected ConcurrentHashMap<String, ArrayList<?>>	data	= null;
+	protected ConcurrentHashMap<String, ConcurrentHashMap<FileItem, ArrayList<?>>>	data	= null;
 
 	public ADataHandler() {
-		this.data = new ConcurrentHashMap<String, ArrayList<?>>();
+		this.data = new ConcurrentHashMap<String, ConcurrentHashMap<FileItem, ArrayList<?>>>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public final void addData(final String dataKey, final ArrayList<IPersistable> dataList) {
-		if (!this.data.containsKey(dataKey) || (this.data.containsKey(dataKey) && (this.data.get(dataKey) == null))) {
-			this.data.put(dataKey, new ArrayList<IPersistable>());
+	public final void addData(final String dataKey, final FileItem fileItem, final ArrayList<IPersistable> dataList) {
+		if ((dataKey != null) && (fileItem != null) && (fileItem.getId() != null) && (this.data != null)) {
+
+			if (!this.data.containsKey(dataKey) || (this.data.containsKey(dataKey) && (this.data.get(dataKey) == null))) {
+				this.data.put(dataKey, new ConcurrentHashMap<FileItem, ArrayList<?>>());
+			}
+			if (this.data.get(dataKey).containsKey(fileItem)) {
+				dataList.addAll((Collection<? extends IPersistable>) this.data.get(dataKey).get(fileItem));
+			}
+			this.data.get(dataKey).put(fileItem, dataList);
 		}
-		((ArrayList<IPersistable>) this.data.get(dataKey)).addAll(dataList);
 	}
 
-	public final void addData(final String dataKey, final IPersistable data) {
-		final ArrayList<IPersistable> tempList = new ArrayList<IPersistable>();
-		tempList.add(data);
-		this.addData(dataKey, tempList);
-	}
-
-	@SuppressWarnings("unchecked")
-	public final ArrayList<IPersistable> getData(final String dataKey) {
-		if (this.data.get(dataKey) != null && this.data.get(dataKey) instanceof ArrayList) {
-			return (ArrayList<IPersistable>) this.data.get(dataKey);
+	public final void addData(final String dataKey, final FileItem fileItem, final IPersistable data) {
+		if ((dataKey != null) && (fileItem != null) && (fileItem.getId() != null) && (data != null)) {
+			final ArrayList<IPersistable> tempList = new ArrayList<IPersistable>();
+			tempList.add(data);
+			this.addData(dataKey, fileItem, tempList);
 		}
-		return null;
 	}
 
-	// TODO move to specific handler
-	// private ArrayList<FileAttributeList> attributes = null;
-	// private ArrayList<FileTag> fileTags = null;
-	// private ArrayList<MediaItem> mediaItems = null;
-
+	/**
+	 * Clears all data from this Handler.
+	 */
 	private void clearData() {
 		this.data.clear();
+	}
+
+	/**
+	 * Returns all data that are saved in database for a specific dataKey. If
+	 * fileItem is null, all items will be returned. If fileItem is NOT null,
+	 * the Map only contains a single FileItem with all values.
+	 * 
+	 * @param dataKey
+	 * @param fileItem
+	 * @return
+	 */
+	public final ConcurrentHashMap<FileItem, ArrayList<?>> getData(final String dataKey, final FileItem fileItem) {
+		if (this.data.get(dataKey) != null) {
+			if (fileItem != null) {
+				final ArrayList<?> tempArrayList = this.data.get(dataKey).get(fileItem);
+				final ConcurrentHashMap<FileItem, ArrayList<?>> tempMap = new ConcurrentHashMap<FileItem, ArrayList<?>>();
+				tempMap.put(fileItem, tempArrayList);
+				return tempMap;
+			} else {
+				return this.data.get(dataKey);
+			}
+		}
+		return null;
 	}
 
 	public abstract ArrayList<?> getHandlerDataForFileItem(final FileItem fileItem);
@@ -124,6 +152,8 @@ public abstract class ADataHandler<E> {
 		}
 		return null;
 	}
+
+	protected abstract void persistData() throws Exception;
 
 	/**
 	 * Sets the data to the specific fileItem in the DataStore.

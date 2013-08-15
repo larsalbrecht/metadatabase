@@ -287,6 +287,11 @@ public abstract class ACollector implements Runnable {
 		this.preparePersist();
 		Debug.startTimer("Collector persist time: " + this.getInfoType());
 		this.persist();
+		try {
+			ADataHandler.persistAllDataHandler();
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
 		Debug.stopTimer("Collector persist time: " + this.getInfoType());
 		OptionsHandler.setOption("collectorEndRunLast" + Helper.ucfirst(this.getInfoType()),
 				(new Timestamp(System.currentTimeMillis()).getTime() / 1000));

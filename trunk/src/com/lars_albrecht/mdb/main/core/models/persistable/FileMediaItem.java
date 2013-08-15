@@ -42,6 +42,45 @@ public class FileMediaItem implements IPersistable {
 		this.mediaId = mediaId;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof FileMediaItem)) {
+			return false;
+		}
+		final FileMediaItem other = (FileMediaItem) obj;
+		if ((this.id != null) && (other.id != null) && !this.id.equals(other.id)) {
+			return false;
+		} else if ((this.id != null) && (other.id != null) && this.id.equals(other.id)) {
+			return true;
+		}
+		if (this.fileId == null) {
+			if (other.fileId != null) {
+				return false;
+			}
+		} else if (!this.fileId.equals(other.fileId)) {
+			return false;
+		}
+		if (this.mediaId == null) {
+			if (other.mediaId != null) {
+				return false;
+			}
+		} else if (!this.mediaId.equals(other.mediaId)) {
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	public Object fromHashMap(final HashMap<String, Object> map) {
 		final FileMediaItem result = new FileMediaItem();
@@ -82,6 +121,26 @@ public class FileMediaItem implements IPersistable {
 	 */
 	public final Integer getMediaId() {
 		return this.mediaId;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+
+		if (this.id == null) {
+			result = (prime * result) + ((this.fileId == null) ? 0 : this.fileId.hashCode());
+			result = (prime * result) + ((this.mediaId == null) ? 0 : this.mediaId.hashCode());
+		} else {
+			result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		}
+
+		return result;
 	}
 
 	/**

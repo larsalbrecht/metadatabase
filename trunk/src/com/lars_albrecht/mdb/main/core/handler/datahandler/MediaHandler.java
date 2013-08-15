@@ -7,7 +7,10 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.Helper;
@@ -24,11 +27,34 @@ import com.lars_albrecht.mdb.main.database.DB;
  */
 public class MediaHandler<E> extends ADataHandler<E> {
 
-	public MediaHandler() {
-		this.data.put("fileMediaItems", new ArrayList<FileMediaItem>());
-		this.data.put("mediaItems", new ArrayList<MediaItem>());
+	/**
+	 * Persist FileMediaItems.
+	 * 
+	 * @param fileItem
+	 * @param mediaItems
+	 * @throws Exception
+	 */
+	@SuppressWarnings("unused")
+	private static void createAndPersistFileMediaItems(final FileItem fileItem, final ArrayList<MediaItem> mediaItems) throws Exception {
+		if ((fileItem != null) && (fileItem.getId() != null) && (fileItem.getId() > -1) && (mediaItems != null) && (mediaItems.size() > 0)) {
+			final ArrayList<FileMediaItem> tempFileMediaItems = new ArrayList<FileMediaItem>();
+			for (final MediaItem mediaItem : mediaItems) {
+				if ((mediaItem != null) && (mediaItem.getId() != null)) {
+					tempFileMediaItems.add(new FileMediaItem(fileItem.getId(), mediaItem.getId()));
+				}
+			}
+			if ((tempFileMediaItems != null) && (tempFileMediaItems.size() > 0)) {
+				DataHandler.persist(tempFileMediaItems, false);
+			}
+		}
 	}
 
+	/**
+	 * Returns a list of FileMediaItems for a single fileItem.
+	 * 
+	 * @param fileItem
+	 * @return ArrayList<FileMediaItem>
+	 */
 	@SuppressWarnings("unused")
 	private static ArrayList<FileMediaItem> getFileMediaItemsForFile(final FileItem fileItem) {
 		final ArrayList<FileMediaItem> resultList = new ArrayList<FileMediaItem>();
@@ -56,7 +82,13 @@ public class MediaHandler<E> extends ADataHandler<E> {
 		return resultList;
 	}
 
-	@SuppressWarnings("unused")
+	/**
+	 * Returns a list of persisted MediaItems for a list of non-persisted
+	 * MediaItems.
+	 * 
+	 * @param mediaItems
+	 * @return
+	 */
 	private static ArrayList<MediaItem> getPersistedMediaItemsForMediaItems(final ArrayList<MediaItem> mediaItems) {
 		final ArrayList<MediaItem> resultList = new ArrayList<MediaItem>();
 		if ((mediaItems != null) && (mediaItems.size() > 0)) {
@@ -92,24 +124,20 @@ public class MediaHandler<E> extends ADataHandler<E> {
 		return resultList;
 	}
 
-	@SuppressWarnings("unused")
-	private static void persistFileMediaItems(final FileItem fileItem, final ArrayList<MediaItem> mediaItems) throws Exception {
-		if ((fileItem != null) && (fileItem.getId() != null) && (fileItem.getId() > -1) && (mediaItems != null) && (mediaItems.size() > 0)) {
-			final ArrayList<FileMediaItem> tempFileMediaItems = new ArrayList<FileMediaItem>();
-			for (final MediaItem mediaItem : mediaItems) {
-				if ((mediaItem != null) && (mediaItem.getId() != null)) {
-					tempFileMediaItems.add(new FileMediaItem(fileItem.getId(), mediaItem.getId()));
-				}
-			}
-			if ((tempFileMediaItems != null) && (tempFileMediaItems.size() > 0)) {
-				DataHandler.persist(tempFileMediaItems, false);
-			}
-		}
+	private static void persistFileMediaItems(final ArrayList<FileMediaItem> fileMediaItems) throws Exception {
+		DataHandler.persist(fileMediaItems, false);
 	}
 
-	@SuppressWarnings("unused")
 	private static void persistMediaItems(final ArrayList<MediaItem> mediaItems) throws Exception {
 		DataHandler.persist(mediaItems, false);
+	}
+
+	public MediaHandler() {
+		this.data.put("fileMediaItems", new ConcurrentHashMap<FileItem, ArrayList<?>>());
+		this.data.put("mediaItems", new ConcurrentHashMap<FileItem, ArrayList<?>>());
+
+		// this.data.put("fileMediaItems", new ArrayList<FileMediaItem>());
+		// this.data.put("mediaItems", new ArrayList<MediaItem>());
 	}
 
 	@Override
@@ -138,5 +166,43 @@ public class MediaHandler<E> extends ADataHandler<E> {
 
 		}
 		return resultList;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	protected void persistData() throws Exception {
+		if (this.data.containsKey("mediaItems") && (this.data.get("mediaItems") != null)) {
+			// create full list of media items
+			ArrayList<MediaItem> tempMediaItems = new ArrayList<MediaItem>();
+			for (final Map.Entry<FileItem, ArrayList<?>> entry : this.data.get("mediaItems").entrySet()) {
+				if (entry.getValue() != null) {
+					tempMediaItems.addAll((Collection<? extends MediaItem>) entry.getValue());
+				}
+			}
+			// persist media items...
+			MediaHandler.persistMediaItems(tempMediaItems);
+			// get media items with id
+			tempMediaItems = MediaHandler.getPersistedMediaItemsForMediaItems(tempMediaItems);
+
+			// create full list of FileMediaItems
+			final ArrayList<FileMediaItem> tempFileMediaItems = new ArrayList<FileMediaItem>();
+			for (final Map.Entry<FileItem, ArrayList<?>> entry : this.data.get("mediaItems").entrySet()) {
+				if ((entry != null) && (entry.getKey() != null) && (entry.getKey().getId() != null) && (entry.getValue() != null)) {
+					for (final MediaItem mediaItem : (ArrayList<MediaItem>) entry.getValue()) {
+						if (tempMediaItems.contains(mediaItem)) {
+							tempFileMediaItems.add(new FileMediaItem(entry.getKey().getId(), tempMediaItems.get(
+									tempMediaItems.indexOf(mediaItem)).getId()));
+						}
+					}
+				}
+			}
+
+			// persist full list of FileMediaItems
+			if ((tempFileMediaItems != null) && (tempFileMediaItems.size() > 0)) {
+				MediaHandler.persistFileMediaItems(tempFileMediaItems);
+			}
+
+			this.data.get("mediaItems").clear();
+		}
 	}
 }
