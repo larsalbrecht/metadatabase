@@ -222,7 +222,7 @@ public class WebServerHelper {
 				} else if (action.equalsIgnoreCase("addTag") && (request.getGetParams().get("value") != null)
 						&& (request.getGetParams().get("fileId") != null)) {
 					try {
-						final Tag tempTag = new Tag(request.getGetParams().get("value"));
+						final Tag tempTag = new Tag(request.getGetParams().get("value"), Boolean.TRUE);
 						final Integer fileId = Integer.parseInt(request.getGetParams().get("fileId"));
 						final Integer id = this.mainController.getDataHandler().addFileTag(new FileTag(fileId, tempTag, Boolean.TRUE));
 						final ArrayList<Tag> tempTagList = new ArrayList<Tag>();

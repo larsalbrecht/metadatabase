@@ -13,6 +13,9 @@ import java.util.regex.Pattern;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.AttributeHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.TagHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
@@ -47,6 +50,7 @@ public class FileDetailsPage extends WebPage {
 
 	}
 
+	@SuppressWarnings("unchecked")
 	private Template generateDetailView(final FileItem item) {
 		final Template detailViewTemplate = this.getPageTemplate();
 
@@ -94,9 +98,10 @@ public class FileDetailsPage extends WebPage {
 			final String removeLink = detailViewTemplate.getSubMarkerContent("removeLink");
 
 			final ConcurrentHashMap<String, String> tempReplacements = new ConcurrentHashMap<String, String>();
-			if ((item.getFileTags() != null) && (item.getFileTags().size() > 0)) {
+			final ArrayList<FileTag> itemFileTags = (ArrayList<FileTag>) ADataHandler.getHandlerDataFromFileItem(item, TagHandler.class);
+			if ((itemFileTags != null) && (itemFileTags.size() > 0)) {
 				String tempTagItem = detailViewTemplate.getSubMarkerContent("tagListItem");
-				for (final FileTag fileTag : item.getFileTags()) {
+				for (final FileTag fileTag : itemFileTags) {
 					if ((fileTag != null) && (fileTag.getTag() != null) && (fileTag.getTag().getId() != null)
 							&& (fileTag.getTag().getName() != null)) {
 
@@ -116,7 +121,9 @@ public class FileDetailsPage extends WebPage {
 			detailViewTemplate.replaceMarker("tags", tagsContainer, false);
 
 			// if file has attributes
-			if ((item.getAttributes() != null) && (item.getAttributes().size() > 0)) {
+			final ArrayList<FileAttributeList> itemFileAttributes = (ArrayList<FileAttributeList>) ADataHandler.getHandlerDataFromFileItem(
+					item, AttributeHandler.class);
+			if ((itemFileAttributes != null) && (itemFileAttributes.size() > 0)) {
 				// get marker for attributes
 				String attributes = detailViewTemplate.getSubMarkerContent("attributes");
 
@@ -130,7 +137,7 @@ public class FileDetailsPage extends WebPage {
 				String gallery = "";
 				String currentSection = null;
 				// for each attribute ...
-				for (final FileAttributeList attributeList : item.getAttributes()) {
+				for (final FileAttributeList attributeList : itemFileAttributes) {
 					currentSection = attributeList.getSectionName();
 					if ((currentInfoType == null) || !currentInfoType.equalsIgnoreCase(attributeList.getInfoType())) {
 						if (i > 0) {

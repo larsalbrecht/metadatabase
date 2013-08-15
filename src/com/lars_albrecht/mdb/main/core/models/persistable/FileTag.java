@@ -102,10 +102,10 @@ public class FileTag implements IPersistable {
 		if (map.containsKey("file_id")) {
 			result.setFileId((Integer) map.get("file_id"));
 		}
-		if (map.containsKey("tag_id") && map.containsKey("tag_name")) {
-			result.setTag(new Tag((Integer) map.get("tag_id"), (String) map.get("tag_name")));
-		} else if (map.containsKey("tag_name")) {
-			result.setTag(new Tag((String) map.get("tag_name")));
+		if (map.containsKey("tag_id") && map.containsKey("tag_name") && map.containsKey("tagIsUser")) {
+			result.setTag(new Tag((Integer) map.get("tag_id"), (String) map.get("tag_name"), (Boolean) map.get("tagIsUser")));
+		} else if (map.containsKey("tag_name") && map.containsKey("tagIsUser")) {
+			result.setTag(new Tag((String) map.get("tag_name"), (Boolean) map.get("tagIsUser")));
 		} else if (map.containsKey("tag_id")) {
 			result.setTag(new Tag((Integer) map.get("tag_id")));
 		}

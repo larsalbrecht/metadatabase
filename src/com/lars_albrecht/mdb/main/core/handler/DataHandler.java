@@ -17,8 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
-import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
-import com.lars_albrecht.mdb.main.core.models.KeyValue;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
 import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileAttributes;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
@@ -35,7 +34,7 @@ import com.lars_albrecht.mdb.main.database.DB;
  *         TODO To support multiple databases, use a base class and create a
  *         class for each database type?
  * 
- *         TODO Build singleton
+ *         TODO Build singleton?
  * 
  */
 public class DataHandler {
@@ -291,70 +290,6 @@ public class DataHandler {
 		return resultList;
 	}
 
-	@SuppressWarnings("unchecked")
-	public ArrayList<FileAttributeList> findAllAttributesForFileId(final Integer fileId) {
-		final ArrayList<FileAttributeList> resultList = new ArrayList<FileAttributeList>();
-		// ArrayList<KeyValue<Key<String>, Value<Object>>>
-		HashMap<String, Object> tempMapKey = null;
-		HashMap<String, Object> tempMapValue = null;
-		ResultSet rs = null;
-		final String sql = "SELECT "
-				+ "	tiKey.id AS 'keyId', tiKey.Key AS 'keyKey', tiKey.infoType AS 'keyInfoType', tiKey.section AS 'keySection', tiKey.editable AS 'keyEditable', tiKey.searchable AS 'keySearchable', tiValue.id as 'valueId', tiValue.value as 'valueValue' "
-				+ "FROM " + "	fileInformation as fi " + "LEFT JOIN " + " 	" + new FileAttributes().getDatabaseTable() + " as ti " + "ON "
-				+ " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	" + new Key<>().getDatabaseTable() + " AS tiKey " + "ON "
-				+ " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	" + new Value<>().getDatabaseTable() + " AS tiValue " + "ON "
-				+ "	tiValue.id = ti.value_id " + "WHERE " + "	fi.id = '" + fileId + "' ORDER BY keyInfoType, keySection ";
-		try {
-			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
-			rs = DB.query(sql);
-			final ResultSetMetaData rsmd = rs.getMetaData();
-			FileAttributeList tempFileAttributeList = null;
-			for (; rs.next();) { // for each line
-				KeyValue<String, Object> kv = null;
-				tempMapKey = new HashMap<String, Object>();
-				tempMapValue = new HashMap<String, Object>();
-				String section = null;
-				String infoType = null;
-				for (int i = 1; i <= rsmd.getColumnCount(); i++) { // for each
-																	// column
-					final String originalName = Helper.lcfirst(rsmd.getColumnLabel(i).replaceFirst("key", "").replaceFirst("value", ""));
-					if (rsmd.getColumnLabel(i).startsWith("key")) {
-						if (originalName.equals("section")) {
-							section = rs.getString("keySection");
-						} else if (originalName.equals("infoType")) {
-							infoType = rs.getString("keyInfoType");
-						}
-						tempMapKey.put(originalName, rs.getObject(i));
-					} else if (rsmd.getColumnLabel(i).startsWith("value")) {
-						tempMapValue.put(originalName, rs.getObject(i));
-					}
-				}
-
-				final Key<String> key = (Key<String>) (new Key<String>()).fromHashMap(tempMapKey);
-				final Value<Object> value = ((Value<Object>) (new Value<Object>()).fromHashMap(tempMapValue));
-				if ((key != null) && (value != null) && (value.getValue() != null)) {
-					kv = new KeyValue<String, Object>(key, value);
-
-					int index = -1;
-					if ((index = this.indexOfSectionInFileAttributeList(resultList, section, infoType)) > -1) {
-						tempFileAttributeList = resultList.get(index);
-						tempFileAttributeList.getKeyValues().add(kv);
-						resultList.set(index, tempFileAttributeList);
-					} else {
-						tempFileAttributeList = new FileAttributeList();
-						tempFileAttributeList.setSectionName(section);
-						tempFileAttributeList.setInfoType(infoType);
-						tempFileAttributeList.getKeyValues().add(kv);
-						resultList.add(tempFileAttributeList);
-					}
-				}
-			}
-		} catch (final SQLException e) {
-			e.printStackTrace();
-		}
-		return resultList;
-	}
-
 	public ArrayList<FileItem> findAllByFileItemValue(final String fileItemValue) {
 		final FileItem fileItem = new FileItem();
 		HashMap<String, Object> tempMap = null;
@@ -508,14 +443,11 @@ public class DataHandler {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
 					}
 					resultItem = (FileItem) resultItem.fromHashMap(tempMap);
+
+					// load data from handlers
 					if (resultItem.getId() != null) {
-						final ArrayList<FileAttributeList> attribList = this.findAllAttributesForFileId(fileId);
-						if ((attribList != null) && (attribList.size() > 0)) {
-							resultItem.getAttributes().addAll(attribList);
-						}
-						final ArrayList<FileTag> tagList = this.findAllTagsForFileId(fileId);
-						if ((tagList != null) && (tagList.size() > 0)) {
-							resultItem.getFileTags().addAll(tagList);
+						for (final ADataHandler<?> dataHandler : ADataHandler.getDataHandlers()) {
+							dataHandler.setHandlerDataToFileItem(resultItem, dataHandler.getHandlerDataForFileItem(resultItem));
 						}
 					}
 				}
@@ -524,33 +456,6 @@ public class DataHandler {
 			}
 		}
 		return resultItem;
-	}
-
-	public ArrayList<FileTag> findAllTagsForFileId(final Integer fileId) {
-		final ArrayList<FileTag> resultList = new ArrayList<FileTag>();
-		// ArrayList<KeyValue<Key<String>, Value<Object>>>
-		ResultSet rs = null;
-		final String sql = "SELECT "
-				+ " tag.id AS tagId, tag.name AS 'tagName', tag.isuser AS 'tagIsUser', fTag.id AS 'fileTagId', fTag.isuser AS 'fileTagIsUser' "
-				+ "FROM " + "	fileInformation as fi " + "LEFT JOIN " + " fileTags as fTag " + "ON " + " fi.id = fTag.file_id "
-				+ " LEFT JOIN " + " 	tags AS tag " + "ON " + " 	tag.id = fTag.tag_id " + "WHERE " + "	fi.id = '" + fileId
-				+ "' ORDER BY tag.name, fTag.isuser ";
-		try {
-			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
-			rs = DB.query(sql);
-			FileTag tempFileTag = null;
-			for (; rs.next();) { // for each line
-
-				if ((rs.getInt("fileTagId") > 0) && (rs.getInt("tagId") > 0)) {
-					tempFileTag = new FileTag(rs.getInt("fileTagId"), fileId, new Tag(rs.getInt("tagId"), rs.getString("tagName"),
-							rs.getBoolean("tagIsUser")), rs.getBoolean("fileTagIsUser"));
-					resultList.add(tempFileTag);
-				}
-			}
-		} catch (final SQLException e) {
-			e.printStackTrace();
-		}
-		return resultList;
 	}
 
 	public ArrayList<String> findAllValuesForKey(final String key) {
@@ -899,37 +804,6 @@ public class DataHandler {
 	 */
 	public ArrayList<Value<?>> getValues() {
 		return this.values;
-	}
-
-	/**
-	 * Returns the index of a section in a FileAttributeList.
-	 * 
-	 * @param fileAttribList
-	 * @param sectionName
-	 * @param infoType
-	 * @return int
-	 */
-	private int indexOfSectionInFileAttributeList(final ArrayList<FileAttributeList> fileAttribList,
-			final String sectionName,
-			final String infoType) {
-		if ((infoType != null) && (sectionName != null)) {
-			for (final FileAttributeList fileAttributeListItem : fileAttribList) {
-				if ((fileAttributeListItem != null) && (fileAttributeListItem.getSectionName() != null)) {
-					if (fileAttributeListItem.getSectionName().equalsIgnoreCase(sectionName)
-							&& (fileAttribList.indexOf(fileAttributeListItem) > -1)) {
-						final int pos = fileAttribList.indexOf(fileAttributeListItem);
-						if ((pos > -1) && (fileAttribList.get(pos) != null) && (fileAttribList.get(pos).getKeyValues() != null)
-								&& (fileAttribList.get(pos).getKeyValues().size() > 0)
-								&& (fileAttribList.get(pos).getKeyValues().get(0).getKey() != null)
-								&& fileAttribList.get(pos).getKeyValues().get(0).getKey().getInfoType().equalsIgnoreCase(infoType)) {
-							return pos;
-						}
-					}
-				}
-			}
-		}
-
-		return -1;
 	}
 
 	/**

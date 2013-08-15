@@ -18,6 +18,7 @@ import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.controller.interfaces.IController;
 import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.handler.OptionsHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileAttributes;
@@ -277,6 +278,7 @@ public abstract class ACollector implements Runnable {
 		Debug.startTimer("Collector collect time: " + this.getInfoType());
 		this.fileItems = this.prepareFileItems(this.fileItems, this.getInfoType());
 		Debug.log(Debug.LEVEL_INFO, "Really collect for: " + this.fileItems.size() + " in " + this.getInfoType());
+		ADataHandler.clearAllDataHandler();
 		this.doCollect();
 		Debug.stopTimer("Collector collect time: " + this.getInfoType());
 		this.keysToAdd = this.getKeysToAdd();

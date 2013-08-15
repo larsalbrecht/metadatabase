@@ -23,6 +23,8 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.exporter.abstracts.AExporter;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.AttributeHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
@@ -120,10 +122,11 @@ public class PDFExport extends AExporter {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private ArrayList<PdfPTable> generateAttributeTable(final FileItem fileItem) {
 		ArrayList<PdfPTable> tableList = null;
 		PdfPTable table = null;
-		if (fileItem.getAttributes().size() > 0) {
+		if (ADataHandler.getHandlerDataFromFileItem(fileItem, AttributeHandler.class).size() > 0) {
 			tableList = new ArrayList<PdfPTable>();
 			PdfPCell cell = null;
 			final Font headlineFont = new Font(FontFamily.HELVETICA, 18, Font.BOLD, BaseColor.BLACK);
@@ -131,7 +134,8 @@ public class PDFExport extends AExporter {
 			final Font defaultTextFont = new Font(FontFamily.HELVETICA, 14, Font.NORMAL, BaseColor.BLACK);
 
 			String currentInfoType = null;
-			for (final FileAttributeList attributeList : fileItem.getAttributes()) {
+			for (final FileAttributeList attributeList : (ArrayList<FileAttributeList>) ADataHandler.getHandlerDataFromFileItem(fileItem,
+					AttributeHandler.class)) {
 				if ((currentInfoType == null) || !currentInfoType.equalsIgnoreCase(attributeList.getInfoType())) {
 					if (table != null) {
 						cell = new PdfPCell(new Phrase(" "));

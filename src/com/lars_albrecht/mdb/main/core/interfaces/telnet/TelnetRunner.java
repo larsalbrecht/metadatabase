@@ -14,6 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.AttributeHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
 import com.lars_albrecht.mdb.main.core.helper.InterfaceHelper;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
@@ -104,7 +106,8 @@ public class TelnetRunner implements Runnable {
 							out.println(fileItem.getFullpath());
 							out.println(Helper.getHumanreadableFileSize(fileItem.getSize()));
 							out.println("");
-							for (final FileAttributeList attributeList : fileItem.getAttributes()) {
+							for (final FileAttributeList attributeList : (ArrayList<FileAttributeList>) ADataHandler
+									.getHandlerDataFromFileItem(fileItem, AttributeHandler.class)) {
 								out.println("");
 								out.println(attributeList.getSectionName());
 								for (final KeyValue<String, Object> keyValue : attributeList.getKeyValues()) {

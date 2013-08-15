@@ -8,10 +8,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.general.utilities.ChecksumSHA1;
-import com.lars_albrecht.mdb.main.core.handler.MediaHandler;
-import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
 
 /**
@@ -22,30 +21,31 @@ import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
  */
 public class FileItem implements IPersistable {
 
-	private Integer							id			= null;
-	private String							name		= null;
-	private String							fullpath	= null;
-	private String							dir			= null;
-	private Long							size		= null;
-	private String							ext			= null;
-	private String							filehash	= null;
-	private Integer							createTS	= null;
-	private Integer							status		= null;
-	private String							filetype	= null;
-	private Integer							updateTS	= null;
+	private Integer									id			= null;
+	private String									name		= null;
+	private String									fullpath	= null;
+	private String									dir			= null;
+	private Long									size		= null;
+	private String									ext			= null;
+	private String									filehash	= null;
+	private Integer									createTS	= null;
+	private Integer									status		= null;
+	private String									filetype	= null;
+	private Integer									updateTS	= null;
 
-	private ArrayList<FileAttributeList>	attributes	= null;
-	private ArrayList<FileTag>				fileTags	= null;
-	private ArrayList<MediaItem>			mediaItems	= null;
+	private ConcurrentHashMap<String, ArrayList<?>>	dataStore	= null;
 
 	/**
 	 * 
 	 */
 	public FileItem() {
 		super();
-		this.attributes = new ArrayList<FileAttributeList>();
-		this.fileTags = new ArrayList<FileTag>();
-		this.mediaItems = new ArrayList<MediaItem>();
+		this.dataStore = new ConcurrentHashMap<String, ArrayList<?>>();
+	}
+
+	public FileItem(final Integer fileId) {
+		super();
+		this.id = fileId;
 	}
 
 	/**
@@ -274,10 +274,6 @@ public class FileItem implements IPersistable {
 		return this;
 	}
 
-	public ArrayList<FileAttributeList> getAttributes() {
-		return this.attributes;
-	}
-
 	/**
 	 * @return the createTS
 	 */
@@ -288,6 +284,13 @@ public class FileItem implements IPersistable {
 	@Override
 	public String getDatabaseTable() {
 		return "fileInformation";
+	}
+
+	/**
+	 * @return the dataStore
+	 */
+	public final ConcurrentHashMap<String, ArrayList<?>> getDataStore() {
+		return this.dataStore;
 	}
 
 	public String getDir() {
@@ -306,13 +309,6 @@ public class FileItem implements IPersistable {
 	}
 
 	/**
-	 * @return the fileTags
-	 */
-	public final ArrayList<FileTag> getFileTags() {
-		return this.fileTags;
-	}
-
-	/**
 	 * @return the filetype
 	 */
 	public String getFiletype() {
@@ -326,16 +322,6 @@ public class FileItem implements IPersistable {
 	@Override
 	public Integer getId() {
 		return this.id;
-	}
-
-	/**
-	 * @return the mediaItems
-	 */
-	public final ArrayList<MediaItem> getMediaItems() {
-		if (this.mediaItems == null) {
-			this.mediaItems = MediaHandler.getMediaItemsForFile(this);
-		}
-		return this.mediaItems;
 	}
 
 	public String getName() {
@@ -387,16 +373,20 @@ public class FileItem implements IPersistable {
 		return result;
 	}
 
-	public void setAttributes(final ArrayList<FileAttributeList> attributes) {
-		this.attributes = attributes;
-	}
-
 	/**
 	 * @param createTS
 	 *            the createTS to set
 	 */
 	public void setCreateTS(final Integer createTS) {
 		this.createTS = createTS;
+	}
+
+	/**
+	 * @param dataStore
+	 *            the dataStore to set
+	 */
+	public final void setDataStore(final ConcurrentHashMap<String, ArrayList<?>> dataStore) {
+		this.dataStore = dataStore;
 	}
 
 	public void setDir(final String dir) {
@@ -416,14 +406,6 @@ public class FileItem implements IPersistable {
 	}
 
 	/**
-	 * @param fileTags
-	 *            the fileTags to set
-	 */
-	public final void setFileTags(final ArrayList<FileTag> fileTags) {
-		this.fileTags = fileTags;
-	}
-
-	/**
 	 * @param filetype
 	 *            the filetype to set
 	 */
@@ -438,14 +420,6 @@ public class FileItem implements IPersistable {
 	@Override
 	public void setId(final Integer id) {
 		this.id = id;
-	}
-
-	/**
-	 * @param mediaItems
-	 *            the mediaItems to set
-	 */
-	public final void setMediaItems(final ArrayList<MediaItem> mediaItems) {
-		this.mediaItems = mediaItems;
 	}
 
 	public void setName(final String name) {
@@ -505,7 +479,7 @@ public class FileItem implements IPersistable {
 	public String toString() {
 		return "Id: " + this.id + " | " + "Name: " + this.name + " | " + "Fullpath: " + this.fullpath + " | " + "Dir: " + this.dir + " | "
 				+ "Size: " + this.size + " | " + "Ext: " + this.ext + " | " + "CreatedTS: " + this.createTS + " | " + "UpdatedTS: "
-				+ this.updateTS + " | " + this.getAttributes() + " | " + this.getFileTags() + " | " + this.getMediaItems();
+				+ this.updateTS + " | " + this.dataStore;
 	}
 
 }
