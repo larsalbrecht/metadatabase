@@ -25,12 +25,6 @@ public class Tag implements IPersistable {
 		this.id = id;
 	}
 
-	public Tag(final Integer id, final String name) {
-		super();
-		this.id = id;
-		this.name = name;
-	}
-
 	public Tag(final Integer id, final String name, final Boolean isUser) {
 		super();
 		this.id = id;
@@ -38,9 +32,10 @@ public class Tag implements IPersistable {
 		this.isUser = isUser;
 	}
 
-	public Tag(final String name) {
+	public Tag(final String name, final Boolean isUser) {
 		super();
 		this.name = name;
+		this.isUser = isUser;
 	}
 
 	/*
@@ -92,7 +87,11 @@ public class Tag implements IPersistable {
 			result.setName((String) map.get("name"));
 		}
 		if (map.containsKey("isuser")) {
-			result.setIsUser((Boolean) map.get("isuser"));
+			if (map.get("isuser") instanceof Boolean) {
+				result.setIsUser((Boolean) map.get("isuser"));
+			} else if (map.get("isuser") instanceof Integer) {
+				result.setIsUser((Integer) map.get("isuser") == 0 ? false : true);
+			}
 		}
 
 		return result;

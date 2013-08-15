@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.lars_albrecht.mdb.main.core.handler;
+package com.lars_albrecht.mdb.main.core.handler.datahandler;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -11,6 +11,8 @@ import java.util.HashMap;
 
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.Helper;
+import com.lars_albrecht.mdb.main.core.handler.DataHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileMediaItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.MediaItem;
@@ -20,9 +22,15 @@ import com.lars_albrecht.mdb.main.database.DB;
  * @author lalbrecht
  * 
  */
-public class MediaHandler {
+public class MediaHandler<E> extends ADataHandler<E> {
 
-	public static ArrayList<FileMediaItem> getFileMediaItemsForFile(final FileItem fileItem) {
+	public MediaHandler() {
+		this.data.put("fileMediaItems", new ArrayList<FileMediaItem>());
+		this.data.put("mediaItems", new ArrayList<MediaItem>());
+	}
+
+	@SuppressWarnings("unused")
+	private static ArrayList<FileMediaItem> getFileMediaItemsForFile(final FileItem fileItem) {
 		final ArrayList<FileMediaItem> resultList = new ArrayList<FileMediaItem>();
 		if ((fileItem != null) && (fileItem.getId() != null) && (fileItem.getId() > -1)) {
 
@@ -48,34 +56,8 @@ public class MediaHandler {
 		return resultList;
 	}
 
-	public static ArrayList<MediaItem> getMediaItemsForFile(final FileItem fileItem) {
-		final ArrayList<MediaItem> resultList = new ArrayList<MediaItem>();
-		if ((fileItem != null) && (fileItem.getId() != null) && (fileItem.getId() > -1)) {
-
-			ResultSet rs = null;
-			final String sql = "SELECT mi.id, mi.name, mi.type, mi.uri, mi.options FROM mediaItems AS mi LEFT JOIN fileMedia AS fm ON fm.media_id = mi.id WHERE fm.file_id = '"
-					+ fileItem.getId() + "'";
-			try {
-				Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
-				rs = DB.query(sql);
-				HashMap<String, Object> tempMap = null;
-				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) { // for each line
-					tempMap = new HashMap<String, Object>();
-					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
-					}
-					resultList.add((MediaItem) new MediaItem().fromHashMap(tempMap));
-				}
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			}
-
-		}
-		return resultList;
-	}
-
-	public static ArrayList<MediaItem> getPersistedMediaItemsForMediaItems(final ArrayList<MediaItem> mediaItems) {
+	@SuppressWarnings("unused")
+	private static ArrayList<MediaItem> getPersistedMediaItemsForMediaItems(final ArrayList<MediaItem> mediaItems) {
 		final ArrayList<MediaItem> resultList = new ArrayList<MediaItem>();
 		if ((mediaItems != null) && (mediaItems.size() > 0)) {
 			final ArrayList<String> mediaNames = new ArrayList<String>();
@@ -110,7 +92,8 @@ public class MediaHandler {
 		return resultList;
 	}
 
-	public static void persistFileMediaItems(final FileItem fileItem, final ArrayList<MediaItem> mediaItems) throws Exception {
+	@SuppressWarnings("unused")
+	private static void persistFileMediaItems(final FileItem fileItem, final ArrayList<MediaItem> mediaItems) throws Exception {
 		if ((fileItem != null) && (fileItem.getId() != null) && (fileItem.getId() > -1) && (mediaItems != null) && (mediaItems.size() > 0)) {
 			final ArrayList<FileMediaItem> tempFileMediaItems = new ArrayList<FileMediaItem>();
 			for (final MediaItem mediaItem : mediaItems) {
@@ -124,7 +107,36 @@ public class MediaHandler {
 		}
 	}
 
-	public static void persistMediaItems(final ArrayList<MediaItem> mediaItems) throws Exception {
+	@SuppressWarnings("unused")
+	private static void persistMediaItems(final ArrayList<MediaItem> mediaItems) throws Exception {
 		DataHandler.persist(mediaItems, false);
+	}
+
+	@Override
+	public ArrayList<?> getHandlerDataForFileItem(final FileItem fileItem) {
+		final ArrayList<MediaItem> resultList = new ArrayList<MediaItem>();
+		if ((fileItem != null) && (fileItem.getId() != null) && (fileItem.getId() > -1)) {
+
+			ResultSet rs = null;
+			final String sql = "SELECT mi.id, mi.name, mi.type, mi.uri, mi.options FROM mediaItems AS mi LEFT JOIN fileMedia AS fm ON fm.media_id = mi.id WHERE fm.file_id = '"
+					+ fileItem.getId() + "'";
+			try {
+				Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
+				rs = DB.query(sql);
+				HashMap<String, Object> tempMap = null;
+				final ResultSetMetaData rsmd = rs.getMetaData();
+				for (; rs.next();) { // for each line
+					tempMap = new HashMap<String, Object>();
+					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
+					}
+					resultList.add((MediaItem) new MediaItem().fromHashMap(tempMap));
+				}
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			}
+
+		}
+		return resultList;
 	}
 }

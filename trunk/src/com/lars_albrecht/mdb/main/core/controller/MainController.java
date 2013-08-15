@@ -20,7 +20,14 @@ import com.lars_albrecht.mdb.main.core.finder.event.IFinderListener;
 import com.lars_albrecht.mdb.main.core.handler.ConfigurationHandler;
 import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.AttributeHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.MediaHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.TagHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
+import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileMediaItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
 
 /**
  * @author lalbrecht
@@ -215,8 +222,14 @@ public class MainController implements IFinderListener, ICollectorListener {
 		FileFinder.getInstance().addToPathList(new File("trunk/web/img/plugins/fancybox"), -1);
 
 		this.dataHandler = new DataHandler(this);
-		this.globalVars = new ConcurrentHashMap<String, Object>();
+		ADataHandler.addDataHandler(new AttributeHandler<FileAttributeList>());
+		ADataHandler.addDataHandler(new TagHandler<FileTag>());
+		ADataHandler.addDataHandler(new MediaHandler<FileMediaItem>());
 
+		ADataHandler.getDataHandler(TagHandler.class).addData("test", new FileTag(1, null, false));
+		ADataHandler.getDataHandler(TagHandler.class).addData("test", new FileTag(2, null, true));
+
+		this.globalVars = new ConcurrentHashMap<String, Object>();
 		try {
 			this.configHandler = new ConfigurationHandler();
 		} catch (final PropertiesExNotInitilizedException e) {
