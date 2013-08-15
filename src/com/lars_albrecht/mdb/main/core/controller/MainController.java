@@ -226,9 +226,6 @@ public class MainController implements IFinderListener, ICollectorListener {
 		ADataHandler.addDataHandler(new TagHandler<FileTag>());
 		ADataHandler.addDataHandler(new MediaHandler<FileMediaItem>());
 
-		ADataHandler.getDataHandler(TagHandler.class).addData("test", new FileTag(1, null, false));
-		ADataHandler.getDataHandler(TagHandler.class).addData("test", new FileTag(2, null, true));
-
 		this.globalVars = new ConcurrentHashMap<String, Object>();
 		try {
 			this.configHandler = new ConfigurationHandler();
