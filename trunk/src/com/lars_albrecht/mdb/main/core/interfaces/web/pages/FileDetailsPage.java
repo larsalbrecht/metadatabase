@@ -225,6 +225,10 @@ public class FileDetailsPage extends WebPage {
 					} else if (attributeList.getSectionName().equalsIgnoreCase("images")) { // TODO
 																							// REMOVE
 																							// THIS!
+						/**
+						 * TODO remove this code block and replace the gallery
+						 * with access to the MediaHandler.
+						 */
 						String imageContainer = "";
 						String tempImageContainer = null;
 

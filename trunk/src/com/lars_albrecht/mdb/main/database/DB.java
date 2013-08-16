@@ -723,6 +723,13 @@ public class DB implements IDatabase {
 						DB.update(sql);
 						sql = "ALTER TABLE 'typeInformation_value' RENAME TO 'attributes_value'";
 						DB.update(sql);
+					} else if (false && i == 4) { // remove media from
+													// attributes to
+						// media
+						/**
+						 * TODO select all items and get the images. Copy to
+						 * media table and insert all there.
+						 */
 					}
 				}
 				DB.endTransaction();
