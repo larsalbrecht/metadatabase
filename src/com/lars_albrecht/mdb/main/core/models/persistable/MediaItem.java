@@ -27,12 +27,13 @@ public class MediaItem implements IPersistable {
 	public static int							TYPE_LOC_IMAGE				= 2;
 	public static int							TYPE_LOC_VIDEO				= 4;
 
-	public static int							OPTION_WEB_IMAGE_PREFIXURL	= 1;
-	public static int							OPTION_WEB_IMAGE_SUFFIXURL	= 3;
+	public static int							OPTION_WEB_BASE_PATH		= 1;
+	public static int							OPTION_WEB_SECURE_BASE_PATH	= 3;
+	public static int							OPTION_WEB_PREFIXURL		= 5;
+	public static int							OPTION_WEB_SUFFIXURL		= 7;
+	public static int							OPTION_WEB_ISDIRECT			= 9;
 
-	public static int							OPTION_WEB_VIDEO_PREFIXURL	= 5;
-	public static int							OPTION_WEB_VIDEO_SUFFIXURL	= 7;
-	public static int							OPTION_WEB_VIDEO_HOSTER		= 9;
+	public static int							OPTION_SIZES				= 100;
 
 	private Integer								id							= null;
 	private String								name						= null;
