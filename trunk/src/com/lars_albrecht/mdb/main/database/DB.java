@@ -3,6 +3,7 @@ package com.lars_albrecht.mdb.main.database;
 import java.awt.Image;
 import java.math.BigDecimal;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.Date;
@@ -20,6 +21,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.general.utilities.Debug;
+import com.lars_albrecht.general.utilities.Helper;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.MediaHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.FileMediaItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.MediaItem;
 import com.lars_albrecht.mdb.main.database.interfaces.IDatabase;
 
 /**
@@ -659,8 +666,9 @@ public class DB implements IDatabase {
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	private boolean updateDBWithVersion() {
-		final int newDBVersion = 3;
+		final int newDBVersion = 4;
 		// INSERT A DATABASE VERSION
 		String sql = "";
 		ResultSet rs = null;
@@ -723,13 +731,82 @@ public class DB implements IDatabase {
 						DB.update(sql);
 						sql = "ALTER TABLE 'typeInformation_value' RENAME TO 'attributes_value'";
 						DB.update(sql);
-					} else if (false && i == 4) { // remove media from
-													// attributes to
+					} else if (i == 4) { // remove media from
+											// attributes to
 						// media
+
+						ADataHandler.addDataHandler(new MediaHandler<FileMediaItem>());
 						/**
 						 * TODO select all items and get the images. Copy to
 						 * media table and insert all there.
 						 */
+						sql = "SELECT fi.id AS fileId, ti.id AS fileAttributesId, tiKey.id AS keyId, tiKey.key AS keyKey, tiValue.id AS valueId, tiValue.value AS valueValue FROM 'fileInformation' AS fi LEFT JOIN fileAttributes as ti ON ti.file_id = fi.id LEFT JOIN attributes_key AS tiKey ON tiKey.id = ti.key_id LEFT JOIN attributes_value AS tiValue ON tiValue.id = ti.value_id LEFT JOIN fileTags AS ft ON fi.id = ft.file_id LEFT JOIN tags AS t ON ft.tag_id = t.id WHERE tiKey.key IN('poster_path', 'backdrop_path', 'POSTER', 'trailer') ORDER BY 'fileInformation.name'";
+						rs = DB.query(sql);
+						MediaItem tempMediaItem = null;
+						ADataHandler.clearAllDataHandler();
+						final ArrayList<Integer> keyListToDelete = new ArrayList<Integer>();
+						final ArrayList<Integer> valueListToDelete = new ArrayList<Integer>();
+						final ArrayList<Integer> fileAttributeListToDelete = new ArrayList<Integer>();
+						while (rs.next()) {
+
+							final ConcurrentHashMap<Integer, Object> tempMap = new ConcurrentHashMap<Integer, Object>();
+							tempMediaItem = null;
+
+							try {
+								if (rs.getString("keyKey").equalsIgnoreCase("poster_path")
+										|| rs.getString("keyKey").equalsIgnoreCase("POSTER")) {
+									final String options = MediaItem.OPTION_WEB_BASE_PATH + "|"
+											+ "http://d3gtl9l2a4fn1j.cloudfront.net/t/p/" + ";" + MediaItem.OPTION_WEB_SECURE_BASE_PATH
+											+ "|" + "https://d3gtl9l2a4fn1j.cloudfront.net/t/p/" + ";" + MediaItem.OPTION_SIZES
+											+ "|w92,w154,w185,w342,w500,original";
+
+									tempMap.putAll((Map<? extends Integer, ? extends Object>) Helper.explode(options, ";", "|"));
+									tempMediaItem = new MediaItem("poster", MediaItem.TYPE_WEB_IMAGE, new URI(rs.getString("valueValue")),
+											tempMap);
+
+								} else if (rs.getString("keyKey").equalsIgnoreCase("backdrop_path")) {
+									final String options = MediaItem.OPTION_WEB_BASE_PATH + "|"
+											+ "http://d3gtl9l2a4fn1j.cloudfront.net/t/p/" + ";" + MediaItem.OPTION_WEB_SECURE_BASE_PATH
+											+ "|" + "https://d3gtl9l2a4fn1j.cloudfront.net/t/p/" + ";" + MediaItem.OPTION_SIZES
+											+ "|w300,w780,w1280,original";
+									tempMap.putAll((Map<? extends Integer, ? extends Object>) Helper.explode(options, ";", "|"));
+									tempMediaItem = new MediaItem("backdrop", MediaItem.TYPE_WEB_IMAGE,
+											new URI(rs.getString("valueValue")), tempMap);
+								} else if (rs.getString("keyKey").equalsIgnoreCase("trailer")) {
+									final String options = MediaItem.OPTION_WEB_BASE_PATH + "|http://www.youtube.com/watch?v=;"
+											+ MediaItem.OPTION_WEB_ISDIRECT + "|false";
+									tempMap.putAll((Map<? extends Integer, ? extends Object>) Helper.explode(options, ";", "|"));
+									tempMediaItem = new MediaItem(rs.getString("valueValue").substring(0,
+											rs.getString("valueValue").indexOf(",")), MediaItem.TYPE_WEB_VIDEO, new URI(rs.getString(
+											"valueValue").substring(
+											rs.getString("valueValue").indexOf(",", rs.getString("valueValue").indexOf(",") + 1) + 1,
+											rs.getString("valueValue")
+													.indexOf(
+															",",
+															rs.getString("valueValue").indexOf(",",
+																	rs.getString("valueValue").indexOf(",") + 1) + 1))), tempMap);
+
+								}
+
+								keyListToDelete.add(rs.getInt("keyId"));
+								valueListToDelete.add(rs.getInt("valueId"));
+								fileAttributeListToDelete.add(rs.getInt("fileAttributesId"));
+								((MediaHandler<?>) ADataHandler.getDataHandler(MediaHandler.class)).addData("mediaItems",
+										new FileItem(rs.getInt("fileId")), tempMediaItem);
+
+							} catch (final URISyntaxException e) {
+								e.printStackTrace();
+							}
+						}
+						ADataHandler.persistAllDataHandler();
+						ADataHandler.removeDataHandler((ADataHandler.getDataHandler(MediaHandler.class)));
+
+						sql = "DELETE FROM attributes_key WHERE id IN (" + Helper.implode(keyListToDelete, ",", "'", "'") + ")";
+						DB.update(sql);
+						sql = "DELETE FROM attributes_value WHERE id IN (" + Helper.implode(valueListToDelete, ",", "'", "'") + ")";
+						DB.update(sql);
+						sql = "DELETE FROM fileAttributes WHERE id IN (" + Helper.implode(fileAttributeListToDelete, ",", "'", "'") + ")";
+						DB.update(sql);
 					}
 				}
 				DB.endTransaction();
@@ -742,6 +819,8 @@ public class DB implements IDatabase {
 			}
 			e.printStackTrace();
 			return false;
+		} catch (final Exception e) {
+			e.printStackTrace();
 		}
 		return true;
 	}
