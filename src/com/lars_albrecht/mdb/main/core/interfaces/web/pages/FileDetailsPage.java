@@ -14,6 +14,7 @@ import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.AttributeHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.MediaHandler;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.TagHandler;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
@@ -23,6 +24,7 @@ import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
+import com.lars_albrecht.mdb.main.core.models.persistable.MediaItem;
 
 /**
  * @author lalbrecht
@@ -120,6 +122,77 @@ public class FileDetailsPage extends WebPage {
 			tagsContainer = Template.replaceMarker(tagsContainer, "tagList", tagsList, false);
 			detailViewTemplate.replaceMarker("tags", tagsContainer, false);
 
+			// add media
+			final ArrayList<MediaItem> fileMediaItems = (ArrayList<MediaItem>) ((MediaHandler<?>) ADataHandler
+					.getDataHandler(MediaHandler.class)).getHandlerDataForFileItem(item);
+			final ArrayList<MediaItem> fileMediaItemsImages = new ArrayList<MediaItem>();
+			final ArrayList<MediaItem> fileMediaItemsVideos = new ArrayList<MediaItem>();
+
+			String mainImage = null;
+			String gallery = null;
+
+			for (final MediaItem mediaItem : fileMediaItems) {
+				if ((mediaItem.getType() == MediaItem.TYPE_LOC_IMAGE) || mediaItem.getType().equals(MediaItem.TYPE_WEB_IMAGE)) {
+					fileMediaItemsImages.add(mediaItem);
+				} else if ((mediaItem.getType() == MediaItem.TYPE_LOC_VIDEO) || mediaItem.getType().equals(MediaItem.TYPE_WEB_VIDEO)) {
+					fileMediaItemsVideos.add(mediaItem);
+				}
+			}
+
+			if (fileMediaItemsImages.size() > 0) {
+
+				// build file-image
+				MediaItem fileImage = null;
+				for (final MediaItem mediaItem : fileMediaItemsImages) {
+					if (mediaItem.getName().equalsIgnoreCase("poster")) {
+						fileImage = mediaItem;
+						break;
+					}
+				}
+
+				if ((fileImage != null)
+						&& ((fileImage.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) == Boolean.TRUE) || ((!fileImage.getOptions()
+								.containsKey(MediaItem.OPTION_WEB_ISDIRECT) || (fileImage.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) == Boolean.FALSE)) && (fileImage
+								.getOptions().get(MediaItem.OPTION_WEB_BASE_PATH) != null)))) {
+
+					mainImage = detailViewTemplate.getSubMarkerContent("image");
+					mainImage = Template.replaceMarker(mainImage, "imageSrc", this.getUrlFromMediaItem(fileImage, 1), false);
+					mainImage = Template.replaceMarker(mainImage, "imageClass", "posterImage", false);
+					mainImage = Template.replaceMarker(mainImage, "imageTitle", fileImage.getName(), false);
+				}
+
+				// build gallery
+				String tempGalleryItem = null;
+				String tempGalleryItems = "";
+				String galleryContainer = null;
+				for (final MediaItem mediaItem : fileMediaItemsImages) {
+					// exclude fileImage
+					if ((fileImage != null) && fileImage.equals(mediaItem)) {
+						continue;
+					}
+
+					if (galleryContainer == null) {
+						galleryContainer = detailViewTemplate.getSubMarkerContent("gallery");
+					}
+
+					tempGalleryItem = detailViewTemplate.getSubMarkerContent("image");
+					tempGalleryItem = Template.replaceMarker(tempGalleryItem, "imageSrc", this.getUrlFromMediaItem(mediaItem, 0), false);
+					tempGalleryItem = Template.replaceMarker(tempGalleryItem, "imageClass",
+							"galleryImage galleryImage-" + mediaItem.getType(), false);
+					tempGalleryItem = Template.replaceMarker(tempGalleryItem, "imageTitle", mediaItem.getName(), false);
+
+					tempGalleryItem = Template.replaceMarker(detailViewTemplate.getSubMarkerContent("galleryItem"), "image",
+							tempGalleryItem, false);
+
+					tempGalleryItem = Template.replaceMarker(tempGalleryItem, "imageSrcBig", this.getUrlFromMediaItem(mediaItem, 2), false);
+
+					tempGalleryItems += tempGalleryItem;
+
+				}
+
+				gallery = Template.replaceMarker(galleryContainer, "galleryItems", tempGalleryItems, false);
+			}
+
 			// if file has attributes
 			final ArrayList<FileAttributeList> itemFileAttributes = (ArrayList<FileAttributeList>) ADataHandler.getHandlerDataFromFileItem(
 					item, AttributeHandler.class);
@@ -133,8 +206,6 @@ public class FileDetailsPage extends WebPage {
 				String attributesList = "";
 				String sectionList = "";
 				String attributeSectionList = "";
-				String images = "";
-				String gallery = "";
 				String currentSection = null;
 				// for each attribute ...
 				for (final FileAttributeList attributeList : itemFileAttributes) {
@@ -222,53 +293,6 @@ public class FileDetailsPage extends WebPage {
 						} catch (final UnsupportedEncodingException e) {
 							e.printStackTrace();
 						}
-					} else if (attributeList.getSectionName().equalsIgnoreCase("images")) { // TODO
-																							// REMOVE
-																							// THIS!
-						/**
-						 * TODO remove this code block and replace the gallery
-						 * with access to the MediaHandler.
-						 */
-						String imageContainer = "";
-						String tempImageContainer = null;
-
-						String galleryContainer = null;
-						String tempGalleryItems = "";
-						String tempGalleryItem = null;
-						for (final KeyValue<String, Object> keyValue : attributeList.getKeyValues()) {
-							if (keyValue.getKey().getKey().equalsIgnoreCase("poster_path")) {
-								tempImageContainer = detailViewTemplate.getSubMarkerContent("image");
-								tempImageContainer = Template.replaceMarker(tempImageContainer, "imageSrc",
-										"https://d3gtl9l2a4fn1j.cloudfront.net/t/p/w300" + (String) keyValue.getValue().getValue(), false);
-								tempImageContainer = Template.replaceMarker(tempImageContainer, "imageClass", "posterImage", false);
-								tempImageContainer = Template.replaceMarker(tempImageContainer, "imageTitle", (String) keyValue.getValue()
-										.getValue(), false);
-
-								imageContainer += tempImageContainer;
-							} else {
-								if (galleryContainer == null) {
-									galleryContainer = detailViewTemplate.getSubMarkerContent("gallery");
-								}
-
-								tempGalleryItem = detailViewTemplate.getSubMarkerContent("image");
-								tempGalleryItem = Template.replaceMarker(tempGalleryItem, "imageSrc",
-										"https://d3gtl9l2a4fn1j.cloudfront.net/t/p/w92" + (String) keyValue.getValue().getValue(), false);
-								tempGalleryItem = Template.replaceMarker(tempGalleryItem, "imageClass", "galleryImage galleryImage-"
-										+ keyValue.getKey().getKey(), false);
-								tempGalleryItem = Template.replaceMarker(tempGalleryItem, "imageTitle", (String) keyValue.getValue()
-										.getValue(), false);
-
-								tempGalleryItem = Template.replaceMarker(detailViewTemplate.getSubMarkerContent("galleryItem"), "image",
-										tempGalleryItem, false);
-
-								tempGalleryItem = Template.replaceMarker(tempGalleryItem, "imageSrcBig",
-										"https://d3gtl9l2a4fn1j.cloudfront.net/t/p/w500" + (String) keyValue.getValue().getValue(), false);
-
-								tempGalleryItems += tempGalleryItem;
-							}
-						}
-						images = imageContainer;
-						gallery = Template.replaceMarker(galleryContainer, "galleryItems", tempGalleryItems, false);
 					}
 					i++;
 				}
@@ -279,7 +303,7 @@ public class FileDetailsPage extends WebPage {
 				// add all attribute sections to attributes
 				attributes = Template.replaceMarker(attributes, "attributesList", attributeSectionList, Boolean.TRUE);
 
-				detailViewTemplate.replaceMarker("images", images, Boolean.FALSE);
+				detailViewTemplate.replaceMarker("mainimage", mainImage, Boolean.FALSE);
 				detailViewTemplate.replaceMarker("gallery", gallery, Boolean.FALSE);
 
 				// add all attributes to template
@@ -317,6 +341,17 @@ public class FileDetailsPage extends WebPage {
 			title = "Detailansicht: Keine Datei gewählt";
 		}
 		return title;
+	}
+
+	private String getUrlFromMediaItem(final MediaItem mediaItem, final Integer size) {
+		if (mediaItem.getOptions().containsKey(MediaItem.OPTION_WEB_ISDIRECT)
+				&& (mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) == Boolean.TRUE)) {
+			return mediaItem.getUri().toString();
+		} else {
+			return mediaItem.getOptions().get(MediaItem.OPTION_WEB_BASE_PATH)
+					+ ((ArrayList<?>) (Helper.explode((String) mediaItem.getOptions().get(MediaItem.OPTION_SIZES), ","))).get(size)
+							.toString() + mediaItem.getUri().toString();
+		}
 	}
 
 	private ArrayList<Object> getValuesForKey(final FileAttributeList list, final String key) {

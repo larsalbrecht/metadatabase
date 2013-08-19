@@ -146,9 +146,7 @@ public class Helper {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <K, V> Map<? extends Object, ? extends Object> explode(final String s,
-			final String entryDelimiter,
-			final String keyValueDelimiter) {
+	public static <K, V> Map<? extends K, V> explode(final String s, final String entryDelimiter, final String keyValueDelimiter) {
 		final String[] sParted = s.split(entryDelimiter);
 		Map<K, V> resultMap = null;
 		if ((sParted != null) && (sParted.length > 0)) {
@@ -160,6 +158,33 @@ public class Helper {
 				eParted = string.split("\\" + keyValueDelimiter);
 				if ((eParted != null) && (eParted.length == 2)) {
 					key = ((K) eParted[0]);
+					key.getClass();
+					value = ((V) eParted[1]);
+					resultMap.put(key, value);
+				}
+			}
+			return resultMap;
+		}
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <V> Map<Integer, V> explodeIntKeys(final String s, final String entryDelimiter, final String keyValueDelimiter) {
+		final String[] sParted = s.split(entryDelimiter);
+		Map<Integer, V> resultMap = null;
+		if ((sParted != null) && (sParted.length > 0)) {
+			resultMap = new ConcurrentHashMap<Integer, V>();
+			Integer key = null;
+			V value = null;
+			Object[] eParted = null;
+			for (final String string : sParted) {
+				eParted = string.split("\\" + keyValueDelimiter);
+				if ((eParted != null) && (eParted.length == 2)) {
+					if (eParted[0] instanceof String) {
+						key = Integer.parseInt((String) eParted[0]);
+					} else {
+						key = ((Integer) eParted[0]);
+					}
 					value = ((V) eParted[1]);
 					resultMap.put(key, value);
 				}

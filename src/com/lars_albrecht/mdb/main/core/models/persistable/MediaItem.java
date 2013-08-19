@@ -6,7 +6,6 @@ package com.lars_albrecht.mdb.main.core.models.persistable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.general.utilities.Helper;
@@ -21,19 +20,19 @@ import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
  */
 public class MediaItem implements IPersistable {
 
-	public static int							TYPE_WEB_IMAGE				= 1;
-	public static int							TYPE_WEB_VIDEO				= 3;
+	public static Integer						TYPE_WEB_IMAGE				= 1;
+	public static Integer						TYPE_WEB_VIDEO				= 3;
 
-	public static int							TYPE_LOC_IMAGE				= 2;
-	public static int							TYPE_LOC_VIDEO				= 4;
+	public static Integer						TYPE_LOC_IMAGE				= 2;
+	public static Integer						TYPE_LOC_VIDEO				= 4;
 
-	public static int							OPTION_WEB_BASE_PATH		= 1;
-	public static int							OPTION_WEB_SECURE_BASE_PATH	= 3;
-	public static int							OPTION_WEB_PREFIXURL		= 5;
-	public static int							OPTION_WEB_SUFFIXURL		= 7;
-	public static int							OPTION_WEB_ISDIRECT			= 9;
+	public static Integer						OPTION_WEB_BASE_PATH		= 1;
+	public static Integer						OPTION_WEB_SECURE_BASE_PATH	= 3;
+	public static Integer						OPTION_WEB_PREFIXURL		= 5;
+	public static Integer						OPTION_WEB_SUFFIXURL		= 7;
+	public static Integer						OPTION_WEB_ISDIRECT			= 9;
 
-	public static int							OPTION_SIZES				= 100;
+	public static Integer						OPTION_SIZES				= 100;
 
 	private Integer								id							= null;
 	private String								name						= null;
@@ -159,7 +158,6 @@ public class MediaItem implements IPersistable {
 		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Object fromHashMap(final HashMap<String, Object> map) {
 		final MediaItem result = new MediaItem();
@@ -182,7 +180,7 @@ public class MediaItem implements IPersistable {
 		}
 
 		if (map.containsKey("options") && (map.get("options") != null)) {
-			result.getOptions().putAll((Map<? extends Integer, ? extends Object>) Helper.explode((String) map.get("options"), ";", "|"));
+			result.getOptions().putAll(Helper.explodeIntKeys((String) map.get("options"), ";", "|"));
 		}
 
 		return result;
