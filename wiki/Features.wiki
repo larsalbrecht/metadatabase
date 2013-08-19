@@ -27,3 +27,6 @@
  * Better managing of additional metafiles like images or videos
  * Default/Better "API"s for getting information from database and put informations to database
  * Better implementation of functions like searching, tagging and exporting to use this in own projects
+ * Possibility to change filenames
+ * Possibility to remove collector-information
+ * Fix to delete unfound files
