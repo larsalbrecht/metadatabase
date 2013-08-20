@@ -734,7 +734,8 @@ public class DB implements IDatabase {
 					} else if (i == 4) { // remove media from
 											// attributes to
 						// media
-
+						this.createTableMediaItems();
+						this.createTableFileMedia();
 						ADataHandler.addDataHandler(new MediaHandler<FileMediaItem>());
 						/**
 						 * TODO select all items and get the images. Copy to
