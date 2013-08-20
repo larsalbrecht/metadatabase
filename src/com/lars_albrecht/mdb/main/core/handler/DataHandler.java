@@ -113,7 +113,8 @@ public class DataHandler {
 	 * interface. Insert not more than 500 items at time, because SQLite has a
 	 * limit of 500 (http://sqlite.org/limits.html @ point 7).
 	 * 
-	 * Use "doReplace" to replace an existing item instead of insert the item.
+	 * Use "doReplace" to replace (REPLACE INTO) an existing item instead of
+	 * insert (INSERT OR IGNORE) the item.
 	 * 
 	 * @see "http://sqlite.org/limits.html"
 	 * 
