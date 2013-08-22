@@ -425,6 +425,7 @@ public class DataHandler {
 	 * @param fileId
 	 * @return FileItem
 	 */
+	@Deprecated
 	public FileItem findAllInfoForAllByFileId(final Integer fileId) {
 		HashMap<String, Object> tempMap = null;
 		FileItem resultItem = new FileItem();
