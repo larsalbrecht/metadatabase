@@ -656,22 +656,22 @@ public class DataHandler {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
 					}
 					tempFileItem = (FileItem) fileItem.fromHashMap(tempMap);
-
-					if (tempFileItem.getId() != null) {
-						for (final String handlerName : handlerArr) {
-							// load data from handlers
-							for (final ADataHandler<?> dataHandler : ADataHandler.getDataHandlers()) {
-								if (dataHandler.getClass().getCanonicalName().equalsIgnoreCase(handlerName)) {
-									dataHandler.setHandlerDataToFileItem(tempFileItem, dataHandler.getHandlerDataForFileItem(tempFileItem));
-								}
-							}
-						}
-					}
-
 					resultList.add(tempFileItem);
 				}
 			} catch (final SQLException e) {
 				e.printStackTrace();
+			}
+		}
+
+		// loads all additional data of the handler
+		if ((resultList != null) && (resultList.size() > 0)) {
+			for (final String handlerName : handlerArr) {
+				// load data from handlers
+				for (final ADataHandler<?> dataHandler : ADataHandler.getDataHandlers()) {
+					if (dataHandler.getClass().getCanonicalName().equalsIgnoreCase(handlerName)) {
+						dataHandler.setHandlerDataToFileItems(dataHandler.getHandlerDataForFileItems(resultList));
+					}
+				}
 			}
 		}
 

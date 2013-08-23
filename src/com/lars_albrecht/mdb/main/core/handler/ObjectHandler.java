@@ -133,7 +133,7 @@ public class ObjectHandler {
 	public static ArrayList<FileItem> fileListToFileItemList(final ArrayList<File> foundFilesList) {
 		final ArrayList<FileItem> tempFileItemList = new ArrayList<FileItem>();
 		for (final File file : foundFilesList) {
-			if (file != null && file.getName() != null) {
+			if ((file != null) && (file.getName() != null)) {
 				try {
 					tempFileItemList.add(new FileItem(file.getName(), file.getAbsolutePath(), file.getParent(), file.length(), Helper
 							.getFileExtension(file.getName()), null, null));

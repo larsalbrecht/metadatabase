@@ -200,6 +200,13 @@ public class MainController implements IFinderListener, ICollectorListener {
 	}
 
 	/**
+	 * @return the mdbConfig
+	 */
+	public final MDBConfig getMdbConfig() {
+		return this.mdbConfig;
+	}
+
+	/**
 	 * @return the tController
 	 */
 	public TypeController gettController() {
@@ -425,13 +432,6 @@ public class MainController implements IFinderListener, ICollectorListener {
 
 	private ArrayList<FileItem> startTyper(final ArrayList<FileItem> fileItemList) {
 		return this.tController.findOutType(fileItemList);
-	}
-
-	/**
-	 * @return the mdbConfig
-	 */
-	public final MDBConfig getMdbConfig() {
-		return this.mdbConfig;
 	}
 
 }

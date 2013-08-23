@@ -55,6 +55,11 @@ public class TagHandler<E> extends ADataHandler<E> {
 	}
 
 	@Override
+	public ConcurrentHashMap<FileItem, ArrayList<?>> getHandlerDataForFileItems(final ArrayList<FileItem> fileItems) {
+		return null;
+	}
+
+	@Override
 	protected void persistData() throws Exception {
 		// TODO fill persistData with live
 	}

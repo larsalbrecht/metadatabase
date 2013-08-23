@@ -5,6 +5,7 @@ package com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
@@ -143,6 +144,8 @@ public abstract class ADataHandler<E> {
 
 	public abstract ArrayList<?> getHandlerDataForFileItem(final FileItem fileItem);
 
+	public abstract ConcurrentHashMap<FileItem, ArrayList<?>> getHandlerDataForFileItems(final ArrayList<FileItem> fileItems);
+
 	@SuppressWarnings("unchecked")
 	public final ArrayList<E> getHandlerDataFromFileItem(final FileItem fileItem) {
 
@@ -167,6 +170,23 @@ public abstract class ADataHandler<E> {
 			fileItem.getDataStore().put(this.getClass().getCanonicalName(), handlerData);
 		}
 		return fileItem;
+	}
+
+	/**
+	 * Sets the data to the specific fileItems in the DataStore.
+	 * 
+	 * @param fileItems
+	 * @param handlerData
+	 * @return FileItem
+	 */
+	public final ArrayList<FileItem> setHandlerDataToFileItems(final ConcurrentHashMap<FileItem, ArrayList<?>> handlerData) {
+		final ArrayList<FileItem> tempList = new ArrayList<FileItem>();
+		if (handlerData != null) {
+			for (final Map.Entry<FileItem, ArrayList<?>> fileSet : handlerData.entrySet()) {
+				tempList.add(this.setHandlerDataToFileItem(fileSet.getKey(), fileSet.getValue()));
+			}
+		}
+		return tempList;
 	}
 
 }

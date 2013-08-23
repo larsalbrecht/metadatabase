@@ -344,7 +344,7 @@ public class FileDetailsPage extends WebPage {
 	}
 
 	private String getUrlFromMediaItem(final MediaItem mediaItem, final Integer size) {
-		if (mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) != null
+		if ((mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) != null)
 				&& (mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) == Boolean.TRUE)) {
 			return mediaItem.getUri().toString();
 		} else {
