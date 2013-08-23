@@ -344,13 +344,17 @@ public class FileDetailsPage extends WebPage {
 	}
 
 	private String getUrlFromMediaItem(final MediaItem mediaItem, final Integer size) {
-		if (mediaItem.getOptions().containsKey(MediaItem.OPTION_WEB_ISDIRECT)
+		if (mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) != null
 				&& (mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) == Boolean.TRUE)) {
 			return mediaItem.getUri().toString();
 		} else {
-			return mediaItem.getOptions().get(MediaItem.OPTION_WEB_BASE_PATH)
-					+ ((ArrayList<?>) (Helper.explode((String) mediaItem.getOptions().get(MediaItem.OPTION_SIZES), ","))).get(size)
-							.toString() + mediaItem.getUri().toString();
+			if (mediaItem.getOptions().get(MediaItem.OPTION_WEB_BASE_PATH) != null) {
+				return mediaItem.getOptions().get(MediaItem.OPTION_WEB_BASE_PATH)
+						+ ((ArrayList<?>) (Helper.explode((String) mediaItem.getOptions().get(MediaItem.OPTION_SIZES), ","))).get(size)
+								.toString() + mediaItem.getUri().toString();
+			} else {
+				return mediaItem.getUri().toString();
+			}
 		}
 	}
 

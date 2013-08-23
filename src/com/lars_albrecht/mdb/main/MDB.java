@@ -52,7 +52,7 @@ public class MDB {
 
 		this.initDB();
 
-		this.mainController = new MainController();
+		this.mainController = new MainController(this.mdbConfig);
 
 		// Initialize controllers
 		this.initTypeController();
@@ -125,8 +125,7 @@ public class MDB {
 	}
 
 	private void initTypeController() {
-		this.tController = new TypeController(this.mainController);
-		this.tController.setTypers(this.mdbConfig.getListOfTypers());
+		this.tController = new TypeController(this.mainController, this.mdbConfig.getListOfTypers());
 	}
 
 	public void run() {
