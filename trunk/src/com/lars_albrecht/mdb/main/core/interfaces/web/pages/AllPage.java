@@ -18,6 +18,7 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.MediaItem;
 
 /**
  * @author lalbrecht
@@ -126,6 +127,21 @@ public class AllPage extends WebPage {
 
 			tempFileListItem = allTemplate.getSubMarkerContent("allFileListItem");
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "name", itemTitle, false);
+
+			// TODO Refactor / Recode. This is only proof of concept.
+			final ArrayList<MediaItem> fileMediaItems = ((MediaHandler<?>) ADataHandler.getDataHandler(MediaHandler.class))
+					.getHandlerDataForFileItem(fileItem);
+			String imageToShow = null;
+			if (fileMediaItems != null) {
+				for (final MediaItem mediaItem : fileMediaItems) {
+					if (mediaItem.getName().equalsIgnoreCase("poster")) {
+						imageToShow = this.getUrlFromMediaItem(mediaItem, 1);
+						break;
+					}
+				}
+			}
+
+			tempFileListItem = Template.replaceMarker(tempFileListItem, "itemImageUrl", imageToShow, false);
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "itemId", fileItem.getId().toString(), false);
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "type", fileItem.getFiletype(), false);
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "added",
@@ -139,6 +155,21 @@ public class AllPage extends WebPage {
 		allTemplate.replaceMarker("content", fileList, false);
 
 		return allTemplate;
+	}
+
+	private String getUrlFromMediaItem(final MediaItem mediaItem, final Integer size) {
+		if ((mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) != null)
+				&& (mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) == Boolean.TRUE)) {
+			return mediaItem.getUri().toString();
+		} else {
+			if (mediaItem.getOptions().get(MediaItem.OPTION_WEB_BASE_PATH) != null) {
+				return mediaItem.getOptions().get(MediaItem.OPTION_WEB_BASE_PATH)
+						+ ((ArrayList<?>) (Helper.explode((String) mediaItem.getOptions().get(MediaItem.OPTION_SIZES), ","))).get(size)
+								.toString() + mediaItem.getUri().toString();
+			} else {
+				return mediaItem.getUri().toString();
+			}
+		}
 	}
 
 	private String getExtractedName(final FileItem fileItem) {

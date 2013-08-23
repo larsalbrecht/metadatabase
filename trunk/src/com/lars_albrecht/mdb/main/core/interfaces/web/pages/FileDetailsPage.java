@@ -123,19 +123,21 @@ public class FileDetailsPage extends WebPage {
 			detailViewTemplate.replaceMarker("tags", tagsContainer, false);
 
 			// add media
-			final ArrayList<MediaItem> fileMediaItems = (ArrayList<MediaItem>) ((MediaHandler<?>) ADataHandler
-					.getDataHandler(MediaHandler.class)).getHandlerDataForFileItem(item);
+			final ArrayList<MediaItem> fileMediaItems = ((MediaHandler<?>) ADataHandler.getDataHandler(MediaHandler.class))
+					.getHandlerDataForFileItem(item);
 			final ArrayList<MediaItem> fileMediaItemsImages = new ArrayList<MediaItem>();
 			final ArrayList<MediaItem> fileMediaItemsVideos = new ArrayList<MediaItem>();
 
 			String mainImage = null;
 			String gallery = null;
 
-			for (final MediaItem mediaItem : fileMediaItems) {
-				if ((mediaItem.getType() == MediaItem.TYPE_LOC_IMAGE) || mediaItem.getType().equals(MediaItem.TYPE_WEB_IMAGE)) {
-					fileMediaItemsImages.add(mediaItem);
-				} else if ((mediaItem.getType() == MediaItem.TYPE_LOC_VIDEO) || mediaItem.getType().equals(MediaItem.TYPE_WEB_VIDEO)) {
-					fileMediaItemsVideos.add(mediaItem);
+			if (fileMediaItems != null) {
+				for (final MediaItem mediaItem : fileMediaItems) {
+					if ((mediaItem.getType() == MediaItem.TYPE_LOC_IMAGE) || mediaItem.getType().equals(MediaItem.TYPE_WEB_IMAGE)) {
+						fileMediaItemsImages.add(mediaItem);
+					} else if ((mediaItem.getType() == MediaItem.TYPE_LOC_VIDEO) || mediaItem.getType().equals(MediaItem.TYPE_WEB_VIDEO)) {
+						fileMediaItemsVideos.add(mediaItem);
+					}
 				}
 			}
 
