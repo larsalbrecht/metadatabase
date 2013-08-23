@@ -77,7 +77,8 @@ public class AllPage extends WebPage {
 				additionalHandlerData);
 
 		// pagination start
-		final boolean showPagination = (fileItems.size() > 0) && (maxItemsForPagingOption > -1) ? true : false;
+		final boolean showPagination = (fileItems.size() > 0) && (maxItemsForPagingOption > 0)
+				&& (fileItems.size() > maxItemsForPagingOption) ? true : false;
 		if (showPagination) {
 			final int pageCount = (int) Math.ceil(new Double(maxExistingElems) / new Double(maxElems));
 			final int pageFirst = 0; // ever 0
@@ -118,10 +119,10 @@ public class AllPage extends WebPage {
 
 		// TODO extract / refactor this code block to a general class.
 		String itemTitle = null;
+		String extractedName = null;
 		for (final FileItem fileItem : fileItems) {
-			itemTitle = fileItem.getName();
-
-			itemTitle = this.getExtractedName(fileItem);
+			extractedName = this.getExtractedName(fileItem);
+			itemTitle = extractedName != null ? extractedName : fileItem.getName();
 
 			tempFileListItem = allTemplate.getSubMarkerContent("allFileListItem");
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "name", itemTitle, false);

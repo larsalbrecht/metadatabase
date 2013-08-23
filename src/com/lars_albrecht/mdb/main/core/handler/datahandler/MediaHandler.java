@@ -140,37 +140,69 @@ public class MediaHandler<E> extends ADataHandler<E> {
 		// this.data.put("mediaItems", new ArrayList<MediaItem>());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public ArrayList<?> getHandlerDataForFileItem(final FileItem fileItem) {
-		final ArrayList<MediaItem> resultList = new ArrayList<MediaItem>();
-		if ((fileItem != null) && (fileItem.getId() != null) && (fileItem.getId() > -1)) {
+	public ArrayList<MediaItem> getHandlerDataForFileItem(final FileItem fileItem) {
+		final ArrayList<FileItem> fileItems = new ArrayList<FileItem>();
+		fileItems.add(fileItem);
+		return (ArrayList<MediaItem>) this.getHandlerDataForFileItems(fileItems).get(fileItem);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public ConcurrentHashMap<FileItem, ArrayList<?>> getHandlerDataForFileItems(final ArrayList<FileItem> fileItems) {
+		final ConcurrentHashMap<FileItem, ArrayList<?>> resultMap = new ConcurrentHashMap<FileItem, ArrayList<?>>();
+
+		final String[] fileIds = new String[fileItems.size()];
+
+		int idCounter = 0;
+		for (final FileItem fileItem : fileItems) {
+			fileIds[idCounter] = fileItem.getId().toString();
+			idCounter++;
+		}
+
+		if ((fileItems != null) && fileItems.size() > 0) {
 
 			ResultSet rs = null;
-			final String sql = "SELECT mi.id, mi.name, mi.type, mi.uri, mi.options FROM mediaItems AS mi LEFT JOIN fileMedia AS fm ON fm.media_id = mi.id WHERE fm.file_id = '"
-					+ fileItem.getId() + "'";
+			final String sql = "SELECT fm.file_id AS 'fileId', mi.id, mi.name, mi.type, mi.uri, mi.options FROM mediaItems AS mi LEFT JOIN fileMedia AS fm ON fm.media_id = mi.id WHERE fm.file_id IN ("
+					+ Helper.implode(fileIds, ",", "'", "'") + ")";
 			try {
 				Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 				rs = DB.query(sql);
 				HashMap<String, Object> tempMap = null;
 				final ResultSetMetaData rsmd = rs.getMetaData();
+				Integer fileId = null;
+				FileItem currentFileItem = null;
 				for (; rs.next();) { // for each line
 					tempMap = new HashMap<String, Object>();
 					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
 					}
-					resultList.add((MediaItem) new MediaItem().fromHashMap(tempMap));
+					fileId = rs.getInt("fileId");
+
+					// get fileitem
+					for (final FileItem fileItem : fileItems) {
+						if (fileItem.getId().equals(fileId)) {
+							currentFileItem = fileItem;
+							break;
+						}
+					}
+
+					if (currentFileItem != null) {
+						if (!resultMap.containsKey(currentFileItem)) {
+							resultMap.put(currentFileItem, new ArrayList<MediaItem>());
+						}
+
+						((ArrayList<MediaItem>) resultMap.get(currentFileItem)).add((MediaItem) new MediaItem().fromHashMap(tempMap));
+					}
+
 				}
 			} catch (final SQLException e) {
 				e.printStackTrace();
 			}
 
 		}
-		return resultList;
-	}
-
-	@Override
-	public ConcurrentHashMap<FileItem, ArrayList<?>> getHandlerDataForFileItems(final ArrayList<FileItem> fileItems) {
-		return null;
+		return resultMap;
 	}
 
 	@SuppressWarnings("unchecked")

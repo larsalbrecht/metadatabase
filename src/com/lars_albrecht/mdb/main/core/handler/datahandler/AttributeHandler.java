@@ -38,12 +38,13 @@ public class AttributeHandler<E> extends ADataHandler<E> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public ArrayList<E> getHandlerDataForFileItem(final FileItem fileItem) {
+	public ArrayList<FileAttributeList> getHandlerDataForFileItem(final FileItem fileItem) {
 		final ArrayList<FileItem> fileItems = new ArrayList<FileItem>();
 		fileItems.add(fileItem);
-		return (ArrayList<E>) this.getHandlerDataForFileItems(fileItems).get(fileItem);
+		return (ArrayList<FileAttributeList>) this.getHandlerDataForFileItems(fileItems).get(fileItem);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ConcurrentHashMap<FileItem, ArrayList<?>> getHandlerDataForFileItems(final ArrayList<FileItem> fileItems) {
 		final ConcurrentHashMap<FileItem, ArrayList<?>> resultMap = new ConcurrentHashMap<FileItem, ArrayList<?>>();
