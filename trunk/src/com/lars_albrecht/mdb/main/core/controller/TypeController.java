@@ -54,6 +54,13 @@ public class TypeController {
 	}
 
 	/**
+	 * @return the availableTypes
+	 */
+	public final ArrayList<String> getAvailableTypes() {
+		return this.availableTypes;
+	}
+
+	/**
 	 * Initialize the typer.
 	 */
 	private void initTyper() {
@@ -72,13 +79,6 @@ public class TypeController {
 	@SuppressWarnings("unused")
 	private final void setTypers(final ArrayList<ATyper> typers) {
 		this.typers = typers;
-	}
-
-	/**
-	 * @return the availableTypes
-	 */
-	public final ArrayList<String> getAvailableTypes() {
-		return this.availableTypes;
 	}
 
 }

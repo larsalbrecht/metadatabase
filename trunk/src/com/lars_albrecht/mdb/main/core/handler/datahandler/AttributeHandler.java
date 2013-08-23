@@ -39,22 +39,41 @@ public class AttributeHandler<E> extends ADataHandler<E> {
 	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<E> getHandlerDataForFileItem(final FileItem fileItem) {
-		final ArrayList<FileAttributeList> resultList = new ArrayList<FileAttributeList>();
+		final ArrayList<FileItem> fileItems = new ArrayList<FileItem>();
+		fileItems.add(fileItem);
+		return (ArrayList<E>) this.getHandlerDataForFileItems(fileItems).get(fileItem);
+	}
+
+	@Override
+	public ConcurrentHashMap<FileItem, ArrayList<?>> getHandlerDataForFileItems(final ArrayList<FileItem> fileItems) {
+		final ConcurrentHashMap<FileItem, ArrayList<?>> resultMap = new ConcurrentHashMap<FileItem, ArrayList<?>>();
+
+		final String[] fileIds = new String[fileItems.size()];
+
+		int idCounter = 0;
+		for (final FileItem fileItem : fileItems) {
+			fileIds[idCounter] = fileItem.getId().toString();
+			idCounter++;
+		}
+
 		// ArrayList<KeyValue<Key<String>, Value<Object>>>
 		HashMap<String, Object> tempMapKey = null;
 		HashMap<String, Object> tempMapValue = null;
 		ResultSet rs = null;
 		final String sql = "SELECT "
-				+ "	tiKey.id AS 'keyId', tiKey.Key AS 'keyKey', tiKey.infoType AS 'keyInfoType', tiKey.section AS 'keySection', tiKey.editable AS 'keyEditable', tiKey.searchable AS 'keySearchable', tiValue.id as 'valueId', tiValue.value as 'valueValue' "
+				+ "	fi.id AS 'fileId', tiKey.id AS 'keyId', tiKey.Key AS 'keyKey', tiKey.infoType AS 'keyInfoType', tiKey.section AS 'keySection', tiKey.editable AS 'keyEditable', tiKey.searchable AS 'keySearchable', tiValue.id as 'valueId', tiValue.value as 'valueValue' "
 				+ "FROM " + "	fileInformation as fi " + "LEFT JOIN " + " 	" + new FileAttributes().getDatabaseTable() + " as ti " + "ON "
 				+ " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	" + new Key<>().getDatabaseTable() + " AS tiKey " + "ON "
 				+ " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	" + new Value<>().getDatabaseTable() + " AS tiValue " + "ON "
-				+ "	tiValue.id = ti.value_id " + "WHERE " + "	fi.id = '" + fileItem.getId() + "' ORDER BY keyInfoType, keySection ";
+				+ "	tiValue.id = ti.value_id " + "WHERE " + "	fi.id IN (" + Helper.implode(fileIds, ",", "'", "'")
+				+ ") ORDER BY fileId, keyInfoType, keySection ";
 		try {
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 			rs = DB.query(sql);
 			final ResultSetMetaData rsmd = rs.getMetaData();
 			FileAttributeList tempFileAttributeList = null;
+			Integer fileId = null;
+			FileItem currentFileItem = null;
 			for (; rs.next();) { // for each line
 				KeyValue<String, Object> kv = null;
 				tempMapKey = new HashMap<String, Object>();
@@ -73,32 +92,52 @@ public class AttributeHandler<E> extends ADataHandler<E> {
 						tempMapKey.put(originalName, rs.getObject(i));
 					} else if (rsmd.getColumnLabel(i).startsWith("value")) {
 						tempMapValue.put(originalName, rs.getObject(i));
+					} else if (rsmd.getColumnLabel(i).equalsIgnoreCase("fileId")) {
+						fileId = rs.getInt("fileId");
 					}
 				}
 
-				final Key<String> key = (Key<String>) (new Key<String>()).fromHashMap(tempMapKey);
-				final Value<Object> value = ((Value<Object>) (new Value<Object>()).fromHashMap(tempMapValue));
-				if ((key != null) && (value != null) && (value.getValue() != null)) {
-					kv = new KeyValue<String, Object>(key, value);
+				// get fileitem
+				for (final FileItem fileItem : fileItems) {
+					if (fileItem.getId().equals(fileId)) {
+						currentFileItem = fileItem;
+						break;
+					}
+				}
 
-					int index = -1;
-					if ((index = this.indexOfSectionInFileAttributeList(resultList, section, infoType)) > -1) {
-						tempFileAttributeList = resultList.get(index);
-						tempFileAttributeList.getKeyValues().add(kv);
-						resultList.set(index, tempFileAttributeList);
-					} else {
-						tempFileAttributeList = new FileAttributeList();
-						tempFileAttributeList.setSectionName(section);
-						tempFileAttributeList.setInfoType(infoType);
-						tempFileAttributeList.getKeyValues().add(kv);
-						resultList.add(tempFileAttributeList);
+				if (currentFileItem != null) {
+					if (!resultMap.containsKey(currentFileItem)) {
+						resultMap.put(currentFileItem, new ArrayList<FileAttributeList>());
+					}
+
+					final Key<String> key = (Key<String>) (new Key<String>()).fromHashMap(tempMapKey);
+					final Value<Object> value = ((Value<Object>) (new Value<Object>()).fromHashMap(tempMapValue));
+					if ((key != null) && (value != null) && (value.getValue() != null)) {
+						kv = new KeyValue<String, Object>(key, value);
+
+						// remove used object
+						int index = -1;
+						if ((index = this.indexOfSectionInFileAttributeList((ArrayList<FileAttributeList>) resultMap.get(currentFileItem),
+								section, infoType)) > -1) {
+							tempFileAttributeList = ((ArrayList<FileAttributeList>) resultMap.get(currentFileItem)).get(index);
+							tempFileAttributeList.getKeyValues().add(kv);
+							tempFileAttributeList.setFileId(rs.getInt("fileId"));
+							((ArrayList<FileAttributeList>) resultMap.get(currentFileItem)).set(index, tempFileAttributeList);
+						} else {
+							tempFileAttributeList = new FileAttributeList();
+							tempFileAttributeList.setSectionName(section);
+							tempFileAttributeList.setInfoType(infoType);
+							tempFileAttributeList.getKeyValues().add(kv);
+							tempFileAttributeList.setFileId(rs.getInt("fileId"));
+							((ArrayList<FileAttributeList>) resultMap.get(currentFileItem)).add(tempFileAttributeList);
+						}
 					}
 				}
 			}
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
-		return (ArrayList<E>) resultList;
+		return resultMap;
 	}
 
 	/**
@@ -136,4 +175,5 @@ public class AttributeHandler<E> extends ADataHandler<E> {
 	protected void persistData() throws Exception {
 		// TODO fill persistData with live
 	}
+
 }

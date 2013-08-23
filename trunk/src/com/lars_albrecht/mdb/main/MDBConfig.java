@@ -37,6 +37,12 @@ public class MDBConfig {
 
 	private final ConcurrentHashMap<String, String[]>	itemTitleExtraction					= new ConcurrentHashMap<String, String[]>();
 
+	public final void addTitleExtraction(final String fileType, final String infoType, final String section, final String key) {
+		this.itemTitleExtraction.put(fileType, new String[] {
+				infoType, section, key
+		});
+	}
+
 	/**
 	 * @return the finderFileFilter
 	 */
@@ -86,6 +92,10 @@ public class MDBConfig {
 		return this.systemTrayInterfaceIconImageFile;
 	}
 
+	public final String[] getTitleExtractionForFileType(final String fileType) {
+		return this.itemTitleExtraction.get(fileType);
+	}
+
 	/**
 	 * @return the webInterfaceFileDetailsOutputItem
 	 */
@@ -123,16 +133,6 @@ public class MDBConfig {
 	 */
 	public final void setWebInterfaceFileDetailsOutputItem(final AbstractFileDetailsOutputItem webInterfaceFileDetailsOutputItem) {
 		this.webInterfaceFileDetailsOutputItem = webInterfaceFileDetailsOutputItem;
-	}
-
-	public final void addTitleExtraction(final String fileType, final String infoType, final String section, final String key) {
-		this.itemTitleExtraction.put(fileType, new String[] {
-				infoType, section, key
-		});
-	}
-
-	public final String[] getTitleExtractionForFileType(final String fileType) {
-		return this.itemTitleExtraction.get(fileType);
 	}
 
 }

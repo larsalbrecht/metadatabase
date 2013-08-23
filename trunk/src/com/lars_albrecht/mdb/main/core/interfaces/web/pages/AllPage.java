@@ -120,30 +120,8 @@ public class AllPage extends WebPage {
 		String itemTitle = null;
 		for (final FileItem fileItem : fileItems) {
 			itemTitle = fileItem.getName();
-			@SuppressWarnings("unchecked")
-			final ArrayList<FileAttributeList> attributesList = (ArrayList<FileAttributeList>) ADataHandler.getHandlerDataFromFileItem(
-					fileItem, AttributeHandler.class);
 
-			for (final String type : this.mainController.gettController().getAvailableTypes()) {
-				if (type != null && type.equalsIgnoreCase(fileItem.getFiletype())) {
-					final String[] titleExtractionPath = this.mainController.getMdbConfig().getTitleExtractionForFileType(type);
-					if (titleExtractionPath != null && titleExtractionPath.length == 3) {
-						for (final FileAttributeList fileAttributeList : attributesList) {
-							if (fileAttributeList.getInfoType().equalsIgnoreCase(titleExtractionPath[0])
-									&& fileAttributeList.getSectionName().equalsIgnoreCase(titleExtractionPath[1])) {
-								if (fileAttributeList.getKeyValues() != null) {
-									for (final KeyValue<String, Object> keyValue : fileAttributeList.getKeyValues()) {
-										if (keyValue.getKey().getKey().equalsIgnoreCase(titleExtractionPath[2])) {
-											itemTitle = keyValue.getValue().getValue().toString();
-											break;
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
+			itemTitle = this.getExtractedName(fileItem);
 
 			tempFileListItem = allTemplate.getSubMarkerContent("allFileListItem");
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "name", itemTitle, false);
@@ -160,6 +138,32 @@ public class AllPage extends WebPage {
 		allTemplate.replaceMarker("content", fileList, false);
 
 		return allTemplate;
+	}
+
+	private String getExtractedName(final FileItem fileItem) {
+		@SuppressWarnings("unchecked")
+		final ArrayList<FileAttributeList> attributesList = (ArrayList<FileAttributeList>) ADataHandler.getHandlerDataFromFileItem(
+				fileItem, AttributeHandler.class);
+		for (final String type : this.mainController.gettController().getAvailableTypes()) {
+			if ((type != null) && type.equalsIgnoreCase(fileItem.getFiletype())) {
+				final String[] titleExtractionPath = this.mainController.getMdbConfig().getTitleExtractionForFileType(type);
+				if ((titleExtractionPath != null) && (titleExtractionPath.length == 3) && (attributesList != null)) {
+					for (final FileAttributeList fileAttributeList : attributesList) {
+						if (fileAttributeList.getInfoType().equalsIgnoreCase(titleExtractionPath[0])
+								&& fileAttributeList.getSectionName().equalsIgnoreCase(titleExtractionPath[1])) {
+							if (fileAttributeList.getKeyValues() != null) {
+								for (final KeyValue<String, Object> keyValue : fileAttributeList.getKeyValues()) {
+									if (keyValue.getKey().getKey().equalsIgnoreCase(titleExtractionPath[2])) {
+										return keyValue.getValue().getValue().toString();
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	@Override

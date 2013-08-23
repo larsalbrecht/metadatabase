@@ -168,6 +168,11 @@ public class MediaHandler<E> extends ADataHandler<E> {
 		return resultList;
 	}
 
+	@Override
+	public ConcurrentHashMap<FileItem, ArrayList<?>> getHandlerDataForFileItems(final ArrayList<FileItem> fileItems) {
+		return null;
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void persistData() throws Exception {
