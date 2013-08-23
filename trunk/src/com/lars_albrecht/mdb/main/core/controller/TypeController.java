@@ -26,9 +26,13 @@ public class TypeController {
 	private ArrayList<ATyper>	typers			= null;
 	private ArrayList<String>	availableTypes	= null;
 
-	public TypeController(final MainController mainController) {
+	public TypeController(final MainController mainController, final ArrayList<ATyper> typers) {
 		this.mainController = mainController;
-		this.typers = new ArrayList<ATyper>();
+		if (typers == null) {
+			this.typers = new ArrayList<ATyper>();
+		} else {
+			this.typers = typers;
+		}
 		this.availableTypes = new ArrayList<String>();
 		this.initTyper();
 	}
@@ -65,8 +69,15 @@ public class TypeController {
 	 * @param typers
 	 *            the typers to set
 	 */
-	public final void setTypers(final ArrayList<ATyper> typers) {
+	private final void setTypers(final ArrayList<ATyper> typers) {
 		this.typers = typers;
+	}
+
+	/**
+	 * @return the availableTypes
+	 */
+	public final ArrayList<String> getAvailableTypes() {
+		return this.availableTypes;
 	}
 
 }

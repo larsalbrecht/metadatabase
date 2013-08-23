@@ -13,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.FileFinder;
 import com.lars_albrecht.general.utilities.PropertiesExNotInitilizedException;
+import com.lars_albrecht.mdb.main.MDBConfig;
 import com.lars_albrecht.mdb.main.core.collector.event.CollectorEvent;
 import com.lars_albrecht.mdb.main.core.collector.event.ICollectorListener;
 import com.lars_albrecht.mdb.main.core.finder.event.FinderEvent;
@@ -42,10 +43,12 @@ public class MainController implements IFinderListener, ICollectorListener {
 	private ExportController					eController		= null;
 	private DataHandler							dataHandler		= null;
 	private ConfigurationHandler				configHandler	= null;
+	private MDBConfig							mdbConfig		= null;
 
 	private ConcurrentHashMap<String, Object>	globalVars		= null;
 
-	public MainController() {
+	public MainController(final MDBConfig mdbConfig) {
+		this.mdbConfig = mdbConfig;
 		this.init();
 	}
 
@@ -422,6 +425,13 @@ public class MainController implements IFinderListener, ICollectorListener {
 
 	private ArrayList<FileItem> startTyper(final ArrayList<FileItem> fileItemList) {
 		return this.tController.findOutType(fileItemList);
+	}
+
+	/**
+	 * @return the mdbConfig
+	 */
+	public final MDBConfig getMdbConfig() {
+		return this.mdbConfig;
 	}
 
 }

@@ -6,6 +6,7 @@ package com.lars_albrecht.mdb.main;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.mdb.main.core.collector.abstracts.ACollector;
 import com.lars_albrecht.mdb.main.core.exporter.abstracts.AExporter;
@@ -19,20 +20,22 @@ import com.lars_albrecht.mdb.main.core.typer.abstracts.ATyper;
  */
 public class MDBConfig {
 
-	private FileFilter						finderFileFilter					= null;
-	private AbstractFileDetailsOutputItem	webInterfaceFileDetailsOutputItem	= null;
+	private FileFilter									finderFileFilter					= null;
+	private AbstractFileDetailsOutputItem				webInterfaceFileDetailsOutputItem	= null;
 
-	private int								loglevel							= 0;
+	private int											loglevel							= 0;
 
-	final private ArrayList<ATyper>			listOfTypers						= new ArrayList<ATyper>();
+	final private ArrayList<ATyper>						listOfTypers						= new ArrayList<ATyper>();
 
-	final private ArrayList<AExporter>		listOfExporter						= new ArrayList<AExporter>();
+	final private ArrayList<AExporter>					listOfExporter						= new ArrayList<AExporter>();
 
-	final private ArrayList<AInterface>		listOfInterfaces					= new ArrayList<AInterface>();
+	final private ArrayList<AInterface>					listOfInterfaces					= new ArrayList<AInterface>();
 
-	final private ArrayList<ACollector>		listOfCollectors					= new ArrayList<ACollector>();
+	final private ArrayList<ACollector>					listOfCollectors					= new ArrayList<ACollector>();
 
-	File									systemTrayInterfaceIconImageFile	= null;
+	private File										systemTrayInterfaceIconImageFile	= null;
+
+	private final ConcurrentHashMap<String, String[]>	itemTitleExtraction					= new ConcurrentHashMap<String, String[]>();
 
 	/**
 	 * @return the finderFileFilter
@@ -120,6 +123,16 @@ public class MDBConfig {
 	 */
 	public final void setWebInterfaceFileDetailsOutputItem(final AbstractFileDetailsOutputItem webInterfaceFileDetailsOutputItem) {
 		this.webInterfaceFileDetailsOutputItem = webInterfaceFileDetailsOutputItem;
+	}
+
+	public final void addTitleExtraction(final String fileType, final String infoType, final String section, final String key) {
+		this.itemTitleExtraction.put(fileType, new String[] {
+				infoType, section, key
+		});
+	}
+
+	public final String[] getTitleExtractionForFileType(final String fileType) {
+		return this.itemTitleExtraction.get(fileType);
 	}
 
 }

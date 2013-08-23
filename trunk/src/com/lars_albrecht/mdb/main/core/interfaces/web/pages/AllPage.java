@@ -9,9 +9,14 @@ import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.handler.OptionsHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.AttributeHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.MediaHandler;
+import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
+import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
+import com.lars_albrecht.mdb.main.core.models.KeyValue;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
 /**
@@ -64,7 +69,12 @@ public class AllPage extends WebPage {
 
 		final int maxExistingElems = this.mainController.getDataHandler().getFileItems().size();
 
-		final ArrayList<FileItem> fileItems = this.mainController.getDataHandler().getFileItemsForPaging(startIndex, maxElems, sortOrder);
+		final String[] additionalHandlerData = {
+				new MediaHandler<>().getClass().getCanonicalName(), new AttributeHandler<>().getClass().getCanonicalName()
+		};
+
+		final ArrayList<FileItem> fileItems = this.mainController.getDataHandler().getFileItemsForPaging(startIndex, maxElems, sortOrder,
+				additionalHandlerData);
 
 		// pagination start
 		final boolean showPagination = (fileItems.size() > 0) && (maxItemsForPagingOption > -1) ? true : false;
@@ -106,9 +116,37 @@ public class AllPage extends WebPage {
 		String fileListItems = "";
 		String tempFileListItem = null;
 
+		// TODO extract / refactor this code block to a general class.
+		String itemTitle = null;
 		for (final FileItem fileItem : fileItems) {
+			itemTitle = fileItem.getName();
+			@SuppressWarnings("unchecked")
+			final ArrayList<FileAttributeList> attributesList = (ArrayList<FileAttributeList>) ADataHandler.getHandlerDataFromFileItem(
+					fileItem, AttributeHandler.class);
+
+			for (final String type : this.mainController.gettController().getAvailableTypes()) {
+				if (type != null && type.equalsIgnoreCase(fileItem.getFiletype())) {
+					final String[] titleExtractionPath = this.mainController.getMdbConfig().getTitleExtractionForFileType(type);
+					if (titleExtractionPath != null && titleExtractionPath.length == 3) {
+						for (final FileAttributeList fileAttributeList : attributesList) {
+							if (fileAttributeList.getInfoType().equalsIgnoreCase(titleExtractionPath[0])
+									&& fileAttributeList.getSectionName().equalsIgnoreCase(titleExtractionPath[1])) {
+								if (fileAttributeList.getKeyValues() != null) {
+									for (final KeyValue<String, Object> keyValue : fileAttributeList.getKeyValues()) {
+										if (keyValue.getKey().getKey().equalsIgnoreCase(titleExtractionPath[2])) {
+											itemTitle = keyValue.getValue().getValue().toString();
+											break;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+
 			tempFileListItem = allTemplate.getSubMarkerContent("allFileListItem");
-			tempFileListItem = Template.replaceMarker(tempFileListItem, "name", fileItem.getName(), false);
+			tempFileListItem = Template.replaceMarker(tempFileListItem, "name", itemTitle, false);
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "itemId", fileItem.getId().toString(), false);
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "type", fileItem.getFiletype(), false);
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "added",

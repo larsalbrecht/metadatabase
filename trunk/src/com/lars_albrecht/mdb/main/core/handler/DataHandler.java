@@ -425,7 +425,6 @@ public class DataHandler {
 	 * @param fileId
 	 * @return FileItem
 	 */
-	@Deprecated
 	public FileItem findAllInfoForAllByFileId(final Integer fileId) {
 		HashMap<String, Object> tempMap = null;
 		FileItem resultItem = new FileItem();
@@ -634,7 +633,10 @@ public class DataHandler {
 		return this.fileItems;
 	}
 
-	public ArrayList<FileItem> getFileItemsForPaging(final int startIndex, final int maxElems, final String orderBy) {
+	public ArrayList<FileItem> getFileItemsForPaging(final int startIndex,
+			final int maxElems,
+			final String orderBy,
+			final String[] handlerArr) {
 		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
 		HashMap<String, Object> tempMap = null;
 		final FileItem fileItem = new FileItem();
@@ -644,6 +646,7 @@ public class DataHandler {
 			ResultSet rs = null;
 			final String sql = "SELECT * FROM " + fileItem.getDatabaseTable() + order + limit;
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
+			FileItem tempFileItem = null;
 			try {
 				rs = DB.query(sql);
 				final ResultSetMetaData rsmd = rs.getMetaData();
@@ -652,7 +655,20 @@ public class DataHandler {
 					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
 					}
-					resultList.add((FileItem) fileItem.fromHashMap(tempMap));
+					tempFileItem = (FileItem) fileItem.fromHashMap(tempMap);
+
+					if (tempFileItem.getId() != null) {
+						for (final String handlerName : handlerArr) {
+							// load data from handlers
+							for (final ADataHandler<?> dataHandler : ADataHandler.getDataHandlers()) {
+								if (dataHandler.getClass().getCanonicalName().equalsIgnoreCase(handlerName)) {
+									dataHandler.setHandlerDataToFileItem(tempFileItem, dataHandler.getHandlerDataForFileItem(tempFileItem));
+								}
+							}
+						}
+					}
+
+					resultList.add(tempFileItem);
 				}
 			} catch (final SQLException e) {
 				e.printStackTrace();
