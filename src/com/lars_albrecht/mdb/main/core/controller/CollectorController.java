@@ -29,7 +29,6 @@ public class CollectorController implements IController, ICollectorListener {
 	/**
 	 * 
 	 * @param mainController
-	 * @throws Exception
 	 */
 	public CollectorController(final MainController mainController) {
 		this.mainController = mainController;

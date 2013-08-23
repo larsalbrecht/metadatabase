@@ -45,8 +45,6 @@ public abstract class ACollector implements Runnable {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param mainController
-	 * @param controller
 	 */
 	public ACollector() {
 		this.keysToAdd = new ArrayList<Key<String>>();
