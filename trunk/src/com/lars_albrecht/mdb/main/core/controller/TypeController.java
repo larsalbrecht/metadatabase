@@ -69,6 +69,7 @@ public class TypeController {
 	 * @param typers
 	 *            the typers to set
 	 */
+	@SuppressWarnings("unused")
 	private final void setTypers(final ArrayList<ATyper> typers) {
 		this.typers = typers;
 	}

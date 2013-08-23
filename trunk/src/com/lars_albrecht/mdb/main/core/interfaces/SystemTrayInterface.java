@@ -111,7 +111,7 @@ public class SystemTrayInterface extends AInterface implements ActionListener {
 	}
 
 	/**
-	 * @param trayIconImagePath
+	 * @param trayIconImageFile
 	 *            the trayIconImagePath to set
 	 * @throws Exception
 	 */

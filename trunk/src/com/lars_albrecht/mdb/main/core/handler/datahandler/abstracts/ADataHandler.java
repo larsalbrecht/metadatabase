@@ -63,7 +63,7 @@ public abstract class ADataHandler<E> {
 	 * 
 	 * @param fileItem
 	 * @param clazz
-	 * @return
+	 * @return hasFileItemHandlerData
 	 */
 	public static final boolean hasFileItemHandlerData(final FileItem fileItem, final Class<?> clazz) {
 		if ((clazz.getSuperclass() == ADataHandler.class) && (fileItem != null) && (fileItem.getDataStore() != null)
@@ -125,7 +125,7 @@ public abstract class ADataHandler<E> {
 	 * 
 	 * @param dataKey
 	 * @param fileItem
-	 * @return
+	 * @return data
 	 */
 	public final ConcurrentHashMap<FileItem, ArrayList<?>> getData(final String dataKey, final FileItem fileItem) {
 		if (this.data.get(dataKey) != null) {
