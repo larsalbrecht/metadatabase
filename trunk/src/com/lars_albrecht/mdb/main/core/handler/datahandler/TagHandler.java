@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.general.utilities.Debug;
+import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
+import com.lars_albrecht.mdb.main.core.models.persistable.MediaItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
 import com.lars_albrecht.mdb.main.database.DB;
 
@@ -26,37 +28,68 @@ public class TagHandler<E> extends ADataHandler<E> {
 		// this.data.put("tags", new ArrayList<FileTag>());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<FileTag> getHandlerDataForFileItem(final FileItem fileItem) {
-		final ArrayList<FileTag> resultList = new ArrayList<FileTag>();
-		// ArrayList<KeyValue<Key<String>, Value<Object>>>
-		ResultSet rs = null;
-		final String sql = "SELECT "
-				+ " tag.id AS tagId, tag.name AS 'tagName', tag.isuser AS 'tagIsUser', fTag.id AS 'fileTagId', fTag.isuser AS 'fileTagIsUser' "
-				+ "FROM " + "	fileInformation as fi " + "LEFT JOIN " + " fileTags as fTag " + "ON " + " fi.id = fTag.file_id "
-				+ " LEFT JOIN " + " 	tags AS tag " + "ON " + " 	tag.id = fTag.tag_id " + "WHERE " + "	fi.id = '" + fileItem.getId()
-				+ "' ORDER BY tag.name, fTag.isuser ";
-		try {
-			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
-			rs = DB.query(sql);
-			FileTag tempFileTag = null;
-			for (; rs.next();) { // for each line
-
-				if ((rs.getInt("fileTagId") > 0) && (rs.getInt("tagId") > 0)) {
-					tempFileTag = new FileTag(rs.getInt("fileTagId"), fileItem.getId(), new Tag(rs.getInt("tagId"),
-							rs.getString("tagName"), rs.getBoolean("tagIsUser")), rs.getBoolean("fileTagIsUser"));
-					resultList.add(tempFileTag);
-				}
-			}
-		} catch (final SQLException e) {
-			e.printStackTrace();
-		}
-		return resultList;
+		final ArrayList<FileItem> fileItems = new ArrayList<FileItem>();
+		fileItems.add(fileItem);
+		return (ArrayList<FileTag>) this.getHandlerDataForFileItems(fileItems).get(fileItem);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ConcurrentHashMap<FileItem, ArrayList<?>> getHandlerDataForFileItems(final ArrayList<FileItem> fileItems) {
-		return null;
+		final ConcurrentHashMap<FileItem, ArrayList<?>> resultMap = new ConcurrentHashMap<FileItem, ArrayList<?>>();
+
+		final String[] fileIds = new String[fileItems.size()];
+
+		int idCounter = 0;
+		for (final FileItem fileItem : fileItems) {
+			fileIds[idCounter] = fileItem.getId().toString();
+			idCounter++;
+		}
+
+		if ((fileItems != null) && fileItems.size() > 0) {
+
+			ResultSet rs = null;
+			final String sql = "SELECT "
+					+ " fi.id AS 'fileId', tag.id AS tagId, tag.name AS 'tagName', tag.isuser AS 'tagIsUser', fTag.id AS 'fileTagId', fTag.isuser AS 'fileTagIsUser' "
+					+ "FROM " + "	fileInformation as fi " + "LEFT JOIN " + " fileTags as fTag " + "ON " + " fi.id = fTag.file_id "
+					+ " LEFT JOIN " + " 	tags AS tag " + "ON " + " 	tag.id = fTag.tag_id " + "WHERE " + "	fi.id IN ("
+					+ Helper.implode(fileIds, ",", "'", "'") + ")" + " ORDER BY tag.name, fTag.isuser ";
+
+			try {
+				Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
+				rs = DB.query(sql);
+				Integer fileId = null;
+				FileItem currentFileItem = null;
+				for (; rs.next();) { // for each line
+					fileId = rs.getInt("fileId");
+
+					// get fileitem
+					for (final FileItem fileItem : fileItems) {
+						if (fileItem.getId().equals(fileId)) {
+							currentFileItem = fileItem;
+							break;
+						}
+					}
+
+					if (currentFileItem != null) {
+						if (!resultMap.containsKey(currentFileItem)) {
+							resultMap.put(currentFileItem, new ArrayList<MediaItem>());
+						}
+
+						((ArrayList<FileTag>) resultMap.get(currentFileItem)).add(new FileTag(rs.getInt("fileTagId"), fileId, new Tag(rs
+								.getInt("tagId"), rs.getString("tagName"), rs.getBoolean("tagIsUser")), rs.getBoolean("fileTagIsUser")));
+					}
+
+				}
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			}
+
+		}
+		return resultMap;
 	}
 
 	@Override
