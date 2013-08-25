@@ -55,7 +55,7 @@ public class DB implements IDatabase {
 	public static final Integer	DBTYPE_SQLITE		= 0;
 	public static final Integer	DBTYPE_H2			= 1;
 
-	private static Integer		DBTYPE				= DB.DBTYPE_SQLITE;
+	private static Integer		DBTYPE				= DB.DBTYPE_H2;
 
 	public static boolean		useQuotesForFields	= false;
 
@@ -472,13 +472,13 @@ public class DB implements IDatabase {
 	private void createTableAttributesKey() throws SQLException {
 		String sql = null;
 		// attributes_key
-		sql = "CREATE TABLE IF NOT EXISTS 'attributes_key' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'key' VARCHAR(255), ";
-		sql += "'infoType' VARCHAR(255), ";
-		sql += "'section' VARCHAR(255), ";
-		sql += "'editable' INTEGER, ";
-		sql += "'searchable' INTEGER ";
+		sql = "CREATE TABLE IF NOT EXISTS attributes_key ( ";
+		sql += "id INTEGER PRIMARY KEY " + this.autoIncrementStr() + ", ";
+		sql += "key VARCHAR(255), ";
+		sql += "infoType VARCHAR(255), ";
+		sql += "section VARCHAR(255), ";
+		sql += "editable INTEGER, ";
+		sql += "searchable INTEGER ";
 		sql += "); ";
 		DB.update(sql);
 		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_attributes_key ON attributes_key (key, infoType, section);";
@@ -488,24 +488,25 @@ public class DB implements IDatabase {
 	private void createTableAttributesValue() throws SQLException {
 		String sql = null;
 		// attributes_value
-		sql = "CREATE TABLE IF NOT EXISTS 'attributes_value' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'value' TEXT ";
+		sql = "CREATE TABLE IF NOT EXISTS attributes_value ( ";
+		sql += "id INTEGER PRIMARY KEY " + this.autoIncrementStr() + ", ";
+		sql += "value TEXT ";
 		sql += "); ";
 		DB.update(sql);
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_attributes_value ON attributes_value (value);";
-		DB.update(sql);
+		// sql =
+		// "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_attributes_value ON attributes_value (value);";
+		// DB.update(sql);
 	}
 
 	private void createTableCollectorInformation() throws SQLException {
 		String sql = null;
 		// collectorInformation
-		sql = "CREATE TABLE IF NOT EXISTS 'collectorInformation' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'collectorName' VARCHAR(255), ";
-		sql += "'file_id' INTEGER, ";
-		sql += "'key' VARCHAR(255), ";
-		sql += "'value' VARCHAR(255), ";
+		sql = "CREATE TABLE IF NOT EXISTS collectorInformation ( ";
+		sql += "id INTEGER PRIMARY KEY " + this.autoIncrementStr() + ", ";
+		sql += "collectorName VARCHAR(255), ";
+		sql += "file_id INTEGER, ";
+		sql += "key VARCHAR(255), ";
+		sql += "value VARCHAR(255), ";
 		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE ";
 		sql += ");";
 		DB.update(sql);
@@ -516,11 +517,11 @@ public class DB implements IDatabase {
 	private void createTableFileAttributes() throws SQLException {
 		String sql = null;
 		// fileAttributes
-		sql = "CREATE TABLE IF NOT EXISTS 'fileAttributes' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'file_id' INTEGER, ";
-		sql += "'key_id' INTEGER, ";
-		sql += "'value_id' INTEGER, ";
+		sql = "CREATE TABLE IF NOT EXISTS fileAttributes ( ";
+		sql += "id INTEGER PRIMARY KEY " + this.autoIncrementStr() + ", ";
+		sql += "file_id INTEGER, ";
+		sql += "key_id INTEGER, ";
+		sql += "value_id INTEGER, ";
 		// sql += "'value' INTEGER ";
 		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
 		sql += "FOREIGN KEY (key_id) REFERENCES attributes_key(id) ON DELETE CASCADE, ";
@@ -531,21 +532,37 @@ public class DB implements IDatabase {
 		DB.update(sql);
 	}
 
+	private String autoIncrementStr() {
+		if (DB.DBTYPE == DB.DBTYPE_SQLITE) {
+			return "AUTOINCREMENT";
+		} else {
+			return "auto_increment";
+		}
+	}
+
+	private String currentDatetimeStr() {
+		if (DB.DBTYPE == DB.DBTYPE_SQLITE) {
+			return "(datetime('now','localtime'))";
+		} else {
+			return "CURRENT_TIMESTAMP()";
+		}
+	}
+
 	private void createTableFileInformation() throws SQLException {
 		// fileInformation
 		String sql = null;
-		sql = "CREATE TABLE IF NOT EXISTS 'fileInformation' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'name' VARCHAR(255), ";
-		sql += "'dir' VARCHAR(255), ";
-		sql += "'ext' VARCHAR(255), ";
-		sql += "'size' LONG, ";
-		sql += "'fullpath' VARCHAR(255), ";
-		sql += "'filehash' VARCHAR(255), ";
-		sql += "'filetype' INTEGER, ";
-		sql += "'createTS' DATE DEFAULT (datetime('now','localtime')), ";
-		sql += "'updateTS' DATE DEFAULT (datetime('now','localtime')), ";
-		sql += "'status' INTEGER NOT NULL DEFAULT '0' ";
+		sql = "CREATE TABLE IF NOT EXISTS fileInformation ( ";
+		sql += "id INTEGER PRIMARY KEY " + this.autoIncrementStr() + ", ";
+		sql += "name VARCHAR(255), ";
+		sql += "dir VARCHAR(255), ";
+		sql += "ext VARCHAR(255), ";
+		sql += "size LONG, ";
+		sql += "fullpath VARCHAR(255), ";
+		sql += "filehash VARCHAR(255), ";
+		sql += "filetype INTEGER, ";
+		sql += "createTS DATE DEFAULT " + this.currentDatetimeStr() + ", ";
+		sql += "updateTS DATE DEFAULT " + this.currentDatetimeStr() + ", ";
+		sql += "status INTEGER NOT NULL DEFAULT '0' ";
 		sql += ");";
 		DB.update(sql);
 		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_fileinformation_fullpath ON fileInformation (fullpath);";
@@ -561,10 +578,10 @@ public class DB implements IDatabase {
 	private void createTableFileMedia() throws SQLException {
 		String sql = null;
 		// options
-		sql = "CREATE TABLE IF NOT EXISTS 'fileMedia' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'file_id' INTEGER, ";
-		sql += "'media_id' INTEGER, ";
+		sql = "CREATE TABLE IF NOT EXISTS fileMedia ( ";
+		sql += "id INTEGER PRIMARY KEY " + this.autoIncrementStr() + ", ";
+		sql += "file_id INTEGER, ";
+		sql += "media_id INTEGER, ";
 		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
 		sql += "FOREIGN KEY (media_id) REFERENCES mediaItems(id) ON DELETE CASCADE ";
 		sql += "); ";
@@ -576,11 +593,11 @@ public class DB implements IDatabase {
 	private void createTableFileTags() throws SQLException {
 		String sql = null;
 		// fileTags
-		sql = "CREATE TABLE IF NOT EXISTS 'fileTags' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'file_id' INTEGER, ";
-		sql += "'tag_id' INTEGER, ";
-		sql += "'isuser' INTEGER, ";
+		sql = "CREATE TABLE IF NOT EXISTS fileTags ( ";
+		sql += "id INTEGER PRIMARY KEY " + this.autoIncrementStr() + ", ";
+		sql += "file_id INTEGER, ";
+		sql += "tag_id INTEGER, ";
+		sql += "isuser INTEGER, ";
 		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
 		sql += "FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE ";
 		// sql += "'value' INTEGER ";
@@ -595,12 +612,12 @@ public class DB implements IDatabase {
 	private void createTableMediaItems() throws SQLException {
 		String sql = null;
 		// options
-		sql = "CREATE TABLE IF NOT EXISTS 'mediaItems' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'name' VARCHAR(255), ";
-		sql += "'type' INTEGER, ";
-		sql += "'uri' VARCHAR(255), ";
-		sql += "'options' TEXT ";
+		sql = "CREATE TABLE IF NOT EXISTS mediaItems ( ";
+		sql += "id INTEGER PRIMARY KEY " + this.autoIncrementStr() + ", ";
+		sql += "name VARCHAR(255), ";
+		sql += "type INTEGER, ";
+		sql += "uri VARCHAR(255), ";
+		sql += "options TEXT ";
 		sql += "); ";
 		DB.update(sql);
 		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_mediaItems ON mediaItems (name, type, uri);";
@@ -610,10 +627,10 @@ public class DB implements IDatabase {
 	private void createTableOptions() throws SQLException {
 		String sql = null;
 		// options
-		sql = "CREATE TABLE IF NOT EXISTS 'options' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'name' VARCHAR(255), ";
-		sql += "'value' VARCHAR(255) ";
+		sql = "CREATE TABLE IF NOT EXISTS options ( ";
+		sql += "id INTEGER PRIMARY KEY " + this.autoIncrementStr() + ", ";
+		sql += "name VARCHAR(255), ";
+		sql += "value VARCHAR(255) ";
 		sql += "); ";
 		DB.update(sql);
 		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_options ON options (name);";
@@ -623,10 +640,10 @@ public class DB implements IDatabase {
 	private void createTableTags() throws SQLException {
 		String sql = null;
 		// tags
-		sql = "CREATE TABLE IF NOT EXISTS 'tags' ( ";
-		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
-		sql += "'name' VARCHAR(255), ";
-		sql += "'isuser' INTEGER ";
+		sql = "CREATE TABLE IF NOT EXISTS tags ( ";
+		sql += "id INTEGER PRIMARY KEY " + this.autoIncrementStr() + ", ";
+		sql += "name VARCHAR(255), ";
+		sql += "isuser INTEGER ";
 		sql += "); ";
 		DB.update(sql);
 		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tags_name ON tags (name);";
@@ -637,8 +654,10 @@ public class DB implements IDatabase {
 	public void init() throws Exception {
 		String sql = null;
 		try {
-			sql = "PRAGMA foreign_keys = ON;";
-			DB.update(sql);
+			if (DB.DBTYPE == DB.DBTYPE_SQLITE) {
+				sql = "PRAGMA foreign_keys = ON;";
+				DB.update(sql);
+			}
 
 			if (!this.updateDBWithVersion()) {
 				throw new Exception("Database could not be updated");
@@ -677,7 +696,11 @@ public class DB implements IDatabase {
 
 		try {
 			// check if table exists or not (first start, table does not exists)
-			sql = "SELECT count(*) AS count FROM sqlite_master WHERE type='table' AND name='options'";
+			if (DB.DBTYPE == DB.DBTYPE_SQLITE) {
+				sql = "SELECT COUNT(*) AS count FROM sqlite_master WHERE type='table' AND name='options'";
+			} else {
+				sql = "SELECT COUNT(*) AS count FROM information_schema.tables WHERE table_name = 'options'";
+			}
 			rs = DB.query(sql);
 			if (rs.next() && (rs.getInt("count") > 0)) {
 				sql = "SELECT COUNT(*) AS count, value FROM options WHERE name = 'dbversion'";
