@@ -49,20 +49,18 @@ public class OptionsHandler {
 	}
 
 	public static void setOption(final String optionName, final Object optionValue) {
-		if (optionName != null && optionValue != null) {
 
-			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
-			values.put(1, optionName);
-			values.put(2, optionValue);
-			try {
-				DB.updatePS("MERGE INTO options (name, value) VALUES (?, ?)", values);
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-			OptionsHandler.optionCache.put(optionName, optionValue);
+		final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
+		values.put(1, optionName);
+		values.put(2, optionValue);
+		try {
+			DB.updatePS("REPLACE INTO options (name, value) VALUES (?, ?)", values);
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		} catch (final Exception e) {
+			e.printStackTrace();
 		}
+		OptionsHandler.optionCache.put(optionName, optionValue);
 	}
 
 }
