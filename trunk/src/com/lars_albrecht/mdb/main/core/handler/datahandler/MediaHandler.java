@@ -92,20 +92,33 @@ public class MediaHandler<E> extends ADataHandler<E> {
 	private static ArrayList<MediaItem> getPersistedMediaItemsForMediaItems(final ArrayList<MediaItem> mediaItems) {
 		final ArrayList<MediaItem> resultList = new ArrayList<MediaItem>();
 		if ((mediaItems != null) && (mediaItems.size() > 0)) {
-			final ArrayList<String> mediaNames = new ArrayList<String>();
+			final ArrayList<String> mediaUrls = new ArrayList<String>();
 			for (final MediaItem mediaItem : mediaItems) {
-				if (mediaItem.getName() != null) {
-					mediaNames.add(mediaItem.getName());
+				if (mediaItem.getUri().toString() != null) {
+					mediaUrls.add(mediaItem.getUri().toString());
 				}
 			}
-			if ((mediaNames != null) && (mediaNames.size() > 0)) {
+			if ((mediaUrls != null) && (mediaUrls.size() > 0)) {
 				ResultSet rs = null;
-				final String sql = "SELECT mi.id, mi.name, mi.type, mi.uri, mi.options FROM mediaItems AS mi WHERE mi.name IN ("
-						+ Helper.implode(mediaNames, ", ", "'", "'") + ")";
+
+				final ConcurrentHashMap<Integer, Object> insertValues = new ConcurrentHashMap<Integer, Object>();
+				String psString = "";
+				int valueCounter = 0;
+				for (final String string : mediaUrls) {
+					if (valueCounter > 0) {
+						psString += ",";
+					}
+					psString += "?";
+					insertValues.put(valueCounter + 1, string);
+					valueCounter++;
+				}
+
+				final String sql = "SELECT mi.id, mi.name, mi.type, mi.uri, mi.options FROM mediaItems AS mi WHERE mi.uri IN (" + psString
+						+ ")";
 
 				try {
 					Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
-					rs = DB.query(sql);
+					rs = DB.queryPS(sql, insertValues);
 					HashMap<String, Object> tempMap = null;
 					final ResultSetMetaData rsmd = rs.getMetaData();
 					for (; rs.next();) { // for each line
@@ -116,6 +129,8 @@ public class MediaHandler<E> extends ADataHandler<E> {
 						resultList.add((MediaItem) new MediaItem().fromHashMap(tempMap));
 					}
 				} catch (final SQLException e) {
+					e.printStackTrace();
+				} catch (final Exception e) {
 					e.printStackTrace();
 				}
 			}
