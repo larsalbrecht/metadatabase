@@ -99,43 +99,62 @@ public class MediaHandler<E> extends ADataHandler<E> {
 				}
 			}
 			if ((mediaUrls != null) && (mediaUrls.size() > 0)) {
-				ResultSet rs = null;
-
-				final ConcurrentHashMap<Integer, Object> insertValues = new ConcurrentHashMap<Integer, Object>();
-				String psString = "";
-				int valueCounter = 0;
+				final ArrayList<String> tempList = new ArrayList<String>();
+				int count = 0;
 				for (final String string : mediaUrls) {
-					if (valueCounter > 0) {
-						psString += ",";
-					}
-					psString += "?";
-					insertValues.put(valueCounter + 1, string);
-					valueCounter++;
-				}
+					tempList.add(string);
 
-				final String sql = "SELECT mi.id, mi.name, mi.type, mi.uri, mi.options FROM mediaItems AS mi WHERE mi.uri IN (" + psString
-						+ ")";
+					if (count >= 500) {
+						final Map.Entry<String, ConcurrentHashMap<Integer, Object>> tempEntry = Helper
+								.getQuestionMarksValuesForSQLFromList(tempList);
 
-				try {
-					Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
-					rs = DB.queryPS(sql, insertValues);
-					HashMap<String, Object> tempMap = null;
-					final ResultSetMetaData rsmd = rs.getMetaData();
-					for (; rs.next();) { // for each line
-						tempMap = new HashMap<String, Object>();
-						for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-							tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
+						if (tempEntry != null) {
+							Debug.log(Debug.LEVEL_INFO, "Reached 500 items, execute and add now.");
+							resultList.addAll(MediaHandler.getPersistedMediaItemsForPartOfMediaItems(tempEntry.getKey(),
+									tempEntry.getValue()));
+							tempList.clear();
+							count = 0;
+						} else {
+							Debug.log(Debug.LEVEL_WARN, "Entry is null. Given items: " + tempList);
 						}
-						resultList.add((MediaItem) new MediaItem().fromHashMap(tempMap));
+					} else {
+						count++;
 					}
-				} catch (final SQLException e) {
-					e.printStackTrace();
-				} catch (final Exception e) {
-					e.printStackTrace();
+				}
+				if (count < 500) {
+					final Map.Entry<String, ConcurrentHashMap<Integer, Object>> tempEntry = Helper
+							.getQuestionMarksValuesForSQLFromList(tempList);
+					resultList.addAll(MediaHandler.getPersistedMediaItemsForPartOfMediaItems(tempEntry.getKey(), tempEntry.getValue()));
 				}
 			}
 		}
 
+		return resultList;
+	}
+
+	private static ArrayList<MediaItem> getPersistedMediaItemsForPartOfMediaItems(final String questionStr,
+			final ConcurrentHashMap<Integer, Object> values) {
+		final ArrayList<MediaItem> resultList = new ArrayList<MediaItem>();
+
+		final String sql = "SELECT mi.id, mi.name, mi.type, mi.uri, mi.options FROM mediaItems AS mi WHERE mi.uri IN (" + questionStr + ")";
+		try {
+			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
+			ResultSet rs = null;
+			rs = DB.queryPS(sql, values);
+			HashMap<String, Object> tempMap = null;
+			final ResultSetMetaData rsmd = rs.getMetaData();
+			for (; rs.next();) { // for each line
+				tempMap = new HashMap<String, Object>();
+				for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+					tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
+				}
+				resultList.add((MediaItem) new MediaItem().fromHashMap(tempMap));
+			}
+		} catch (final SQLException e) {
+			e.printStackTrace();
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
 		return resultList;
 	}
 

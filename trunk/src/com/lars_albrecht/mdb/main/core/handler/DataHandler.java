@@ -176,7 +176,6 @@ public class DataHandler {
 					missedItems++;
 				}
 			}
-
 		}
 	}
 
