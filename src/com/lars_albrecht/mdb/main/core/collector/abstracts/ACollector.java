@@ -150,6 +150,7 @@ public abstract class ACollector implements Runnable {
 					try {
 						if (((fileItemId = this.getFileItemId(entry.getKey())) > -1)) {
 							this.transformToFileAttributes(fileItemId, entry.getValue());
+							// if this is commented, the file-timestamp will be not updated
 							this.mainController.getDataHandler().updateUpdateTSForFileItem(fileItemId);
 						}
 					} catch (final Exception e) {
@@ -218,6 +219,8 @@ public abstract class ACollector implements Runnable {
 			// java.lang.Long) in Thread TheTVDB (264)
 			// java.lang.ClassCastException:
 			// java.sql.Timestamp cannot be cast to java.lang.Long
+			
+			// if lastRun = NULL, the collector collects for all files
 			final Long lastRun = (lastRunObj == null ? null : (lastRunObj instanceof String ? Long.parseLong((String) lastRunObj)
 					: (lastRunObj instanceof java.sql.Timestamp ? ((Timestamp) lastRunObj).getTime() : (Long) lastRunObj)));
 			for (int i = 0; i < fileItems.size(); i++) {
