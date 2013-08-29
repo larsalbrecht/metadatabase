@@ -108,7 +108,6 @@ public class ShowInfoControlPage extends WebPage {
 			} else if (doValue.equalsIgnoreCase("stop")) {
 				System.exit(1);
 			}
-
 		}
 
 		controlViewContainer = Template.replaceMarker(controlViewContainer, "finderHref", finderHrefString, false);

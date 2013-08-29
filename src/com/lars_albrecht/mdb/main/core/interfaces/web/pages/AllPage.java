@@ -132,17 +132,20 @@ public class AllPage extends WebPage {
 			final ArrayList<MediaItem> fileMediaItems = ((MediaHandler<?>) ADataHandler.getDataHandler(MediaHandler.class))
 					.getHandlerDataForFileItem(fileItem);
 			String imageToShow = null;
+			String bigImageToShow = null;
 			if (fileMediaItems != null) {
 				for (final MediaItem mediaItem : fileMediaItems) {
 					if (mediaItem.getName().equalsIgnoreCase("poster")) {
 						imageToShow = this.getUrlFromMediaItem(mediaItem, 1);
+						bigImageToShow = this.getUrlFromMediaItem(mediaItem, 2);
 						break;
 					}
 				}
 			}
 
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "itemImageUrl", imageToShow, false);
-			tempFileListItem = Template.replaceMarker(tempFileListItem, "itemId", fileItem.getId().toString(), false);
+			tempFileListItem = Template.replaceMarker(tempFileListItem, "itemImageUrlBig", bigImageToShow, false);
+			tempFileListItem = Template.replaceMarker(tempFileListItem, "itemId", fileItem.getId().toString(), true);
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "type", fileItem.getFiletype(), false);
 			tempFileListItem = Template.replaceMarker(tempFileListItem, "added",
 					Helper.getFormattedTimestamp(fileItem.getCreateTS().longValue(), null), false);

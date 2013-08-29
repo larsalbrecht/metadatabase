@@ -124,7 +124,7 @@ public class DataHandler {
 	 */
 	public static void persist(final ArrayList<?> objects, final boolean doReplace) throws Exception {
 		if ((objects != null) && (objects.size() > 0)) {
-
+			DB.beginTransaction();
 			final IPersistable tempPersistable = (IPersistable) objects.get(0);
 			String insertReplaceStr = null;
 
@@ -176,6 +176,7 @@ public class DataHandler {
 					missedItems++;
 				}
 			}
+			DB.endTransaction();
 		}
 	}
 
