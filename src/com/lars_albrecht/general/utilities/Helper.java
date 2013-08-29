@@ -806,7 +806,7 @@ public class Helper {
 	 * Generate a list of ? and a list of values for a prepared statement.
 	 * 
 	 * @param list
-	 * @return
+	 * @return Map.Entry<String, ConcurrentHashMap<Integer, Object>>
 	 */
 	public static Map.Entry<String, ConcurrentHashMap<Integer, Object>> getQuestionMarksValuesForSQLFromList(final List<?> list) {
 		Map.Entry<String, ConcurrentHashMap<Integer, Object>> resultEntry = null;
