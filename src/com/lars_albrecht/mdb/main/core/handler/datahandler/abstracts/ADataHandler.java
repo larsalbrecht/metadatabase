@@ -166,7 +166,7 @@ public abstract class ADataHandler<E> {
 	 * @return FileItem
 	 */
 	public final FileItem setHandlerDataToFileItem(final FileItem fileItem, final ArrayList<?> handlerData) {
-		if ((fileItem != null) && (fileItem.getDataStore() != null && handlerData != null)) {
+		if ((fileItem != null) && ((fileItem.getDataStore() != null) && (handlerData != null))) {
 			fileItem.getDataStore().put(this.getClass().getCanonicalName(), handlerData);
 		}
 		return fileItem;

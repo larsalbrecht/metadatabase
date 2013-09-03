@@ -138,11 +138,11 @@ public class MediaItem implements IPersistable {
 			if (other.options != null) {
 				return false;
 			}
-		} else if (false && !this.options.equals(other.options)) {
-			// TODO dont use equals here! Write an own compare method or
-			// something else to replace this
-			return false;
-		}
+		}/*
+		 * else if (false && !this.options.equals(other.options)) { // TODO dont
+		 * use equals here! Write an own compare method or // something else to
+		 * replace this return false; }
+		 */
 		if (this.type == null) {
 			if (other.type != null) {
 				return false;

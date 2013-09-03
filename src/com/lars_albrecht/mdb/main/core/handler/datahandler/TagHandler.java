@@ -49,7 +49,7 @@ public class TagHandler<E> extends ADataHandler<E> {
 			idCounter++;
 		}
 
-		if ((fileItems != null) && fileItems.size() > 0) {
+		if ((fileItems != null) && (fileItems.size() > 0)) {
 
 			ResultSet rs = null;
 			final String sql = "SELECT "
