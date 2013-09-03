@@ -160,21 +160,6 @@ public class AllPage extends WebPage {
 		return allTemplate;
 	}
 
-	private String getUrlFromMediaItem(final MediaItem mediaItem, final Integer size) {
-		if ((mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) != null)
-				&& (mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) == Boolean.TRUE)) {
-			return mediaItem.getUri().toString();
-		} else {
-			if (mediaItem.getOptions().get(MediaItem.OPTION_WEB_BASE_PATH) != null) {
-				return mediaItem.getOptions().get(MediaItem.OPTION_WEB_BASE_PATH)
-						+ ((ArrayList<?>) (Helper.explode((String) mediaItem.getOptions().get(MediaItem.OPTION_SIZES), ","))).get(size)
-								.toString() + mediaItem.getUri().toString();
-			} else {
-				return mediaItem.getUri().toString();
-			}
-		}
-	}
-
 	private String getExtractedName(final FileItem fileItem) {
 		@SuppressWarnings("unchecked")
 		final ArrayList<FileAttributeList> attributesList = (ArrayList<FileAttributeList>) ADataHandler.getHandlerDataFromFileItem(
@@ -209,6 +194,21 @@ public class AllPage extends WebPage {
 	@Override
 	public String getTitle() {
 		return "Alle";
+	}
+
+	private String getUrlFromMediaItem(final MediaItem mediaItem, final Integer size) {
+		if ((mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) != null)
+				&& (mediaItem.getOptions().get(MediaItem.OPTION_WEB_ISDIRECT) == Boolean.TRUE)) {
+			return mediaItem.getUri().toString();
+		} else {
+			if (mediaItem.getOptions().get(MediaItem.OPTION_WEB_BASE_PATH) != null) {
+				return mediaItem.getOptions().get(MediaItem.OPTION_WEB_BASE_PATH)
+						+ ((ArrayList<?>) (Helper.explode((String) mediaItem.getOptions().get(MediaItem.OPTION_SIZES), ","))).get(size)
+								.toString() + mediaItem.getUri().toString();
+			} else {
+				return mediaItem.getUri().toString();
+			}
+		}
 	}
 
 }

@@ -435,6 +435,33 @@ public class Helper {
 	}
 
 	/**
+	 * Generate a list of ? and a list of values for a prepared statement.
+	 * 
+	 * @param list
+	 * @return Map.Entry<String, ConcurrentHashMap<Integer, Object>>
+	 */
+	public static Map.Entry<String, ConcurrentHashMap<Integer, Object>> getQuestionMarksValuesForSQLFromList(final List<?> list) {
+		Map.Entry<String, ConcurrentHashMap<Integer, Object>> resultEntry = null;
+		if ((list != null) && (list.size() > 0)) {
+			String resultStr = null;
+			final ConcurrentHashMap<Integer, Object> valueList = new ConcurrentHashMap<Integer, Object>();
+			resultStr = "";
+
+			for (int i = 0; i < list.size(); i++) {
+				if (list.get(i) != null) {
+					if (i > 0) {
+						resultStr += ",";
+					}
+					resultStr += "?";
+					valueList.put(i + 1, list.get(i));
+				}
+			}
+			resultEntry = new AbstractMap.SimpleEntry<String, ConcurrentHashMap<Integer, Object>>(resultStr, valueList);
+		}
+		return resultEntry;
+	}
+
+	/**
 	 * Returns the center-position of the screen.
 	 * 
 	 * @param width
@@ -800,33 +827,6 @@ public class Helper {
 		if ((overWrite == Boolean.TRUE) || ((overWrite == Boolean.FALSE) && (newFile.exists() == Boolean.FALSE))) {
 			ImageIO.write(Helper.toBufferedImage(image), type, newFile);
 		}
-	}
-
-	/**
-	 * Generate a list of ? and a list of values for a prepared statement.
-	 * 
-	 * @param list
-	 * @return Map.Entry<String, ConcurrentHashMap<Integer, Object>>
-	 */
-	public static Map.Entry<String, ConcurrentHashMap<Integer, Object>> getQuestionMarksValuesForSQLFromList(final List<?> list) {
-		Map.Entry<String, ConcurrentHashMap<Integer, Object>> resultEntry = null;
-		if (list != null && list.size() > 0) {
-			String resultStr = null;
-			final ConcurrentHashMap<Integer, Object> valueList = new ConcurrentHashMap<Integer, Object>();
-			resultStr = "";
-
-			for (int i = 0; i < list.size(); i++) {
-				if (list.get(i) != null) {
-					if (i > 0) {
-						resultStr += ",";
-					}
-					resultStr += "?";
-					valueList.put(i + 1, list.get(i));
-				}
-			}
-			resultEntry = new AbstractMap.SimpleEntry<String, ConcurrentHashMap<Integer, Object>>(resultStr, valueList);
-		}
-		return resultEntry;
 	}
 
 }

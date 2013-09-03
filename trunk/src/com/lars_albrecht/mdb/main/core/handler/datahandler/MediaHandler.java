@@ -195,7 +195,7 @@ public class MediaHandler<E> extends ADataHandler<E> {
 			idCounter++;
 		}
 
-		if ((fileItems != null) && fileItems.size() > 0) {
+		if ((fileItems != null) && (fileItems.size() > 0)) {
 
 			ResultSet rs = null;
 			final String sql = "SELECT fm.file_id AS 'fileId', mi.id, mi.name, mi.type, mi.uri, mi.options FROM mediaItems AS mi LEFT JOIN fileMedia AS fm ON fm.media_id = mi.id WHERE fm.file_id IN ("

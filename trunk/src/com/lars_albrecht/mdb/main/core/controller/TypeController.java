@@ -18,13 +18,36 @@ import com.lars_albrecht.mdb.main.core.typer.abstracts.ATyper;
  */
 public class TypeController {
 
-	public static final int		TYPE_ALL		= 0;
-	public static final int		TYPE_MOVIE		= 1;
-	public static final int		TYPE_SERIE		= 2;
+	private MainController					mainController	= null;
+	private ArrayList<ATyper>				typers			= null;
+	private static final ArrayList<String>	availableTypes	= new ArrayList<String>();
 
-	private MainController		mainController	= null;
-	private ArrayList<ATyper>	typers			= null;
-	private ArrayList<String>	availableTypes	= null;
+	/**
+	 * Add a type to the availableTypes-list. If the type is already in the
+	 * list, the type will not added again.
+	 * 
+	 * @param type
+	 *            String
+	 */
+	public static void addType(final String type) {
+		if (!TypeController.containsType(type)) {
+			TypeController.availableTypes.add(type);
+		}
+	}
+
+	/**
+	 * Returns true if the availableTypes contains type.
+	 * 
+	 * @param type
+	 *            String
+	 * @return boolean
+	 */
+	public static boolean containsType(final String type) {
+		if (TypeController.availableTypes.contains(type)) {
+			return true;
+		}
+		return false;
+	}
 
 	public TypeController(final MainController mainController, final ArrayList<ATyper> typers) {
 		this.mainController = mainController;
@@ -33,7 +56,6 @@ public class TypeController {
 		} else {
 			this.typers = typers;
 		}
-		this.availableTypes = new ArrayList<String>();
 		this.initTyper();
 	}
 
@@ -57,7 +79,7 @@ public class TypeController {
 	 * @return the availableTypes
 	 */
 	public final ArrayList<String> getAvailableTypes() {
-		return this.availableTypes;
+		return TypeController.availableTypes;
 	}
 
 	/**
@@ -67,7 +89,7 @@ public class TypeController {
 		for (final ATyper typer : this.typers) {
 			final ArrayList<String> tempTypes = typer.getTypes();
 			if ((tempTypes != null) && (tempTypes.size() > 0)) {
-				this.availableTypes.addAll(tempTypes);
+				TypeController.availableTypes.addAll(tempTypes);
 			}
 		}
 	}
