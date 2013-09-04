@@ -41,6 +41,7 @@ public abstract class ACollector implements Runnable {
 	private ConcurrentHashMap<FileItem, ArrayList<FileAttributeList>>	fileAttributeListToAdd	= null;
 	private ArrayList<FileAttributes>									fileAttributesToAdd		= null;
 	private CollectorEventMulticaster									collectorMulticaster	= null;
+	private ArrayList<String>											types					= null;
 
 	/**
 	 * Default constructor.
@@ -50,11 +51,13 @@ public abstract class ACollector implements Runnable {
 		this.keysToAdd = new ArrayList<Key<String>>();
 		this.valuesToAdd = new ArrayList<Value<?>>();
 		this.fileAttributesToAdd = new ArrayList<FileAttributes>();
+		this.types = new ArrayList<String>();
 	}
 
 	protected void addType(final String type) {
 		if (type != null) {
 			TypeController.addType(type);
+			this.types.add(type);
 		} else {
 			throw new NullPointerException("Type was null");
 		}
@@ -221,7 +224,7 @@ public abstract class ACollector implements Runnable {
 					: (lastRunObj instanceof java.sql.Timestamp ? ((Timestamp) lastRunObj).getTime() : (Long) lastRunObj)));
 			for (int i = 0; i < fileItems.size(); i++) {
 				// item for this collector?
-				if ((fileItems.get(i) != null) && TypeController.containsType(fileItems.get(i).getFiletype())) {
+				if ((fileItems.get(i) != null) && this.types.contains(fileItems.get(i).getFiletype())) {
 					// runned before?
 					if (lastRun == null) {
 						// no, never runned
