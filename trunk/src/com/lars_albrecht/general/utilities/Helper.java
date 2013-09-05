@@ -312,7 +312,11 @@ public class Helper {
 	 * @return String
 	 */
 	public static String getFileNameWithoutExtension(final String filename) {
-		return filename.substring(0, filename.length() - (filename.length() - filename.lastIndexOf(".")));
+		if (filename != null) {
+			return filename.substring(0, filename.length() - (filename.length() - filename.lastIndexOf(".")));
+		} else {
+			return null;
+		}
 	}
 
 	/**
