@@ -828,8 +828,28 @@ public class Helper {
 	 * @throws IOException
 	 */
 	public static void writeImage(final Image image, final String type, final File newFile, final Boolean overWrite) throws IOException {
-		if ((overWrite == Boolean.TRUE) || ((overWrite == Boolean.FALSE) && (newFile.exists() == Boolean.FALSE))) {
+		if (image == null) {
+			throw new NullPointerException("image is null!");
+		} else if ((overWrite == Boolean.TRUE) || ((overWrite == Boolean.FALSE) && (newFile.exists() == Boolean.FALSE))) {
 			ImageIO.write(Helper.toBufferedImage(image), type, newFile);
+		}
+	}
+
+	/**
+	 * Writes a given image to filesystem.
+	 * 
+	 * @param image
+	 *            BufferedImage
+	 * @param type
+	 *            String
+	 * @throws IOException
+	 */
+	public static void
+			writeImage(final BufferedImage image, final String type, final File newFile, final Boolean overWrite) throws IOException {
+		if (image == null) {
+			throw new NullPointerException("image is null!");
+		} else if ((overWrite == Boolean.TRUE) || ((overWrite == Boolean.FALSE) && (newFile.exists() == Boolean.FALSE))) {
+			ImageIO.write(image, type, newFile);
 		}
 	}
 
