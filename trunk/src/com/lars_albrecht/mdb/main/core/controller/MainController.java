@@ -16,6 +16,7 @@ import com.lars_albrecht.general.utilities.PropertiesExNotInitilizedException;
 import com.lars_albrecht.mdb.main.MDBConfig;
 import com.lars_albrecht.mdb.main.core.collector.event.CollectorEvent;
 import com.lars_albrecht.mdb.main.core.collector.event.ICollectorListener;
+import com.lars_albrecht.mdb.main.core.directorywatcher.DirectoryWatcher;
 import com.lars_albrecht.mdb.main.core.finder.event.FinderEvent;
 import com.lars_albrecht.mdb.main.core.finder.event.IFinderListener;
 import com.lars_albrecht.mdb.main.core.handler.ConfigurationHandler;
@@ -44,6 +45,7 @@ public class MainController implements IFinderListener, ICollectorListener {
 	private DataHandler							dataHandler		= null;
 	private ConfigurationHandler				configHandler	= null;
 	private MDBConfig							mdbConfig		= null;
+	private DirectoryWatcher					dw				= null;
 
 	private ConcurrentHashMap<String, Object>	globalVars		= null;
 
@@ -213,6 +215,7 @@ public class MainController implements IFinderListener, ICollectorListener {
 		return this.tController;
 	}
 
+	@SuppressWarnings("unchecked")
 	private void init() {
 		Thread.setDefaultUncaughtExceptionHandler(new Debug());
 
@@ -249,6 +252,12 @@ public class MainController implements IFinderListener, ICollectorListener {
 
 		final ArrayList<?> tempList = ObjectHandler.castStringListToFileList(this.configHandler.getConfigOptionModuleFinderPath());
 		this.globalVars.put("searchPathList", tempList);
+
+		this.dw = new DirectoryWatcher(this);
+		for (final File dir : ((ArrayList<File>) this.globalVars.get("searchPathList"))) {
+			this.dw.addDirecotry(dir);
+		}
+		new Thread(this.dw).start();
 	}
 
 	/**

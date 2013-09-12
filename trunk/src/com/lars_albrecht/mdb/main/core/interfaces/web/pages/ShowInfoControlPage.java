@@ -82,6 +82,7 @@ public class ShowInfoControlPage extends WebPage {
 				finderClassString = "disabled";
 
 				statusMessages.add("Files will be refreshed ...");
+				this.mainController.startSearch();
 			} else if (doValue.equalsIgnoreCase("startCollectors")) {
 				// isStartCollectors
 				collectorHrefString = "javascript:void(0)";
