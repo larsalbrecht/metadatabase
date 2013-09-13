@@ -3,44 +3,22 @@
  */
 package com.lars_albrecht.mdb.main.core.interfaces.web.abstracts;
 
+import org.eclipse.jetty.server.Request;
+
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
-import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 
 /**
  * @author lalbrecht
  * 
  */
-public abstract class WebPage {
+public abstract class WebPage extends AWebPart {
 
-	private Template			pageTemplate	= null;
-	protected MainController	mainController	= null;
-	protected WebServerRequest	request			= null;
-	protected String			actionname		= null;
-
-	public WebPage(final String actionname, final WebServerRequest request, final MainController mainController,
-			final WebInterface webInterface) throws Exception {
-		this.request = request;
-		this.mainController = mainController;
-		this.actionname = actionname;
-
-		if (this.getTemplateName() != null) {
-			this.pageTemplate = new Template(this.getTemplateName());
-		} else {
-			throw new Exception("Template is not set");
-		}
+	public WebPage(final String actionname, final Request request, final MainController mainController, final WebInterface webInterface)
+			throws Exception {
+		super(actionname, request, mainController, webInterface);
 	}
-
-	final public String getGeneratedContent() {
-		return this.pageTemplate.getClearedContent();
-	}
-
-	final protected Template getPageTemplate() {
-		return this.pageTemplate;
-	}
-
-	public abstract String getTemplateName();
 
 	public abstract String getTitle();
 
@@ -50,9 +28,5 @@ public abstract class WebPage {
 
 	final protected void set500Error() {
 		this.setPageTemplate(new Template("500"));
-	}
-
-	final protected void setPageTemplate(final Template pageTemplate) {
-		this.pageTemplate = pageTemplate;
 	}
 }

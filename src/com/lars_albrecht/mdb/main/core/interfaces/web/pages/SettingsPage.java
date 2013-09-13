@@ -6,11 +6,12 @@ package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.jetty.server.Request;
+
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.handler.OptionsHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
-import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 
 /**
@@ -21,8 +22,8 @@ public class SettingsPage extends WebPage {
 
 	private ConcurrentHashMap<String, String>	searchOptionsList	= null;
 
-	public SettingsPage(final String actionname, final WebServerRequest request, final MainController mainController,
-			final WebInterface webInterface) throws Exception {
+	public SettingsPage(final String actionname, final Request request, final MainController mainController, final WebInterface webInterface)
+			throws Exception {
 		super(actionname, request, mainController, webInterface);
 
 		this.searchOptionsList = new ConcurrentHashMap<String, String>();
@@ -34,7 +35,7 @@ public class SettingsPage extends WebPage {
 		this.searchOptionsList.put("Hinzugefügt am (älteste zuerst)", "fileInformation.createTS ASC ");
 		this.searchOptionsList.put("Hinzugefügt am (neuste zuerst)", "fileInformation.createTS DESC ");
 
-		if (request.getGetParams().containsKey("do") && request.getGetParams().get("do").equalsIgnoreCase("save")) {
+		if (request.getParameter("do") != null && request.getParameter("do").equalsIgnoreCase("save")) {
 			this.saveSettings(request);
 		}
 
@@ -151,10 +152,11 @@ public class SettingsPage extends WebPage {
 	 * 
 	 * @param request
 	 */
-	private void saveSettings(final WebServerRequest request) {
-		for (final Entry<String, String> entry : request.getPostParams().entrySet()) {
-			OptionsHandler.setOption(entry.getKey(), entry.getValue());
-		}
+	private void saveSettings(final Request request) {
+		// for (final Entry<String, String> entry :
+		// request.getPostParams().entrySet()) {
+		// OptionsHandler.setOption(entry.getKey(), entry.getValue());
+		// }
 	}
 
 }

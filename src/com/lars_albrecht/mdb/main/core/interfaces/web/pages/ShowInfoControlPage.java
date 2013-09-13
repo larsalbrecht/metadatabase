@@ -8,13 +8,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.jetty.server.Request;
+
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
-import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
@@ -24,7 +25,7 @@ import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
  */
 public class ShowInfoControlPage extends WebPage {
 
-	public ShowInfoControlPage(final String actionname, final WebServerRequest request, final MainController mainController,
+	public ShowInfoControlPage(final String actionname, final Request request, final MainController mainController,
 			final WebInterface webInterface) throws Exception {
 		super(actionname, request, mainController, webInterface);
 
@@ -74,8 +75,8 @@ public class ShowInfoControlPage extends WebPage {
 
 		final ArrayList<String> statusMessages = new ArrayList<String>();
 
-		if (this.request.getGetParams().containsKey("do") && (this.request.getGetParams().get("do") != null)) {
-			final String doValue = this.request.getGetParams().get("do");
+		if (this.request.getParameter("do") != null && (this.request.getParameter("do") != null)) {
+			final String doValue = this.request.getParameter("do");
 			if (doValue.equalsIgnoreCase("startFinder")) {
 				// isStartFinder
 				finderHrefString = "javascript:void(0)";

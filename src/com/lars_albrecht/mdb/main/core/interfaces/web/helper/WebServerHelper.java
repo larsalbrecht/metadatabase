@@ -10,6 +10,8 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
+import org.eclipse.jetty.server.Request;
+
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.FileFinder;
 import com.lars_albrecht.general.utilities.Helper;
@@ -19,7 +21,6 @@ import com.lars_albrecht.mdb.main.core.abstracts.ThreadEx;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
-import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.AllPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.AttributesTagsPage;
@@ -63,8 +64,7 @@ public class WebServerHelper {
 	 * @return String
 	 * @throws UnsupportedEncodingException
 	 */
-	private String
-			generateContent(final String content, final String filename, final WebServerRequest request) throws UnsupportedEncodingException {
+	private String generateContent(final String content, final String filename, final Request request) throws UnsupportedEncodingException {
 		String generatedContent = content;
 		String contentMarkerReplacement = "";
 		String pageTitle = "JMovieDB - Webinterface";
@@ -72,8 +72,8 @@ public class WebServerHelper {
 
 		if (filename.equalsIgnoreCase("index.html") || filename.equalsIgnoreCase("")) {
 			String action = null;
-			if (request.getGetParams().containsKey("action")) {
-				action = request.getGetParams().get("action");
+			if (request.getParameter("action") != null) {
+				action = request.getParameter("action");
 			} else {
 				action = "index";
 			}
@@ -118,16 +118,16 @@ public class WebServerHelper {
 
 			// replace "free" marker.
 			if (Template.containsMarker(content, "searchTerm")) {
-				if (request.getGetParams().containsKey("searchStr") && (request.getGetParams().get("searchStr") != null)) {
-					generatedContent = Template.replaceMarker(generatedContent, "searchTerm", request.getGetParams().get("searchStr")
-							.replaceAll("\"", "&quot;"), Boolean.FALSE);
+				if (request.getParameter("searchStr") != null && (request.getParameter("searchStr") != null)) {
+					generatedContent = Template.replaceMarker(generatedContent, "searchTerm",
+							request.getParameter("searchStr").replaceAll("\"", "&quot;"), Boolean.FALSE);
 				} else {
 					generatedContent = Template.replaceMarker(generatedContent, "searchTerm", "", Boolean.FALSE);
 				}
 			}
 			if (Template.containsMarker(generatedContent, "lastFiveAdded")) {
 				try {
-					final LastFivePartial lastFive = new LastFivePartial(null, null, this.mainController);
+					final LastFivePartial lastFive = new LastFivePartial(null, null, this.mainController, this.webInterface);
 					generatedContent = Template.replaceMarker(generatedContent, "lastFiveAdded", lastFive.getGeneratedContent(), false);
 				} catch (final Exception e) {
 					e.printStackTrace();
@@ -157,13 +157,13 @@ public class WebServerHelper {
 	 * @param request
 	 * @return String
 	 */
-	public String getAjaxContent(final String url, final WebServerRequest request, final boolean isJSON) {
+	public String getAjaxContent(final String url, final Request request, final boolean isJSON) {
 		String content = null;
 		if (url != null) {
 			content = "";
-			if ((request.getGetParams() != null) && (request.getGetParams().size() > 0) && request.getGetParams().containsKey("action")
-					&& (request.getGetParams().get("action") != null)) {
-				final String action = request.getGetParams().get("action");
+			if ((request.getParameters() != null) && (request.getParameters().size() > 0) && request.getParameter("action") != null
+					&& (request.getParameter("action") != null)) {
+				final String action = request.getParameter("action");
 				if (action.equalsIgnoreCase("getStatus")) {
 					if (this.mainController.getfController().getThreadList().size() > 0) {
 						content += "<p>Finder läuft</p>";
@@ -186,13 +186,11 @@ public class WebServerHelper {
 					if (content.equalsIgnoreCase("")) {
 						content = "<p>Keine Aktivitäten</p>";
 					}
-				} else if (action.equalsIgnoreCase("autocompleteSearch") && (request.getGetParams().get("term") != null)) {
-					if (request.getGetParams().get("term").contains("=")) {
+				} else if (action.equalsIgnoreCase("autocompleteSearch") && (request.getParameter("term") != null)) {
+					if (request.getParameter("term").contains("=")) {
 						ArrayList<String> keyList = null;
-						final String searchKey = request.getGetParams().get("term")
-								.substring(0, request.getGetParams().get("term").indexOf("="));
-						final String searchValue = request.getGetParams().get("term")
-								.substring(request.getGetParams().get("term").indexOf("=") + 1);
+						final String searchKey = request.getParameter("term").substring(0, request.getParameter("term").indexOf("="));
+						final String searchValue = request.getParameter("term").substring(request.getParameter("term").indexOf("=") + 1);
 						if ((searchValue != null) && !searchValue.equalsIgnoreCase("")) {
 							keyList = this.mainController.getDataHandler().findAllValuesForKeyWithValuePart(searchKey, searchValue);
 						} else {
@@ -211,19 +209,19 @@ public class WebServerHelper {
 						content = ObjectHandler.stringListToJSON(newKeyList);
 					} else {
 						content = ObjectHandler.fileItemListToJSON(this.mainController.getDataHandler().findAllFileItemForStringInAll(
-								request.getGetParams().get("term")));
+								request.getParameter("term")));
 					}
 					if (content == null) {
 						content = "";
 					}
-				} else if (action.equalsIgnoreCase("autocompleteTags") && (request.getGetParams().get("term") != null)) {
+				} else if (action.equalsIgnoreCase("autocompleteTags") && (request.getParameter("term") != null)) {
 					content = ObjectHandler.tagListToJSON(this.mainController.getDataHandler().getTags());
 
-				} else if (action.equalsIgnoreCase("addTag") && (request.getGetParams().get("value") != null)
-						&& (request.getGetParams().get("fileId") != null)) {
+				} else if (action.equalsIgnoreCase("addTag") && (request.getParameter("value") != null)
+						&& (request.getParameter("fileId") != null)) {
 					try {
-						final Tag tempTag = new Tag(request.getGetParams().get("value"), Boolean.TRUE);
-						final Integer fileId = Integer.parseInt(request.getGetParams().get("fileId"));
+						final Tag tempTag = new Tag(request.getParameter("value"), Boolean.TRUE);
+						final Integer fileId = Integer.parseInt(request.getParameter("fileId"));
 						final Integer id = this.mainController.getDataHandler().addFileTag(new FileTag(fileId, tempTag, Boolean.TRUE));
 						final ArrayList<Tag> tempTagList = new ArrayList<Tag>();
 						tempTag.setId(id);
@@ -233,9 +231,9 @@ public class WebServerHelper {
 						content = null;
 						e.printStackTrace();
 					}
-				} else if (action.equalsIgnoreCase("removeTagFromFile") && (request.getGetParams().get("fileTagId") != null)
-						&& (Integer.parseInt(request.getGetParams().get("fileTagId")) > 0)) {
-					this.mainController.getDataHandler().removeFileTag(Integer.parseInt(request.getGetParams().get("fileTagId")));
+				} else if (action.equalsIgnoreCase("removeTagFromFile") && (request.getParameter("fileTagId") != null)
+						&& (Integer.parseInt(request.getParameter("fileTagId")) > 0)) {
+					this.mainController.getDataHandler().removeFileTag(Integer.parseInt(request.getParameter("fileTagId")));
 					content = "success";
 				}
 			}
@@ -253,7 +251,7 @@ public class WebServerHelper {
 	 * @param request
 	 * @return String
 	 */
-	public String getFileContent(String url, final String folder, final WebServerRequest request) {
+	public String getFileContent(String url, final String folder, final Request request) {
 		File file = null;
 		if (url != null) {
 			if (url.equalsIgnoreCase("")) {

@@ -225,14 +225,14 @@ public class MainController implements IFinderListener, ICollectorListener {
 		FileFinder.getInstance().addToPathList(new File("web"), -1);
 		FileFinder.getInstance().addToPathList(new File("trunk"), -1);
 		FileFinder.getInstance().addToPathList(new File("trunk/web"), -1);
+		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources"), -1);
 		FileFinder.getInstance().addToPathList(new File("trunk/pages"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/css"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/css/vader"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/css/vader/images"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/js"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/vendor"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/img"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/img/plugins/fancybox"), -1);
+		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/css"), -1);
+		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/css/vader"), -1);
+		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/css/vader/images"), -1);
+		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/js"), -1);
+		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/img"), -1);
+		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/img/plugins/fancybox"), -1);
 
 		this.dataHandler = new DataHandler(this);
 		ADataHandler.addDataHandler(new AttributeHandler<FileAttributeList>());
