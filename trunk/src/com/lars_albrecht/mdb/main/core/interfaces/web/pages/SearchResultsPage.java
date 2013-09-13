@@ -9,11 +9,12 @@ import java.util.Arrays;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.jetty.server.Request;
+
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.helper.InterfaceHelper;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
-import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
@@ -31,11 +32,12 @@ public class SearchResultsPage extends WebPage {
 	public final static int	SEARCHTYPE_TEXTALL		= 1;
 	public final static int	SEARCHTYPE_ATTRIBUTE	= 2;
 
-	public SearchResultsPage(final String actionname, final WebServerRequest request, final MainController mainController,
+	public SearchResultsPage(final String actionname, final Request request, final MainController mainController,
 			final WebInterface webInterface) throws Exception {
 		super(actionname, request, mainController, webInterface);
 
-		this.setPageTemplate(this.generateSearchresults(this.getPageTemplate(), request.getGetParams()));
+		this.setPageTemplate(this.generateSearchresults(this.getPageTemplate(),
+				request.getParameter("searchStr") != null ? request.getParameter("searchStr") : null));
 	}
 
 	/**
@@ -47,10 +49,9 @@ public class SearchResultsPage extends WebPage {
 	 * @throws UnsupportedEncodingException
 	 */
 	private Template
-			generateSearchresults(final Template searchResultsTemplate, final ConcurrentHashMap<String, String> GETParams) throws UnsupportedEncodingException {
-		if (GETParams.containsKey("searchStr") && (GETParams.get("searchStr") != null)) {
+			generateSearchresults(final Template searchResultsTemplate, final String searchStr) throws UnsupportedEncodingException {
+		if (searchStr != null) {
 			// get DATA for output
-			String searchStr = null;
 			try {
 				/*
 				 * java.lang.IllegalArgumentException: URLDecoder: Incomplete
@@ -64,7 +65,6 @@ public class SearchResultsPage extends WebPage {
 				 * TODO propably fixed TODO move searchcode to extra
 				 * class/method to reuse this for other interfaces
 				 */
-				searchStr = GETParams.get("searchStr");
 				final ConcurrentHashMap<String, Object> searchResults = InterfaceHelper.searchItems(searchStr,
 						this.mainController.getDataHandler());
 				@SuppressWarnings("unchecked")
@@ -136,8 +136,8 @@ public class SearchResultsPage extends WebPage {
 	@Override
 	public String getTitle() {
 		String searchStr = "";
-		if (this.request.getGetParams().containsKey("searchStr") && (this.request.getGetParams().get("searchStr") != null)) {
-			searchStr = this.request.getGetParams().get("searchStr");
+		if (this.request.getParameter("searchStr") != null && (this.request.getParameter("searchStr") != null)) {
+			searchStr = this.request.getParameter("searchStr");
 		}
 		return "Suchergebnisse für: " + searchStr;
 	}

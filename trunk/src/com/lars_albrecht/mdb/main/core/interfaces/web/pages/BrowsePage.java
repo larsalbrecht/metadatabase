@@ -9,10 +9,11 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jetty.server.Request;
+
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
-import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
@@ -22,8 +23,8 @@ import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
  */
 public class BrowsePage extends WebPage {
 
-	public BrowsePage(final String actionname, final WebServerRequest request, final MainController mainController,
-			final WebInterface webInterface) throws Exception {
+	public BrowsePage(final String actionname, final Request request, final MainController mainController, final WebInterface webInterface)
+			throws Exception {
 		super(actionname, request, mainController, webInterface);
 		this.setPageTemplate(this.generateBrowseView());
 	}

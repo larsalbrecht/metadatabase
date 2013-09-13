@@ -3,10 +3,11 @@
  */
 package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
+import org.eclipse.jetty.server.Request;
+
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
-import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 
 /**
@@ -15,7 +16,7 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
  */
 public class AttributesTagsPage extends WebPage {
 
-	public AttributesTagsPage(final String actionname, final WebServerRequest request, final MainController mainController,
+	public AttributesTagsPage(final String actionname, final Request request, final MainController mainController,
 			final WebInterface webInterface) throws Exception {
 		super(actionname, request, mainController, webInterface);
 		this.setPageTemplate(this.generateAttributesTagsView());

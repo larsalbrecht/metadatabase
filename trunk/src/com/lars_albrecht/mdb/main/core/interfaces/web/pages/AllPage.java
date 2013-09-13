@@ -5,6 +5,8 @@ package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
 import java.util.ArrayList;
 
+import org.eclipse.jetty.server.Request;
+
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
@@ -13,7 +15,6 @@ import com.lars_albrecht.mdb.main.core.handler.datahandler.AttributeHandler;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.MediaHandler;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
-import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 import com.lars_albrecht.mdb.main.core.models.FileAttributeList;
 import com.lars_albrecht.mdb.main.core.models.KeyValue;
@@ -26,8 +27,8 @@ import com.lars_albrecht.mdb.main.core.models.persistable.MediaItem;
  */
 public class AllPage extends WebPage {
 
-	public AllPage(final String actionname, final WebServerRequest request, final MainController mainController,
-			final WebInterface webInterface) throws Exception {
+	public AllPage(final String actionname, final Request request, final MainController mainController, final WebInterface webInterface)
+			throws Exception {
 		super(actionname, request, mainController, webInterface);
 
 		String listOrderOption = (String) OptionsHandler.getOption("listSortOption");
@@ -48,14 +49,14 @@ public class AllPage extends WebPage {
 		String sortOrder = null;
 		int page = 0;
 
-		if (request.getParams().containsKey("sortorder") && (request.getParams().get("sortorder") != null)) {
-			sortOrder = request.getParams().get("sortorder");
+		if (request.getParameter("sortorder") != null && (request.getParameter("sortorder") != null)) {
+			sortOrder = request.getParameter("sortorder");
 		}
 		sortOrder = (sortOrder == null ? listOrderOption : sortOrder);
 
-		if (request.getParams().containsKey("page") && (request.getParams().get("page") != null)
-				&& request.getParams().get("page").matches("(\\d){1,}")) {
-			page = Integer.parseInt(request.getParams().get("page"));
+		if (request.getParameter("page") != null && (request.getParameter("page") != null)
+				&& request.getParameter("page").matches("(\\d){1,}")) {
+			page = Integer.parseInt(request.getParameter("page"));
 		}
 
 		this.setPageTemplate(this.fillAllContainer(this.getPageTemplate(), sortOrder, page, maxItemsForListPagingOption));

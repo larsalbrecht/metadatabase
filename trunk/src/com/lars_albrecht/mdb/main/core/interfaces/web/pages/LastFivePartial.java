@@ -5,10 +5,12 @@ package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
 import java.util.ArrayList;
 
+import org.eclipse.jetty.server.Request;
+
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
-import com.lars_albrecht.mdb.main.core.interfaces.web.WebServerRequest;
+import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPartial;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
@@ -18,8 +20,9 @@ import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
  */
 public class LastFivePartial extends WebPartial {
 
-	public LastFivePartial(final String actionname, final WebServerRequest request, final MainController mainController) throws Exception {
-		super(actionname, request, mainController);
+	public LastFivePartial(final String actionname, final Request request, final MainController mainController,
+			final WebInterface webInteface) throws Exception {
+		super(actionname, request, mainController, webInteface);
 
 		this.setPageTemplate(this.generateLastFivePartial());
 	}
