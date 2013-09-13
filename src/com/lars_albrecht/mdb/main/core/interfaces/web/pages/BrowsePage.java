@@ -4,6 +4,8 @@
 package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -168,6 +170,14 @@ public class BrowsePage extends WebPage {
 	@Override
 	public String getTitle() {
 		return "Browse";
+	}
+
+	@Override
+	public List<String> getPageNames() {
+		final String[] names = {
+				"browser", "Durchsuchen"
+		};
+		return Arrays.asList(names);
 	}
 
 }

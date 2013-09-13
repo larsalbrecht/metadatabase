@@ -80,7 +80,8 @@ public class WebServerHelper {
 
 			try {
 				WebPage page = null;
-				// TODO do dynamically
+				// TODO do dynamically and allow other names instead of an
+				// action call over index.html.
 				if (action.equalsIgnoreCase("index")) {
 					page = new HomePage(action, request, this.mainController, this.webInterface);
 				} else if (action.equalsIgnoreCase("showInfoControl")) {

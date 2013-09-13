@@ -20,12 +20,12 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.helper.WebServerHelper;
  * @author lalbrecht
  * 
  */
-public class MetadatabaseHandler extends AbstractHandler {
+public class MetadatabaseHTMLHandler extends AbstractHandler {
 
 	private MainController	mainController	= null;
 	private WebInterface	webInterface	= null;
 
-	public MetadatabaseHandler(final MainController mainController, final WebInterface webInterface) {
+	public MetadatabaseHTMLHandler(final MainController mainController, final WebInterface webInterface) {
 		this.mainController = mainController;
 		this.webInterface = webInterface;
 	}
