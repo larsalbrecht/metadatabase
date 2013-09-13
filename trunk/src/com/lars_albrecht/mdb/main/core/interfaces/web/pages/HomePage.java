@@ -3,6 +3,9 @@
  */
 package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.jetty.server.Request;
 
 import com.lars_albrecht.mdb.main.core.controller.MainController;
@@ -28,6 +31,14 @@ public class HomePage extends WebPage {
 	@Override
 	public String getTitle() {
 		return "Home";
+	}
+
+	@Override
+	public List<String> getPageNames() {
+		final String[] names = {
+				"home", "index", "Start"
+		};
+		return Arrays.asList(names);
 	}
 
 }

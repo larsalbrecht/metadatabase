@@ -3,6 +3,8 @@
  */
 package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
+import java.util.List;
+
 import org.eclipse.jetty.server.Request;
 
 import com.lars_albrecht.mdb.main.core.controller.MainController;
@@ -36,6 +38,11 @@ public class DefaultErrorPage extends WebPage {
 		} else {
 			return "Server error";
 		}
+	}
+
+	@Override
+	public List<String> getPageNames() {
+		return null;
 	}
 
 }

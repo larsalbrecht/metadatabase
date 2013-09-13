@@ -3,6 +3,9 @@
  */
 package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.jetty.server.Request;
 
 import com.lars_albrecht.general.utilities.Template;
@@ -51,6 +54,14 @@ public class AttributesTagsPage extends WebPage {
 	@Override
 	public String getTitle() {
 		return "Attribute / Tags";
+	}
+
+	@Override
+	public List<String> getPageNames() {
+		final String[] names = {
+				"attributestags", "AttributeTags"
+		};
+		return Arrays.asList(names);
 	}
 
 }

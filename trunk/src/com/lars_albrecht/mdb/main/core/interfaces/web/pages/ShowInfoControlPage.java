@@ -4,6 +4,8 @@
 package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -236,6 +238,14 @@ public class ShowInfoControlPage extends WebPage {
 	@Override
 	public String getTitle() {
 		return "Info / Control";
+	}
+
+	@Override
+	public List<String> getPageNames() {
+		final String[] names = {
+				"infocontrol", "InfoControl"
+		};
+		return Arrays.asList(names);
 	}
 
 }
