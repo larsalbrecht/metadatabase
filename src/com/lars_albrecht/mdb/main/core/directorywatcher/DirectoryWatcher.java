@@ -20,6 +20,8 @@ import com.lars_albrecht.mdb.main.core.controller.MainController;
 /**
  * @author lalbrecht
  * 
+ *         TODO improve this class/function
+ * 
  */
 public class DirectoryWatcher implements Runnable {
 

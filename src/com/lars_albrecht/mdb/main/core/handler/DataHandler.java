@@ -182,7 +182,6 @@ public class DataHandler {
 
 	public DataHandler(final MainController mainController) {
 		this.newFileItems = new ArrayList<FileItem>();
-		this.reloadData(DataHandler.RELOAD_ALL);
 	}
 
 	public Integer addFileTag(final FileTag fileTag) throws Exception {
