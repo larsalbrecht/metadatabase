@@ -398,4 +398,9 @@ public class FileDetailsPage extends WebPage {
 		return Arrays.asList(names);
 	}
 
+	@Override
+	public String getStaticName() {
+		return "showFileDetails";
+	}
+
 }

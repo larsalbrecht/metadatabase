@@ -26,6 +26,8 @@ public abstract class WebPage extends AWebPart {
 
 	public abstract List<String> getPageNames();
 
+	public abstract String getStaticName();
+
 	final protected void set404Error() {
 		this.setPageTemplate(new Template("404"));
 	}

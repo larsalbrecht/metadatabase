@@ -5,9 +5,7 @@ package com.lars_albrecht.mdb.main.core.interfaces.web.helper;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import org.eclipse.jetty.server.Request;
@@ -16,7 +14,6 @@ import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.FileFinder;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.general.utilities.Template;
-import com.lars_albrecht.mdb.main.MDB;
 import com.lars_albrecht.mdb.main.core.abstracts.ThreadEx;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
@@ -70,7 +67,7 @@ public class WebServerHelper {
 		String pageTitle = "JMovieDB - Webinterface";
 		String subTitle = "";
 
-		if (filename.equalsIgnoreCase("index.html") || filename.equalsIgnoreCase("")) {
+		if (content != null && filename != null) {
 			String action = null;
 			if (request.getParameter("action") != null) {
 				action = request.getParameter("action");
@@ -78,35 +75,49 @@ public class WebServerHelper {
 				action = "index";
 			}
 
+			WebPage page = null;
+			final ArrayList<WebPage> pageList = new ArrayList<WebPage>();
 			try {
-				WebPage page = null;
-				// TODO do dynamically and allow other names instead of an
-				// action call over index.html.
-				if (action.equalsIgnoreCase("index")) {
-					page = new HomePage(action, request, this.mainController, this.webInterface);
-				} else if (action.equalsIgnoreCase("showInfoControl")) {
-					page = new ShowInfoControlPage(action, request, this.mainController, this.webInterface);
-				} else if (action.equalsIgnoreCase("showFileDetails")) {
-					page = new FileDetailsPage(action, request, this.mainController, this.webInterface);
-				} else if (action.equalsIgnoreCase("showSearchresults")) {
-					page = new SearchResultsPage(action, request, this.mainController, this.webInterface);
-				} else if (action.equalsIgnoreCase("showSettings")) {
-					page = new SettingsPage(action, request, this.mainController, this.webInterface);
-				} else if (action.equalsIgnoreCase("showBrowser")) {
-					page = new BrowsePage(action, request, this.mainController, this.webInterface);
-				} else if (action.equalsIgnoreCase("showAttributesTags")) {
-					page = new AttributesTagsPage(action, request, this.mainController, this.webInterface);
-				} else if (action.equalsIgnoreCase("showAll")) {
-					page = new AllPage(action, request, this.mainController, this.webInterface);
-				} else {
-					page = new DefaultErrorPage("404", request, this.mainController, this.webInterface);
-				}
-				contentMarkerReplacement = page.getGeneratedContent();
-				subTitle = page.getTitle();
-				pageTitle = subTitle + " | " + pageTitle;
+				pageList.add(new HomePage(action, request, this.mainController, this.webInterface));
+				pageList.add(new ShowInfoControlPage(action, request, this.mainController, this.webInterface));
+				pageList.add(new FileDetailsPage(action, request, this.mainController, this.webInterface));
+				pageList.add(new SearchResultsPage(action, request, this.mainController, this.webInterface));
+				pageList.add(new SettingsPage(action, request, this.mainController, this.webInterface));
+				pageList.add(new BrowsePage(action, request, this.mainController, this.webInterface));
+				pageList.add(new AttributesTagsPage(action, request, this.mainController, this.webInterface));
+				pageList.add(new AllPage(action, request, this.mainController, this.webInterface));
+
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
+
+			if (filename.equalsIgnoreCase("index.html")) {
+				for (final WebPage webPage : pageList) {
+					if (webPage.getStaticName().equalsIgnoreCase(action)) {
+						page = webPage;
+						break;
+					}
+				}
+			} else {
+				for (final WebPage webPage : pageList) {
+					if (webPage.getPageNames().contains(filename)) {
+						page = webPage;
+						break;
+					}
+				}
+
+			}
+			if (page == null) {
+				try {
+					page = new DefaultErrorPage("404", request, this.mainController, this.webInterface);
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
+			}
+
+			contentMarkerReplacement = page.getGeneratedContent();
+			subTitle = page.getTitle();
+			pageTitle = subTitle + " | " + pageTitle;
 
 			// replace contentmarker with "contentMarkerReplacement" if marker
 			// exists.
@@ -245,33 +256,28 @@ public class WebServerHelper {
 
 	/**
 	 * Returns the content of the file from the url. It is like "index.html".
-	 * The file must be in /folder/
 	 * 
-	 * @param url
-	 * @param folder
+	 * @param requestedRessource
 	 * @param request
 	 * @return String
 	 */
-	public String getFileContent(String url, final String folder, final Request request) {
-		File file = null;
-		if (url != null) {
-			if (url.equalsIgnoreCase("")) {
-				url = "index.html";
+	public String getFileContent(String requestedRessource, final Request request) {
+		File indexFile = new File("index.html");
+		if (requestedRessource != null) {
+			if (requestedRessource.equalsIgnoreCase("")) {
+				requestedRessource = "index.html";
 			}
-			Debug.log(Debug.LEVEL_INFO, "Try to load file for web interface: " + url);
-			final InputStream inputStream = MDB.class.getClassLoader().getResourceAsStream(folder + "/" + url);
-			file = new File(url);
+			Debug.log(Debug.LEVEL_INFO, "Try to load file for web interface: " + indexFile);
 			try {
 				String content = "";
-				if (inputStream != null) {
-					content = Helper.getInputStreamContents(inputStream, Charset.forName("UTF-8"));
-					return content;
-				} else if ((file != null) && ((file = FileFinder.getInstance().findFile(new File(new File(url).getName()), false)) != null)
-						&& file.exists() && file.isFile() && file.canRead()) {
-					content = this.generateContent(Helper.getFileContents(file), file.getName(), request);
+				if ((indexFile != null)
+						&& ((indexFile = FileFinder.getInstance()
+								.findFile(new File(new File(indexFile.getAbsolutePath()).getName()), false)) != null) && indexFile.exists()
+						&& indexFile.isFile() && indexFile.canRead()) {
+					content = this.generateContent(Helper.getFileContents(indexFile), requestedRessource, request);
 					return content;
 				} else {
-					Debug.log(Debug.LEVEL_ERROR, "InputStream == null && File == null: " + url + " - " + folder);
+					Debug.log(Debug.LEVEL_ERROR, "InputStream == null && File == null: " + requestedRessource);
 				}
 			} catch (final IOException e) {
 				e.printStackTrace();
