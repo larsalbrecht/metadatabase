@@ -151,4 +151,9 @@ public class SearchResultsPage extends WebPage {
 		return Arrays.asList(names);
 	}
 
+	@Override
+	public String getStaticName() {
+		return "showSearchresults";
+	}
+
 }

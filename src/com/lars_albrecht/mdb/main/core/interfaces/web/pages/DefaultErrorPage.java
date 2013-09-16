@@ -45,4 +45,9 @@ public class DefaultErrorPage extends WebPage {
 		return null;
 	}
 
+	@Override
+	public String getStaticName() {
+		return null;
+	}
+
 }

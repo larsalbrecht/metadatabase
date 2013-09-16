@@ -24,6 +24,17 @@ public class WebServer {
 
 	private MainController	mainController	= null;
 	private WebInterface	webInterface	= null;
+	private Server			server			= null;
+
+	/**
+	 * @param mainController
+	 * @param webInterface
+	 */
+	public WebServer(final MainController mainController, final WebInterface webInterface) {
+		super();
+		this.mainController = mainController;
+		this.webInterface = webInterface;
+	}
 
 	@Override
 	protected void finalize() throws Throwable {
@@ -32,21 +43,19 @@ public class WebServer {
 	/**
 	 * WebServer constructor.
 	 */
-	protected void start(final MainController mainController, final WebInterface webInterface) {
-		this.mainController = mainController;
-		this.webInterface = webInterface;
-		final Server server = new Server();
+	protected void start() {
+		this.server = new Server();
 
 		/**
 		 * http connector
 		 */
 		final HttpConfiguration http_config = new HttpConfiguration();
-		final ServerConnector http = new ServerConnector(server, new HttpConnectionFactory(http_config));
+		final ServerConnector http = new ServerConnector(this.server, new HttpConnectionFactory(http_config));
 		http.setPort(8080);
 		http.setIdleTimeout(30000);
 		http.setName("Metadatabase WebServer-Interface");
 
-		server.setConnectors(new Connector[] {
+		this.server.setConnectors(new Connector[] {
 			http
 		});
 
@@ -70,15 +79,14 @@ public class WebServer {
 		handlers.setHandlers(new Handler[] {
 				mdbDefaultHandler, resource_handler, ajaxHandler, jsonHandler, mdbHTMLHandler, new DefaultHandler()
 		});
-		server.setHandler(handlers);
+		this.server.setHandler(handlers);
 
 		try {
-			server.start();
-			server.join();
+			this.server.start();
+			this.server.join();
 
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 }

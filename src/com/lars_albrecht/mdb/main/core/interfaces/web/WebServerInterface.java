@@ -29,9 +29,9 @@ public class WebServerInterface implements Runnable {
 	 * Starts the webserver.
 	 */
 	public void start() {
-		final WebServer ws = new WebServer();
+		final WebServer ws = new WebServer(this.mainController, this.webInterface);
 		if (ws != null) {
-			ws.start(this.mainController, this.webInterface);
+			ws.start();
 		}
 	}
 

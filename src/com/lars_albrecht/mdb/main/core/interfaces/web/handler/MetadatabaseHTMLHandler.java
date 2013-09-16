@@ -35,7 +35,7 @@ public class MetadatabaseHTMLHandler extends AbstractHandler {
 			handle(final String str, final Request req, final HttpServletRequest httpReq, final HttpServletResponse httpRes) throws IOException,
 					ServletException {
 		final String content = new WebServerHelper(this.mainController, this.webInterface).getFileContent(req.getRequestURI().substring(1),
-				"web", req);
+				req);
 		if (content != null) {
 			httpRes.setContentType("text/html;charset=utf-8");
 			httpRes.setStatus(200);

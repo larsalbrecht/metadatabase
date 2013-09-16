@@ -180,4 +180,9 @@ public class BrowsePage extends WebPage {
 		return Arrays.asList(names);
 	}
 
+	@Override
+	public String getStaticName() {
+		return "showBrowser";
+	}
+
 }

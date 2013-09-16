@@ -248,4 +248,9 @@ public class ShowInfoControlPage extends WebPage {
 		return Arrays.asList(names);
 	}
 
+	@Override
+	public String getStaticName() {
+		return "showInfoControl";
+	}
+
 }

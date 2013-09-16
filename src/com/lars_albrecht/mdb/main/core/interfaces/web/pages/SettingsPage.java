@@ -169,4 +169,9 @@ public class SettingsPage extends WebPage {
 		return Arrays.asList(names);
 	}
 
+	@Override
+	public String getStaticName() {
+		return "showSettings";
+	}
+
 }
