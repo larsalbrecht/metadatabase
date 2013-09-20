@@ -22,11 +22,11 @@ public abstract class WebPage extends AWebPart {
 		super(actionname, request, mainController, webInterface);
 	}
 
-	public abstract String getTitle();
-
 	public abstract List<String> getPageNames();
 
 	public abstract String getStaticName();
+
+	public abstract String getTitle();
 
 	final protected void set404Error() {
 		this.setPageTemplate(new Template("404"));

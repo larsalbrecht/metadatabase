@@ -51,12 +51,12 @@ public class AllPage extends WebPage {
 		String sortOrder = null;
 		int page = 0;
 
-		if (request.getParameter("sortorder") != null && (request.getParameter("sortorder") != null)) {
+		if ((request.getParameter("sortorder") != null) && (request.getParameter("sortorder") != null)) {
 			sortOrder = request.getParameter("sortorder");
 		}
 		sortOrder = (sortOrder == null ? listOrderOption : sortOrder);
 
-		if (request.getParameter("page") != null && (request.getParameter("page") != null)
+		if ((request.getParameter("page") != null) && (request.getParameter("page") != null)
 				&& request.getParameter("page").matches("(\\d){1,}")) {
 			page = Integer.parseInt(request.getParameter("page"));
 		}
@@ -190,6 +190,19 @@ public class AllPage extends WebPage {
 	}
 
 	@Override
+	public List<String> getPageNames() {
+		final String[] names = {
+				"all", "alle"
+		};
+		return Arrays.asList(names);
+	}
+
+	@Override
+	public String getStaticName() {
+		return "showAll";
+	}
+
+	@Override
 	public String getTemplateName() {
 		return "all";
 	}
@@ -212,19 +225,6 @@ public class AllPage extends WebPage {
 				return mediaItem.getUri().toString();
 			}
 		}
-	}
-
-	@Override
-	public List<String> getPageNames() {
-		final String[] names = {
-				"all", "alle"
-		};
-		return Arrays.asList(names);
-	}
-
-	@Override
-	public String getStaticName() {
-		return "showAll";
 	}
 
 }

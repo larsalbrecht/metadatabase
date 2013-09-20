@@ -130,20 +130,6 @@ public class SearchResultsPage extends WebPage {
 	}
 
 	@Override
-	public String getTemplateName() {
-		return "searchresults";
-	}
-
-	@Override
-	public String getTitle() {
-		String searchStr = "";
-		if (this.request.getParameter("searchStr") != null && (this.request.getParameter("searchStr") != null)) {
-			searchStr = this.request.getParameter("searchStr");
-		}
-		return "Suchergebnisse für: " + searchStr;
-	}
-
-	@Override
 	public List<String> getPageNames() {
 		final String[] names = {
 				"searchresults", "Suchergebnisse"
@@ -154,6 +140,20 @@ public class SearchResultsPage extends WebPage {
 	@Override
 	public String getStaticName() {
 		return "showSearchresults";
+	}
+
+	@Override
+	public String getTemplateName() {
+		return "searchresults";
+	}
+
+	@Override
+	public String getTitle() {
+		String searchStr = "";
+		if ((this.request.getParameter("searchStr") != null) && (this.request.getParameter("searchStr") != null)) {
+			searchStr = this.request.getParameter("searchStr");
+		}
+		return "Suchergebnisse für: " + searchStr;
 	}
 
 }

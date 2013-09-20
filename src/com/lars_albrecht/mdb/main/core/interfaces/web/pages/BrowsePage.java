@@ -163,16 +163,6 @@ public class BrowsePage extends WebPage {
 	}
 
 	@Override
-	public String getTemplateName() {
-		return "browser";
-	}
-
-	@Override
-	public String getTitle() {
-		return "Browse";
-	}
-
-	@Override
 	public List<String> getPageNames() {
 		final String[] names = {
 				"browser", "Durchsuchen"
@@ -183,6 +173,16 @@ public class BrowsePage extends WebPage {
 	@Override
 	public String getStaticName() {
 		return "showBrowser";
+	}
+
+	@Override
+	public String getTemplateName() {
+		return "browser";
+	}
+
+	@Override
+	public String getTitle() {
+		return "Browse";
 	}
 
 }

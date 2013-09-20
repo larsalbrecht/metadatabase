@@ -8,10 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.lars_albrecht.general.utilities.FileFinder;
 import com.lars_albrecht.general.utilities.PropertiesEx;
 import com.lars_albrecht.general.utilities.PropertiesExNotInitilizedException;
 import com.lars_albrecht.general.utilities.RessourceBundleEx;
+import com.lars_albrecht.mdb.main.utilities.Paths;
 
 /**
  * @author lalbrecht TODO Build singleton
@@ -25,13 +25,15 @@ public class ConfigurationHandler {
 
 	public ConfigurationHandler() throws FileNotFoundException, IOException, PropertiesExNotInitilizedException {
 		PropertiesEx.getInstance().init(
-				FileFinder.getInstance().findFile(new File(RessourceBundleEx.getInstance("mdb").getProperty("config.ini")), false));
+				new File(Paths.WORKING + File.separator + RessourceBundleEx.getInstance("mdb").getProperty("config.ini")));
 
 		if (PropertiesEx.getInstance().isInit()) {
 			this.readConfigFile();
 		} else {
 			throw new FileNotFoundException("File \""
-					+ new File(RessourceBundleEx.getInstance("mdb").getProperty("config.ini")).getAbsolutePath() + "\" not Found");
+					+ new File(
+							new File(Paths.WORKING + File.separator + RessourceBundleEx.getInstance("mdb").getProperty("config.ini"))
+									.getAbsolutePath()) + "\" not Found");
 		}
 	}
 

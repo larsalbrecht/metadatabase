@@ -34,7 +34,11 @@ public abstract class AWebPart {
 	}
 
 	final public String getGeneratedContent() {
-		return this.pageTemplate.getClearedContent();
+		if (this.pageTemplate != null) {
+			return this.pageTemplate.getClearedContent();
+		} else {
+			return null;
+		}
 	}
 
 	final protected Template getPageTemplate() {

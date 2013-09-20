@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
+import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.helper.WebServerHelper;
@@ -34,13 +35,17 @@ public class MetadatabaseHTMLHandler extends AbstractHandler {
 	public void
 			handle(final String str, final Request req, final HttpServletRequest httpReq, final HttpServletResponse httpRes) throws IOException,
 					ServletException {
+
 		final String content = new WebServerHelper(this.mainController, this.webInterface).getFileContent(req.getRequestURI().substring(1),
 				req);
 		if (content != null) {
+			Debug.log(Debug.LEVEL_INFO, "Content loaded for request-uri: " + str);
 			httpRes.setContentType("text/html;charset=utf-8");
 			httpRes.setStatus(200);
 			req.setHandled(true);
 			httpRes.getWriter().println(content);
+		} else {
+			Debug.log(Debug.LEVEL_INFO, "Content NOT loaded for request-uri: " + str);
 		}
 	}
 
