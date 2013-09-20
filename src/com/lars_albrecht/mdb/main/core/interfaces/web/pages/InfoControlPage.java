@@ -20,14 +20,15 @@ import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
+import com.lars_albrecht.mdb.main.core.utilities.Cache;
 
 /**
  * @author lalbrecht
  * 
  */
-public class ShowInfoControlPage extends WebPage {
+public class InfoControlPage extends WebPage {
 
-	public ShowInfoControlPage(final String actionname, final Request request, final MainController mainController,
+	public InfoControlPage(final String actionname, final Request request, final MainController mainController,
 			final WebInterface webInterface) throws Exception {
 		super(actionname, request, mainController, webInterface);
 
@@ -68,12 +69,14 @@ public class ShowInfoControlPage extends WebPage {
 		final String statusMessageContainer = templateWithControlContainer.getSubMarkerContent("statusMessage");
 
 		String controlViewContainer = templateWithControlContainer.getSubMarkerContent("controlView");
-		String finderHrefString = "?action=showInfoControl&do=startFinder";
+		String finderHrefString = "?action=infoControl&do=startFinder";
 		String finderClassString = "";
-		String collectorHrefString = "?action=showInfoControl&do=startCollectors";
+		String collectorHrefString = "?action=infoControl&do=startCollectors";
 		String collectorClassString = "";
-		final String removeMissingHrefString = "?action=showInfoControl&do=removeMissing";
+		final String removeMissingHrefString = "?action=infoControl&do=removeMissing";
 		final String removeMissingClassString = "";
+		final String clearCacheHrefString = "?action=infoControl&do=clearCache";
+		final String clearCacheHrefClassString = "";
 
 		final ArrayList<String> statusMessages = new ArrayList<String>();
 
@@ -111,6 +114,8 @@ public class ShowInfoControlPage extends WebPage {
 				this.mainController.getDataHandler().removeMissingFilesFromDatabase();
 			} else if (doValue.equalsIgnoreCase("stop")) {
 				System.exit(1);
+			} else if (doValue.equalsIgnoreCase("clearCache")) {
+				Cache.clearCache(Cache.CACHE_WEB);
 			}
 		}
 
@@ -122,6 +127,9 @@ public class ShowInfoControlPage extends WebPage {
 
 		controlViewContainer = Template.replaceMarker(controlViewContainer, "removeMissingHref", removeMissingHrefString, false);
 		controlViewContainer = Template.replaceMarker(controlViewContainer, "removeMissingClass", removeMissingClassString, false);
+
+		controlViewContainer = Template.replaceMarker(controlViewContainer, "clearCacheHref", clearCacheHrefString, false);
+		controlViewContainer = Template.replaceMarker(controlViewContainer, "clearCacheClass", clearCacheHrefClassString, false);
 
 		String statusMessagesContainer = "";
 		if (statusMessages.size() > 0) {

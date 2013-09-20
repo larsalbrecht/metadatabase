@@ -13,7 +13,7 @@ import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 
 /**
- * @author albrela
+ * @author lalbrecht
  * 
  */
 public class MetadatabaseDefaultHandler extends AbstractHandler {

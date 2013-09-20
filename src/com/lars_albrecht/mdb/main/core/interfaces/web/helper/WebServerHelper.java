@@ -24,13 +24,14 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.pages.BrowsePage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.DefaultErrorPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.FileDetailsPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.HomePage;
+import com.lars_albrecht.mdb.main.core.interfaces.web.pages.InfoControlPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.LastFivePartial;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.SearchResultsPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.SettingsPage;
-import com.lars_albrecht.mdb.main.core.interfaces.web.pages.ShowInfoControlPage;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
 import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
-import com.lars_albrecht.mdb.main.utilities.Paths;
+import com.lars_albrecht.mdb.main.core.utilities.Cache;
+import com.lars_albrecht.mdb.main.core.utilities.Paths;
 
 /**
  * @author lalbrecht TODO Do better (Each "page" is an own Object/class and all
@@ -47,9 +48,6 @@ public class WebServerHelper {
 	public final static int					SEARCHTYPE_TEXTALL		= 1;
 	public final static int					SEARCHTYPE_ATTRIBUTE	= 2;
 	private final static ArrayList<WebPage>	pageList				= new ArrayList<WebPage>();
-
-	private static File						indexPath				= null;
-	private static String					indexContent			= null;
 
 	public WebServerHelper(final MainController mainController, final WebInterface webInterface) {
 		this.mainController = mainController;
@@ -85,7 +83,7 @@ public class WebServerHelper {
 		if (WebServerHelper.pageList.size() == 0) {
 			try {
 				WebServerHelper.pageList.add(new HomePage(action, request, this.mainController, this.webInterface));
-				WebServerHelper.pageList.add(new ShowInfoControlPage(action, request, this.mainController, this.webInterface));
+				WebServerHelper.pageList.add(new InfoControlPage(action, request, this.mainController, this.webInterface));
 				WebServerHelper.pageList.add(new FileDetailsPage(action, request, this.mainController, this.webInterface));
 				WebServerHelper.pageList.add(new SearchResultsPage(action, request, this.mainController, this.webInterface));
 				WebServerHelper.pageList.add(new SettingsPage(action, request, this.mainController, this.webInterface));
@@ -268,22 +266,25 @@ public class WebServerHelper {
 	 * @return String
 	 */
 	public String getFileContent(String requestedRessource, final Request request) {
-		if (WebServerHelper.indexPath == null) {
-			WebServerHelper.indexPath = new File(Paths.WEB_ROOT + File.separator + "index.html");
+		File indexPath = (File) Cache.getCacheEntry(Cache.CACHE_WEB, "indexPath");
+		if (indexPath == null) {
+			indexPath = new File(Paths.WEB_ROOT + File.separator + "index.html");
+			Cache.addToCache(Cache.CACHE_WEB, "indexPath", indexPath);
 		}
 		if (requestedRessource != null) {
 			if (requestedRessource.equalsIgnoreCase("")) {
 				requestedRessource = "index.html";
 			}
-			Debug.log(Debug.LEVEL_INFO, "Try to load file for web interface: " + WebServerHelper.indexPath);
+			Debug.log(Debug.LEVEL_INFO, "Try to load file for web interface: " + indexPath);
 			try {
 				String content = "";
-				if ((WebServerHelper.indexPath != null) && (WebServerHelper.indexPath != null) && WebServerHelper.indexPath.exists()
-						&& WebServerHelper.indexPath.isFile() && WebServerHelper.indexPath.canRead()) {
-					if (WebServerHelper.indexContent == null) {
-						WebServerHelper.indexContent = Helper.getFileContents(WebServerHelper.indexPath);
+				if ((indexPath != null) && (indexPath != null) && indexPath.exists() && indexPath.isFile() && indexPath.canRead()) {
+					String indexContent = (String) Cache.getCacheEntry(Cache.CACHE_WEB, "indexContent");
+					if (indexContent == null) {
+						indexContent = Helper.getFileContents(indexPath);
+						Cache.addToCache(Cache.CACHE_WEB, "indexContent", indexContent);
 					}
-					content = this.generateContent(WebServerHelper.indexContent, requestedRessource, request);
+					content = this.generateContent(indexContent, requestedRessource, request);
 					if (content == null) {
 						System.out.println("NULL");
 					}
