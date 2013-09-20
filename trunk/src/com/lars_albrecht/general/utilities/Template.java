@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.lars_albrecht.mdb.main.utilities.Paths;
+import com.lars_albrecht.mdb.main.core.utilities.Paths;
 
 /**
  * @author lalbrecht

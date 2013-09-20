@@ -19,7 +19,7 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseAjaxHa
 import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseDefaultHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseHTMLHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseJSONHandler;
-import com.lars_albrecht.mdb.main.utilities.Paths;
+import com.lars_albrecht.mdb.main.core.utilities.Paths;
 
 public class WebServer {
 

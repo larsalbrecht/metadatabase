@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.lars_albrecht.mdb.main.utilities;
+package com.lars_albrecht.mdb.main.core.utilities;
 
 import java.io.File;
 

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import com.lars_albrecht.general.utilities.PropertiesEx;
 import com.lars_albrecht.general.utilities.PropertiesExNotInitilizedException;
 import com.lars_albrecht.general.utilities.RessourceBundleEx;
-import com.lars_albrecht.mdb.main.utilities.Paths;
+import com.lars_albrecht.mdb.main.core.utilities.Paths;
 
 /**
  * @author lalbrecht TODO Build singleton

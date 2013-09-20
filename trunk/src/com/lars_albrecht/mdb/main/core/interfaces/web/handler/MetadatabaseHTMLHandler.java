@@ -35,10 +35,12 @@ public class MetadatabaseHTMLHandler extends AbstractHandler {
 	public void
 			handle(final String str, final Request req, final HttpServletRequest httpReq, final HttpServletResponse httpRes) throws IOException,
 					ServletException {
+		Debug.startTimer("MetadatabaseHTMLHandler handleTime: " + str);
 
-		final String content = new WebServerHelper(this.mainController, this.webInterface).getFileContent(req.getRequestURI().substring(1),
-				req);
+		String content = new WebServerHelper(this.mainController, this.webInterface).getFileContent(req.getRequestURI().substring(1), req);
+		Debug.stopTimer("MetadatabaseHTMLHandler handleTime: " + str);
 		if (content != null) {
+			content += "<!-- Server Time " + Debug.getTime("MetadatabaseHTMLHandler handleTime: " + str) + " -->";
 			Debug.log(Debug.LEVEL_INFO, "Content loaded for request-uri: " + str);
 			httpRes.setContentType("text/html;charset=utf-8");
 			httpRes.setStatus(200);
@@ -48,5 +50,4 @@ public class MetadatabaseHTMLHandler extends AbstractHandler {
 			Debug.log(Debug.LEVEL_INFO, "Content NOT loaded for request-uri: " + str);
 		}
 	}
-
 }
