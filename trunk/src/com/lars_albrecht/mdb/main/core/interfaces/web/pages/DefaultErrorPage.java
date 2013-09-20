@@ -23,6 +23,16 @@ public class DefaultErrorPage extends WebPage {
 	}
 
 	@Override
+	public List<String> getPageNames() {
+		return null;
+	}
+
+	@Override
+	public String getStaticName() {
+		return null;
+	}
+
+	@Override
 	public String getTemplateName() {
 		if (this.actionname.equalsIgnoreCase("404")) {
 			return "404";
@@ -38,16 +48,6 @@ public class DefaultErrorPage extends WebPage {
 		} else {
 			return "Server error";
 		}
-	}
-
-	@Override
-	public List<String> getPageNames() {
-		return null;
-	}
-
-	@Override
-	public String getStaticName() {
-		return null;
 	}
 
 }

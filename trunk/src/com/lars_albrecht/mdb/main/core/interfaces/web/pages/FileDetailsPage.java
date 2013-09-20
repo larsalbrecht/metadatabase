@@ -42,7 +42,7 @@ public class FileDetailsPage extends WebPage {
 		super(actionname, request, mainController, webInterface);
 		this.webInterface = webInterface;
 
-		if (request.getParameter("fileId") != null && (request.getParameter("fileId") != null)) {
+		if ((request.getParameter("fileId") != null) && (request.getParameter("fileId") != null)) {
 			final Integer fileId = Integer.parseInt(request.getParameter("fileId"));
 
 			if ((fileId != null) && (fileId > 0)) {
@@ -323,6 +323,19 @@ public class FileDetailsPage extends WebPage {
 	}
 
 	@Override
+	public List<String> getPageNames() {
+		final String[] names = {
+				"filedetails", "Detailansicht"
+		};
+		return Arrays.asList(names);
+	}
+
+	@Override
+	public String getStaticName() {
+		return "showFileDetails";
+	}
+
+	@Override
 	public String getTemplateName() {
 		return "filedetails";
 	}
@@ -330,7 +343,7 @@ public class FileDetailsPage extends WebPage {
 	@Override
 	public String getTitle() {
 		String title;
-		if (this.request.getParameter("fileId") != null && (this.request.getParameter("fileId") != null)) {
+		if ((this.request.getParameter("fileId") != null) && (this.request.getParameter("fileId") != null)) {
 			final Integer fileId = Integer.parseInt(this.request.getParameter("fileId"));
 			if ((fileId != null) && (fileId > 0)) {
 				final FileItem tempFileItem = this.mainController.getDataHandler().findAllInfoForAllByFileId(fileId);
@@ -388,19 +401,6 @@ public class FileDetailsPage extends WebPage {
 			}
 		}
 		return resultList;
-	}
-
-	@Override
-	public List<String> getPageNames() {
-		final String[] names = {
-				"filedetails", "Detailansicht"
-		};
-		return Arrays.asList(names);
-	}
-
-	@Override
-	public String getStaticName() {
-		return "showFileDetails";
 	}
 
 }

@@ -37,7 +37,7 @@ public class SettingsPage extends WebPage {
 		this.searchOptionsList.put("Hinzugefügt am (älteste zuerst)", "fileInformation.createTS ASC ");
 		this.searchOptionsList.put("Hinzugefügt am (neuste zuerst)", "fileInformation.createTS DESC ");
 
-		if (request.getParameter("do") != null && request.getParameter("do").equalsIgnoreCase("save")) {
+		if ((request.getParameter("do") != null) && request.getParameter("do").equalsIgnoreCase("save")) {
 			this.saveSettings(request);
 		}
 
@@ -140,6 +140,19 @@ public class SettingsPage extends WebPage {
 	}
 
 	@Override
+	public List<String> getPageNames() {
+		final String[] names = {
+				"settings", "Einstellungen", "Optionen", "options"
+		};
+		return Arrays.asList(names);
+	}
+
+	@Override
+	public String getStaticName() {
+		return "showSettings";
+	}
+
+	@Override
 	public String getTemplateName() {
 		return "settings";
 	}
@@ -159,19 +172,6 @@ public class SettingsPage extends WebPage {
 		// request.getPostParams().entrySet()) {
 		// OptionsHandler.setOption(entry.getKey(), entry.getValue());
 		// }
-	}
-
-	@Override
-	public List<String> getPageNames() {
-		final String[] names = {
-				"settings", "Einstellungen", "Optionen", "options"
-		};
-		return Arrays.asList(names);
-	}
-
-	@Override
-	public String getStaticName() {
-		return "showSettings";
 	}
 
 }

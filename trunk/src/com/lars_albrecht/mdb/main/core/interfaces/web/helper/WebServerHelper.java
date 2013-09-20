@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import org.eclipse.jetty.server.Request;
 
 import com.lars_albrecht.general.utilities.Debug;
-import com.lars_albrecht.general.utilities.FileFinder;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.abstracts.ThreadEx;
@@ -31,6 +30,7 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.pages.SettingsPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.ShowInfoControlPage;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
 import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
+import com.lars_albrecht.mdb.main.utilities.Paths;
 
 /**
  * @author lalbrecht TODO Do better (Each "page" is an own Object/class and all
@@ -40,12 +40,16 @@ import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
  */
 public class WebServerHelper {
 
-	private MainController	mainController			= null;
-	private WebInterface	webInterface			= null;
+	private MainController					mainController			= null;
+	private WebInterface					webInterface			= null;
 
-	public final static int	SEARCHTYPE_MIXED		= 0;
-	public final static int	SEARCHTYPE_TEXTALL		= 1;
-	public final static int	SEARCHTYPE_ATTRIBUTE	= 2;
+	public final static int					SEARCHTYPE_MIXED		= 0;
+	public final static int					SEARCHTYPE_TEXTALL		= 1;
+	public final static int					SEARCHTYPE_ATTRIBUTE	= 2;
+	private final static ArrayList<WebPage>	pageList				= new ArrayList<WebPage>();
+
+	private static File						indexPath				= null;
+	private static String					indexContent			= null;
 
 	public WebServerHelper(final MainController mainController, final WebInterface webInterface) {
 		this.mainController = mainController;
@@ -62,100 +66,102 @@ public class WebServerHelper {
 	 * @throws UnsupportedEncodingException
 	 */
 	private String generateContent(final String content, final String filename, final Request request) throws UnsupportedEncodingException {
+		if ((content == null) || (filename == null) || (request == null)) {
+			return null;
+		}
 		String generatedContent = content;
 		String contentMarkerReplacement = "";
 		String pageTitle = "JMovieDB - Webinterface";
 		String subTitle = "";
 
-		if (content != null && filename != null) {
-			String action = null;
-			if (request.getParameter("action") != null) {
-				action = request.getParameter("action");
-			} else {
-				action = "index";
-			}
+		String action = null;
+		if (request.getParameter("action") != null) {
+			action = request.getParameter("action");
+		} else {
+			action = "index";
+		}
 
-			WebPage page = null;
-			final ArrayList<WebPage> pageList = new ArrayList<WebPage>();
+		WebPage page = null;
+		if (WebServerHelper.pageList.size() == 0) {
 			try {
-				pageList.add(new HomePage(action, request, this.mainController, this.webInterface));
-				pageList.add(new ShowInfoControlPage(action, request, this.mainController, this.webInterface));
-				pageList.add(new FileDetailsPage(action, request, this.mainController, this.webInterface));
-				pageList.add(new SearchResultsPage(action, request, this.mainController, this.webInterface));
-				pageList.add(new SettingsPage(action, request, this.mainController, this.webInterface));
-				pageList.add(new BrowsePage(action, request, this.mainController, this.webInterface));
-				pageList.add(new AttributesTagsPage(action, request, this.mainController, this.webInterface));
-				pageList.add(new AllPage(action, request, this.mainController, this.webInterface));
-
+				WebServerHelper.pageList.add(new HomePage(action, request, this.mainController, this.webInterface));
+				WebServerHelper.pageList.add(new ShowInfoControlPage(action, request, this.mainController, this.webInterface));
+				WebServerHelper.pageList.add(new FileDetailsPage(action, request, this.mainController, this.webInterface));
+				WebServerHelper.pageList.add(new SearchResultsPage(action, request, this.mainController, this.webInterface));
+				WebServerHelper.pageList.add(new SettingsPage(action, request, this.mainController, this.webInterface));
+				WebServerHelper.pageList.add(new BrowsePage(action, request, this.mainController, this.webInterface));
+				WebServerHelper.pageList.add(new AttributesTagsPage(action, request, this.mainController, this.webInterface));
+				WebServerHelper.pageList.add(new AllPage(action, request, this.mainController, this.webInterface));
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
+		}
 
-			if (filename.equalsIgnoreCase("index.html")) {
-				for (final WebPage webPage : pageList) {
-					if (webPage.getStaticName().equalsIgnoreCase(action)) {
-						page = webPage;
-						break;
-					}
+		if (filename.equalsIgnoreCase("index.html")) {
+			for (final WebPage webPage : WebServerHelper.pageList) {
+				if (webPage.getStaticName().equalsIgnoreCase(action)) {
+					page = webPage;
+					break;
 				}
+			}
+		} else {
+			for (final WebPage webPage : WebServerHelper.pageList) {
+				if (webPage.getPageNames().contains(filename)) {
+					page = webPage;
+					break;
+				}
+			}
+
+		}
+		if (page == null) {
+			try {
+				page = new DefaultErrorPage("404", request, this.mainController, this.webInterface);
+				return null;
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		contentMarkerReplacement = page.getGeneratedContent();
+		subTitle = page.getTitle();
+		pageTitle = subTitle + " | " + pageTitle;
+
+		// replace contentmarker with "contentMarkerReplacement" if marker
+		// exists.
+		if (Template.containsMarker(generatedContent, "content")) {
+			generatedContent = Template.replaceMarker(generatedContent, "content", contentMarkerReplacement, Boolean.FALSE);
+			Debug.log(Debug.LEVEL_DEBUG, "marker content exist. Replace it");
+		} else {
+			Debug.log(Debug.LEVEL_ERROR, "marker content DOES NOT exist");
+		}
+
+		// replace "free" marker.
+		if (Template.containsMarker(content, "searchTerm")) {
+			if ((request.getParameter("searchStr") != null) && (request.getParameter("searchStr") != null)) {
+				generatedContent = Template.replaceMarker(generatedContent, "searchTerm",
+						request.getParameter("searchStr").replaceAll("\"", "&quot;"), Boolean.FALSE);
 			} else {
-				for (final WebPage webPage : pageList) {
-					if (webPage.getPageNames().contains(filename)) {
-						page = webPage;
-						break;
-					}
-				}
-
+				generatedContent = Template.replaceMarker(generatedContent, "searchTerm", "", Boolean.FALSE);
 			}
-			if (page == null) {
-				try {
-					page = new DefaultErrorPage("404", request, this.mainController, this.webInterface);
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
+		}
+		if (Template.containsMarker(generatedContent, "lastFiveAdded")) {
+			try {
+				final LastFivePartial lastFive = new LastFivePartial(null, null, this.mainController, this.webInterface);
+				generatedContent = Template.replaceMarker(generatedContent, "lastFiveAdded", lastFive.getGeneratedContent(), false);
+			} catch (final Exception e) {
+				e.printStackTrace();
 			}
-
-			contentMarkerReplacement = page.getGeneratedContent();
-			subTitle = page.getTitle();
-			pageTitle = subTitle + " | " + pageTitle;
-
-			// replace contentmarker with "contentMarkerReplacement" if marker
-			// exists.
-			if (Template.containsMarker(generatedContent, "content")) {
-				generatedContent = Template.replaceMarker(generatedContent, "content", contentMarkerReplacement, Boolean.FALSE);
-				Debug.log(Debug.LEVEL_DEBUG, "marker content exist. Replace it");
-			} else {
-				Debug.log(Debug.LEVEL_ERROR, "marker content DOES NOT exist");
-			}
-
-			// replace "free" marker.
-			if (Template.containsMarker(content, "searchTerm")) {
-				if (request.getParameter("searchStr") != null && (request.getParameter("searchStr") != null)) {
-					generatedContent = Template.replaceMarker(generatedContent, "searchTerm",
-							request.getParameter("searchStr").replaceAll("\"", "&quot;"), Boolean.FALSE);
-				} else {
-					generatedContent = Template.replaceMarker(generatedContent, "searchTerm", "", Boolean.FALSE);
-				}
-			}
-			if (Template.containsMarker(generatedContent, "lastFiveAdded")) {
-				try {
-					final LastFivePartial lastFive = new LastFivePartial(null, null, this.mainController, this.webInterface);
-					generatedContent = Template.replaceMarker(generatedContent, "lastFiveAdded", lastFive.getGeneratedContent(), false);
-				} catch (final Exception e) {
-					e.printStackTrace();
-				}
-				// @SuppressWarnings("deprecation")
-				// final String listOutput =
-				// HTML.generateListOutput(lastFiveList, null, null, false);
-				// generatedContent = Template.replaceMarker(generatedContent,
-				// "lastFiveAdded", listOutput, Boolean.FALSE);
-			}
-			if (Template.containsMarker(generatedContent, "title")) {
-				generatedContent = Template.replaceMarker(generatedContent, "title", pageTitle, Boolean.FALSE);
-			}
-			if (Template.containsMarker(generatedContent, "subTitle")) {
-				generatedContent = Template.replaceMarker(generatedContent, "subTitle", subTitle, Boolean.FALSE);
-			}
+			// @SuppressWarnings("deprecation")
+			// final String listOutput =
+			// HTML.generateListOutput(lastFiveList, null, null, false);
+			// generatedContent = Template.replaceMarker(generatedContent,
+			// "lastFiveAdded", listOutput, Boolean.FALSE);
+		}
+		if (Template.containsMarker(generatedContent, "title")) {
+			generatedContent = Template.replaceMarker(generatedContent, "title", pageTitle, Boolean.FALSE);
+		}
+		if (Template.containsMarker(generatedContent, "subTitle")) {
+			generatedContent = Template.replaceMarker(generatedContent, "subTitle", subTitle, Boolean.FALSE);
 		}
 
 		return generatedContent;
@@ -173,7 +179,7 @@ public class WebServerHelper {
 		String content = null;
 		if (url != null) {
 			content = "";
-			if ((request.getParameters() != null) && (request.getParameters().size() > 0) && request.getParameter("action") != null
+			if ((request.getParameters() != null) && (request.getParameters().size() > 0) && (request.getParameter("action") != null)
 					&& (request.getParameter("action") != null)) {
 				final String action = request.getParameter("action");
 				if (action.equalsIgnoreCase("getStatus")) {
@@ -262,19 +268,25 @@ public class WebServerHelper {
 	 * @return String
 	 */
 	public String getFileContent(String requestedRessource, final Request request) {
-		File indexFile = new File("index.html");
+		if (WebServerHelper.indexPath == null) {
+			WebServerHelper.indexPath = new File(Paths.WEB_ROOT + File.separator + "index.html");
+		}
 		if (requestedRessource != null) {
 			if (requestedRessource.equalsIgnoreCase("")) {
 				requestedRessource = "index.html";
 			}
-			Debug.log(Debug.LEVEL_INFO, "Try to load file for web interface: " + indexFile);
+			Debug.log(Debug.LEVEL_INFO, "Try to load file for web interface: " + WebServerHelper.indexPath);
 			try {
 				String content = "";
-				if ((indexFile != null)
-						&& ((indexFile = FileFinder.getInstance()
-								.findFile(new File(new File(indexFile.getAbsolutePath()).getName()), false)) != null) && indexFile.exists()
-						&& indexFile.isFile() && indexFile.canRead()) {
-					content = this.generateContent(Helper.getFileContents(indexFile), requestedRessource, request);
+				if ((WebServerHelper.indexPath != null) && (WebServerHelper.indexPath != null) && WebServerHelper.indexPath.exists()
+						&& WebServerHelper.indexPath.isFile() && WebServerHelper.indexPath.canRead()) {
+					if (WebServerHelper.indexContent == null) {
+						WebServerHelper.indexContent = Helper.getFileContents(WebServerHelper.indexPath);
+					}
+					content = this.generateContent(WebServerHelper.indexContent, requestedRessource, request);
+					if (content == null) {
+						System.out.println("NULL");
+					}
 					return content;
 				} else {
 					Debug.log(Debug.LEVEL_ERROR, "InputStream == null && File == null: " + requestedRessource);

@@ -6,12 +6,10 @@ package com.lars_albrecht.mdb.main.core.controller;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.general.utilities.Debug;
-import com.lars_albrecht.general.utilities.FileFinder;
 import com.lars_albrecht.general.utilities.PropertiesExNotInitilizedException;
 import com.lars_albrecht.mdb.main.MDBConfig;
 import com.lars_albrecht.mdb.main.core.collector.event.CollectorEvent;
@@ -218,21 +216,6 @@ public class MainController implements IFinderListener, ICollectorListener {
 	@SuppressWarnings("unchecked")
 	private void init() {
 		Thread.setDefaultUncaughtExceptionHandler(new Debug());
-
-		// specify folders to search for files
-		FileFinder.getInstance().addToPathList(Paths.get("").toAbsolutePath().toString(), -1);
-		FileFinder.getInstance().addToPathList(new File("."), -1);
-		FileFinder.getInstance().addToPathList(new File("web"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/pages"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/css"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/css/vader"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/css/vader/images"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/js"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/img"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/ressources/img/plugins/fancybox"), -1);
 
 		this.dataHandler = new DataHandler(this);
 		ADataHandler.addDataHandler(new AttributeHandler<FileAttributeList>());

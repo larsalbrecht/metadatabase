@@ -725,6 +725,11 @@ public class DataHandler {
 		return result;
 	}
 
+	@SuppressWarnings("unused")
+	public void getGroupedFileCount() {
+		final String sql = "SELECT strftime('%Y-%m-%d', createTS) AS 'date', COUNT(*) AS 'count', filetype FROM fileInformation GROUP BY date, filetype ORDER BY date";
+	}
+
 	public ConcurrentHashMap<String, Object> getInfoFromDatabase() {
 		final ConcurrentHashMap<String, Object> resultMap = new ConcurrentHashMap<String, Object>();
 
@@ -1077,11 +1082,6 @@ public class DataHandler {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	@SuppressWarnings("unused")
-	public void getGroupedFileCount() {
-		final String sql = "SELECT strftime('%Y-%m-%d', createTS) AS 'date', COUNT(*) AS 'count', filetype FROM fileInformation GROUP BY date, filetype ORDER BY date";
 	}
 
 }

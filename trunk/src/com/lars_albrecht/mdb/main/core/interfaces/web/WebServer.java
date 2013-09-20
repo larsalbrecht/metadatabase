@@ -19,6 +19,7 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseAjaxHa
 import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseDefaultHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseHTMLHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseJSONHandler;
+import com.lars_albrecht.mdb.main.utilities.Paths;
 
 public class WebServer {
 
@@ -53,7 +54,10 @@ public class WebServer {
 		final ServerConnector http = new ServerConnector(this.server, new HttpConnectionFactory(http_config));
 		http.setPort(8080);
 		http.setIdleTimeout(30000);
-		http.setName("Metadatabase WebServer-Interface");
+
+		// TODO comment this in! [commented out, because jetty 9.0.0 does not
+		// have this method]
+		// http.setName("Metadatabase WebServer-Interface");
 
 		this.server.setConnectors(new Connector[] {
 			http
@@ -69,12 +73,19 @@ public class WebServer {
 
 		final ResourceHandler resource_handler = new ResourceHandler();
 		resource_handler.setDirectoriesListed(false);
-		resource_handler.setResourceBase(".");
 		resource_handler.setWelcomeFiles(new String[] {
 		// "index.html"
 				});
 
-		resource_handler.setResourceBase("trunk/web/ressources");
+		if (Paths.WEB_RESOURCES.exists()) {
+			resource_handler.setResourceBase(Paths.WEB_RESOURCES.getAbsolutePath());
+		} else {
+			try {
+				throw new Exception("ResourceHandler could not be initiated. Path not exists: " + Paths.WEB_RESOURCES);
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
 		final HandlerList handlers = new HandlerList();
 		handlers.setHandlers(new Handler[] {
 				mdbDefaultHandler, resource_handler, ajaxHandler, jsonHandler, mdbHTMLHandler, new DefaultHandler()

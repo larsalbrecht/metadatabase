@@ -24,16 +24,6 @@ public class HomePage extends WebPage {
 	}
 
 	@Override
-	public String getTemplateName() {
-		return "home";
-	}
-
-	@Override
-	public String getTitle() {
-		return "Home";
-	}
-
-	@Override
 	public List<String> getPageNames() {
 		final String[] names = {
 				"home", "index", "Start"
@@ -44,6 +34,16 @@ public class HomePage extends WebPage {
 	@Override
 	public String getStaticName() {
 		return "index";
+	}
+
+	@Override
+	public String getTemplateName() {
+		return "home";
+	}
+
+	@Override
+	public String getTitle() {
+		return "Home";
 	}
 
 }

@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.lars_albrecht.mdb.main.utilities.Paths;
+
 /**
  * @author lalbrecht
  * 
@@ -53,6 +55,9 @@ public class Template {
 	}
 
 	public static String getSubMarkerContent(final String content, final String markername) {
+		if (content == null) {
+			return null;
+		}
 		String markerContent = null;
 
 		final String markerStart = "{" + markername + "-start}";
@@ -121,7 +126,11 @@ public class Template {
 	}
 
 	public String getClearedContent() {
-		return Template.getClearedContent(this.content);
+		if (this.content != null) {
+			return Template.getClearedContent(this.content);
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -137,32 +146,25 @@ public class Template {
 	 * TODO replace this with helper if helper can read from input stream and
 	 * filesystem in one function.
 	 * 
-	 * @param url
+	 * @param filename
 	 * @param folder
 	 * @return String
 	 */
 	@SuppressWarnings("unused")
-	private String getFileContent(final String url, final String folder) {
-		FileFinder.getInstance().addToPathList(new File("web/pages"), -1);
-		FileFinder.getInstance().addToPathList(new File("web/pages/partials"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/pages"), -1);
-		FileFinder.getInstance().addToPathList(new File("trunk/web/pages/partials"), -1);
-		File file = null;
-		if (url != null) {
-			Debug.log(Debug.LEVEL_INFO, "Try to load file for template: " + url);
+	private String getFileContent(final File file) {
+		if (file != null) {
+			Debug.log(Debug.LEVEL_INFO, "Try to load file: " + file);
 			// TODO FIX this inputStream
 			// final InputStream inputStream =
 			// Main.class.getClassLoader().getResourceAsStream(folder + "/" +
 			// url);
 			final InputStream inputStream = null;
-			file = new File(url);
 			try {
 				String content = "";
 				if (inputStream != null) {
 					content = Helper.getInputStreamContents(inputStream, Charset.forName("UTF-8"));
 					return content;
-				} else if ((file != null) && ((file = FileFinder.getInstance().findFile(new File(new File(url).getName()), false)) != null)
-						&& file.exists() && file.isFile() && file.canRead()) {
+				} else if ((file != null) && file.exists() && file.isFile() && file.canRead()) {
 					content = Helper.getFileContents(file);
 					return content;
 				} else {
@@ -186,14 +188,24 @@ public class Template {
 
 	public final void loadTemplateFile(final String templateName) {
 		if ((templateName != null) && !templateName.equalsIgnoreCase("")) {
-			this.content = this.getFileContent(templateName + ".page", "web");
-			if (this.content == null) {
-				this.content = this.getFileContent(templateName + ".partial", "web");
+			File file = null;
+			if (new File(Paths.WEB_PAGES + File.separator + templateName + ".page").exists()) {
+				file = new File(Paths.WEB_PAGES + File.separator + templateName + ".page");
+			} else if (new File(Paths.WEB_PAGES_PARTIALS + File.separator + templateName + ".partial").exists()) {
+				file = new File(Paths.WEB_PAGES_PARTIALS + File.separator + templateName + ".partial");
 			}
-			if (this.content != null) {
-				Debug.log(Debug.LEVEL_INFO, "loaded template file: " + templateName);
+			if ((file != null) && file.exists() && file.canRead()) {
+				this.content = this.getFileContent(file);
+				if (this.content == null) {
+					this.content = this.getFileContent(file);
+				}
+				if (this.content != null) {
+					Debug.log(Debug.LEVEL_INFO, "loaded template file: " + file + "(" + templateName + ")");
+				} else {
+					Debug.log(Debug.LEVEL_ERROR, "Template could not be loaded: " + file + "(" + templateName + ")");
+				}
 			} else {
-				Debug.log(Debug.LEVEL_ERROR, "Template could not be loaded: " + templateName);
+				Debug.log(Debug.LEVEL_ERROR, "Templatefile could not be found: " + file + "(" + templateName + ")");
 			}
 		} else {
 			this.content = "no valid template file specified";

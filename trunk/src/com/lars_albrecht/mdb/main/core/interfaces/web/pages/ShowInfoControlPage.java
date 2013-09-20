@@ -77,7 +77,7 @@ public class ShowInfoControlPage extends WebPage {
 
 		final ArrayList<String> statusMessages = new ArrayList<String>();
 
-		if (this.request.getParameter("do") != null && (this.request.getParameter("do") != null)) {
+		if ((this.request.getParameter("do") != null) && (this.request.getParameter("do") != null)) {
 			final String doValue = this.request.getParameter("do");
 			if (doValue.equalsIgnoreCase("startFinder")) {
 				// isStartFinder
@@ -231,16 +231,6 @@ public class ShowInfoControlPage extends WebPage {
 	}
 
 	@Override
-	public String getTemplateName() {
-		return "infocontrol";
-	}
-
-	@Override
-	public String getTitle() {
-		return "Info / Control";
-	}
-
-	@Override
 	public List<String> getPageNames() {
 		final String[] names = {
 				"infocontrol", "InfoControl"
@@ -251,6 +241,16 @@ public class ShowInfoControlPage extends WebPage {
 	@Override
 	public String getStaticName() {
 		return "showInfoControl";
+	}
+
+	@Override
+	public String getTemplateName() {
+		return "infocontrol";
+	}
+
+	@Override
+	public String getTitle() {
+		return "Info / Control";
 	}
 
 }

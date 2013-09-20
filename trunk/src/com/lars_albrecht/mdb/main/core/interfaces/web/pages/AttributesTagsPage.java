@@ -47,16 +47,6 @@ public class AttributesTagsPage extends WebPage {
 	}
 
 	@Override
-	public String getTemplateName() {
-		return "attributestags";
-	}
-
-	@Override
-	public String getTitle() {
-		return "Attribute / Tags";
-	}
-
-	@Override
 	public List<String> getPageNames() {
 		final String[] names = {
 				"attributestags", "AttributeTags"
@@ -67,6 +57,16 @@ public class AttributesTagsPage extends WebPage {
 	@Override
 	public String getStaticName() {
 		return "showAttributesTags";
+	}
+
+	@Override
+	public String getTemplateName() {
+		return "attributestags";
+	}
+
+	@Override
+	public String getTitle() {
+		return "Attribute / Tags";
 	}
 
 }
