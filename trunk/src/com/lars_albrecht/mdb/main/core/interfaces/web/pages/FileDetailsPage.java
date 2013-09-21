@@ -42,7 +42,7 @@ public class FileDetailsPage extends WebPage {
 		super(actionname, request, mainController, webInterface);
 		this.webInterface = webInterface;
 
-		if ((request.getParameter("fileId") != null) && (request.getParameter("fileId") != null)) {
+		if ((request.getParameter("fileId") != null)) {
 			final Integer fileId = Integer.parseInt(request.getParameter("fileId"));
 
 			if ((fileId != null) && (fileId > 0)) {

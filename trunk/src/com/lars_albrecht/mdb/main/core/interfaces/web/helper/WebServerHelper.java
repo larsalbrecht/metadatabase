@@ -80,22 +80,26 @@ public class WebServerHelper {
 		}
 
 		WebPage page = null;
-		if (WebServerHelper.pageList.size() == 0) {
-			try {
-				WebServerHelper.pageList.add(new HomePage(action, request, this.mainController, this.webInterface));
-				WebServerHelper.pageList.add(new InfoControlPage(action, request, this.mainController, this.webInterface));
-				WebServerHelper.pageList.add(new FileDetailsPage(action, request, this.mainController, this.webInterface));
-				WebServerHelper.pageList.add(new SearchResultsPage(action, request, this.mainController, this.webInterface));
-				WebServerHelper.pageList.add(new SettingsPage(action, request, this.mainController, this.webInterface));
-				WebServerHelper.pageList.add(new BrowsePage(action, request, this.mainController, this.webInterface));
-				WebServerHelper.pageList.add(new AttributesTagsPage(action, request, this.mainController, this.webInterface));
-				WebServerHelper.pageList.add(new AllPage(action, request, this.mainController, this.webInterface));
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
+		// TODO! enable caching, but not for all pages (fileDetailsPage)
+		// if (WebServerHelper.pageList.size() == 0) {
+		// TODO remove after enable caching
+		WebServerHelper.pageList.clear();
+		try {
+			WebServerHelper.pageList.add(new HomePage(action, request, this.mainController, this.webInterface));
+			WebServerHelper.pageList.add(new InfoControlPage(action, request, this.mainController, this.webInterface));
+			WebServerHelper.pageList.add(new FileDetailsPage(action, request, this.mainController, this.webInterface));
+			WebServerHelper.pageList.add(new SearchResultsPage(action, request, this.mainController, this.webInterface));
+			WebServerHelper.pageList.add(new SettingsPage(action, request, this.mainController, this.webInterface));
+			WebServerHelper.pageList.add(new BrowsePage(action, request, this.mainController, this.webInterface));
+			WebServerHelper.pageList.add(new AttributesTagsPage(action, request, this.mainController, this.webInterface));
+			WebServerHelper.pageList.add(new AllPage(action, request, this.mainController, this.webInterface));
+		} catch (final Exception e) {
+			e.printStackTrace();
 		}
+		// }
 
 		if (filename.equalsIgnoreCase("index.html")) {
+			// get page by index action
 			for (final WebPage webPage : WebServerHelper.pageList) {
 				if (webPage.getStaticName().equalsIgnoreCase(action)) {
 					page = webPage;
@@ -103,6 +107,7 @@ public class WebServerHelper {
 				}
 			}
 		} else {
+			// get page by name
 			for (final WebPage webPage : WebServerHelper.pageList) {
 				if (webPage.getPageNames().contains(filename)) {
 					page = webPage;
