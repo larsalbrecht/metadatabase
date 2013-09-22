@@ -18,6 +18,7 @@ import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
+import com.lars_albrecht.mdb.main.core.interfaces.web.factory.WebPageFactory;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.AllPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.AttributesTagsPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.BrowsePage;
@@ -84,38 +85,55 @@ public class WebServerHelper {
 		// if (WebServerHelper.pageList.size() == 0) {
 		// TODO remove after enable caching
 		WebServerHelper.pageList.clear();
+		WebPageFactory.clearWebPages();
 		try {
-			WebServerHelper.pageList.add(new HomePage(action, request, this.mainController, this.webInterface));
-			WebServerHelper.pageList.add(new InfoControlPage(action, request, this.mainController, this.webInterface));
-			WebServerHelper.pageList.add(new FileDetailsPage(action, request, this.mainController, this.webInterface));
-			WebServerHelper.pageList.add(new SearchResultsPage(action, request, this.mainController, this.webInterface));
-			WebServerHelper.pageList.add(new SettingsPage(action, request, this.mainController, this.webInterface));
-			WebServerHelper.pageList.add(new BrowsePage(action, request, this.mainController, this.webInterface));
-			WebServerHelper.pageList.add(new AttributesTagsPage(action, request, this.mainController, this.webInterface));
-			WebServerHelper.pageList.add(new AllPage(action, request, this.mainController, this.webInterface));
+			WebPageFactory.addWebPage(new String[] {
+					"home", "index", "Start"
+			}, HomePage.class);
+			WebPageFactory.addWebPage(new String[] {
+					"infoControl", "infoKontrolle"
+			}, InfoControlPage.class);
+			WebPageFactory.addWebPage(new String[] {
+					"filedetails", "detailansicht"
+			}, FileDetailsPage.class);
+			WebPageFactory.addWebPage(new String[] {
+					"searchresults", "suchergebnisse"
+			}, SearchResultsPage.class);
+			WebPageFactory.addWebPage(new String[] {
+					"settings", "einstellungen"
+			}, SettingsPage.class);
+			WebPageFactory.addWebPage(new String[] {
+					"browser", "durchsuchen"
+			}, BrowsePage.class);
+			WebPageFactory.addWebPage(new String[] {
+					"attributestags", "AttributeTags"
+			}, AttributesTagsPage.class);
+			WebPageFactory.addWebPage(new String[] {
+					"all", "alle"
+			}, AllPage.class);
+
+			// WebServerHelper.pageList.add(new HomePage(action, request,
+			// this.mainController, this.webInterface));
+			// WebServerHelper.pageList.add(new InfoControlPage(action, request,
+			// this.mainController, this.webInterface));
+			// WebServerHelper.pageList.add(new FileDetailsPage(action, request,
+			// this.mainController, this.webInterface));
+			// WebServerHelper.pageList.add(new SearchResultsPage(action,
+			// request, this.mainController, this.webInterface));
+			// WebServerHelper.pageList.add(new SettingsPage(action, request,
+			// this.mainController, this.webInterface));
+			// WebServerHelper.pageList.add(new BrowsePage(action, request,
+			// this.mainController, this.webInterface));
+			// WebServerHelper.pageList.add(new AttributesTagsPage(action,
+			// request, this.mainController, this.webInterface));
+			// WebServerHelper.pageList.add(new AllPage(action, request,
+			// this.mainController, this.webInterface));
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 		// }
 
-		if (filename.equalsIgnoreCase("index.html")) {
-			// get page by index action
-			for (final WebPage webPage : WebServerHelper.pageList) {
-				if (webPage.getStaticName().equalsIgnoreCase(action)) {
-					page = webPage;
-					break;
-				}
-			}
-		} else {
-			// get page by name
-			for (final WebPage webPage : WebServerHelper.pageList) {
-				if (webPage.getPageNames().contains(filename)) {
-					page = webPage;
-					break;
-				}
-			}
-
-		}
+		page = WebPageFactory.getWebPage(action, action, request, this.mainController, this.webInterface);
 		if (page == null) {
 			try {
 				page = new DefaultErrorPage("404", request, this.mainController, this.webInterface);

@@ -3,8 +3,6 @@
  */
 package com.lars_albrecht.mdb.main.core.interfaces.web.abstracts;
 
-import java.util.List;
-
 import org.eclipse.jetty.server.Request;
 
 import com.lars_albrecht.general.utilities.Template;
@@ -21,10 +19,6 @@ public abstract class WebPage extends AWebPart {
 			throws Exception {
 		super(actionname, request, mainController, webInterface);
 	}
-
-	public abstract List<String> getPageNames();
-
-	public abstract String getStaticName();
 
 	public abstract String getTitle();
 
