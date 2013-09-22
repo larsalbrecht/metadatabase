@@ -6,7 +6,6 @@ package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -127,19 +126,6 @@ public class SearchResultsPage extends WebPage {
 		}
 
 		return searchResultsTemplate;
-	}
-
-	@Override
-	public List<String> getPageNames() {
-		final String[] names = {
-				"searchresults", "Suchergebnisse"
-		};
-		return Arrays.asList(names);
-	}
-
-	@Override
-	public String getStaticName() {
-		return "showSearchresults";
 	}
 
 	@Override

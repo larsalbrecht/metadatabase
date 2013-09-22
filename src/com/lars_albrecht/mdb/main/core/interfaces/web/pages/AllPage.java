@@ -4,8 +4,6 @@
 package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.jetty.server.Request;
 
@@ -187,19 +185,6 @@ public class AllPage extends WebPage {
 			}
 		}
 		return null;
-	}
-
-	@Override
-	public List<String> getPageNames() {
-		final String[] names = {
-				"all", "alle"
-		};
-		return Arrays.asList(names);
-	}
-
-	@Override
-	public String getStaticName() {
-		return "showAll";
 	}
 
 	@Override

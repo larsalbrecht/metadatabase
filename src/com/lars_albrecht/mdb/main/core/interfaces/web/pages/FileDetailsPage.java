@@ -6,8 +6,6 @@ package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -320,19 +318,6 @@ public class FileDetailsPage extends WebPage {
 		}
 
 		return detailViewTemplate;
-	}
-
-	@Override
-	public List<String> getPageNames() {
-		final String[] names = {
-				"filedetails", "Detailansicht"
-		};
-		return Arrays.asList(names);
-	}
-
-	@Override
-	public String getStaticName() {
-		return "showFileDetails";
 	}
 
 	@Override

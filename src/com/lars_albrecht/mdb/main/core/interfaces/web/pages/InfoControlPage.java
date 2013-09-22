@@ -4,8 +4,6 @@
 package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -236,19 +234,6 @@ public class InfoControlPage extends WebPage {
 		infoControlTemplate = this.fillMissingContainer(infoControlTemplate);
 
 		return infoControlTemplate;
-	}
-
-	@Override
-	public List<String> getPageNames() {
-		final String[] names = {
-				"infocontrol", "InfoControl"
-		};
-		return Arrays.asList(names);
-	}
-
-	@Override
-	public String getStaticName() {
-		return "showInfoControl";
 	}
 
 	@Override

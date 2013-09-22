@@ -3,8 +3,6 @@
  */
 package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -137,19 +135,6 @@ public class SettingsPage extends WebPage {
 		settingsTemplate.replaceMarker("content", settingsFieldsContainer, false);
 
 		return settingsTemplate;
-	}
-
-	@Override
-	public List<String> getPageNames() {
-		final String[] names = {
-				"settings", "Einstellungen", "Optionen", "options"
-		};
-		return Arrays.asList(names);
-	}
-
-	@Override
-	public String getStaticName() {
-		return "showSettings";
 	}
 
 	@Override
