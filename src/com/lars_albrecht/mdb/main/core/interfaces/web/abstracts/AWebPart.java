@@ -19,12 +19,14 @@ public abstract class AWebPart {
 	protected MainController	mainController	= null;
 	protected Request			request			= null;
 	protected String			actionname		= null;
+	protected WebInterface		webInterface	= null;
 
 	public AWebPart(final String actionname, final Request request, final MainController mainController, final WebInterface webInterface)
 			throws Exception {
 		this.request = request;
 		this.mainController = mainController;
 		this.actionname = actionname;
+		this.webInterface = webInterface;
 
 		if (this.getTemplateName() != null) {
 			this.pageTemplate = new Template(this.getTemplateName());
