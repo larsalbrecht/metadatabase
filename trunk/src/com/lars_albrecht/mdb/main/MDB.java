@@ -67,6 +67,7 @@ public class MDB {
 		this.mainController.seteController(this.eController);
 		this.mainController.setiController(this.iController);
 		this.mainController.setcController(this.cController);
+
 	}
 
 	private void initCollectorController() {
@@ -105,14 +106,14 @@ public class MDB {
 
 			// TODO TMP only, make it configurable (enable/disable/plugins)
 			if (this.mdbConfig.getSystemTrayInterfaceIconImageFile() != null) {
-				final SystemTrayInterface systemTrayInterface = new SystemTrayInterface();
+				final SystemTrayInterface systemTrayInterface = new SystemTrayInterface(this.mainController);
 				systemTrayInterface.setTrayIconImagePath(this.mdbConfig.getSystemTrayInterfaceIconImageFile());
 				this.mdbConfig.getListOfInterfaces().add(systemTrayInterface);
 			}
-			this.mdbConfig.getListOfInterfaces().add(new TelnetInterface());
+			this.mdbConfig.getListOfInterfaces().add(new TelnetInterface(this.mainController));
 
 			if (this.mdbConfig.getWebInterfaceFileDetailsOutputItem() != null) {
-				final WebInterface webInterface = new WebInterface();
+				final WebInterface webInterface = new WebInterface(this.mainController);
 				webInterface.setFileDetailsOutputItem(this.mdbConfig.getWebInterfaceFileDetailsOutputItem());
 				this.mdbConfig.getListOfInterfaces().add(webInterface);
 			}

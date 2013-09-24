@@ -19,16 +19,9 @@ import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.factory.WebPageFactory;
-import com.lars_albrecht.mdb.main.core.interfaces.web.pages.AllPage;
-import com.lars_albrecht.mdb.main.core.interfaces.web.pages.AttributesTagsPage;
-import com.lars_albrecht.mdb.main.core.interfaces.web.pages.BrowsePage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.DefaultErrorPage;
-import com.lars_albrecht.mdb.main.core.interfaces.web.pages.FileDetailsPage;
-import com.lars_albrecht.mdb.main.core.interfaces.web.pages.HomePage;
-import com.lars_albrecht.mdb.main.core.interfaces.web.pages.InfoControlPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.LastFivePartial;
-import com.lars_albrecht.mdb.main.core.interfaces.web.pages.SearchResultsPage;
-import com.lars_albrecht.mdb.main.core.interfaces.web.pages.SettingsPage;
+import com.lars_albrecht.mdb.main.core.interfaces.web.pages.MainNavigationPartial;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
 import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
 import com.lars_albrecht.mdb.main.core.utilities.Cache;
@@ -83,55 +76,6 @@ public class WebServerHelper {
 		WebPage page = null;
 		// TODO! enable caching, but not for all pages (fileDetailsPage)
 		// if (WebServerHelper.pageList.size() == 0) {
-		// TODO remove after enable caching
-		WebServerHelper.pageList.clear();
-		WebPageFactory.clearWebPages();
-		try {
-			WebPageFactory.addWebPage(new String[] {
-					"home", "index", "Start"
-			}, HomePage.class);
-			WebPageFactory.addWebPage(new String[] {
-					"infoControl", "infoKontrolle"
-			}, InfoControlPage.class);
-			WebPageFactory.addWebPage(new String[] {
-					"filedetails", "detailansicht"
-			}, FileDetailsPage.class);
-			WebPageFactory.addWebPage(new String[] {
-					"searchresults", "suchergebnisse"
-			}, SearchResultsPage.class);
-			WebPageFactory.addWebPage(new String[] {
-					"settings", "einstellungen"
-			}, SettingsPage.class);
-			WebPageFactory.addWebPage(new String[] {
-					"browser", "durchsuchen"
-			}, BrowsePage.class);
-			WebPageFactory.addWebPage(new String[] {
-					"attributestags", "AttributeTags"
-			}, AttributesTagsPage.class);
-			WebPageFactory.addWebPage(new String[] {
-					"all", "alle"
-			}, AllPage.class);
-
-			// WebServerHelper.pageList.add(new HomePage(action, request,
-			// this.mainController, this.webInterface));
-			// WebServerHelper.pageList.add(new InfoControlPage(action, request,
-			// this.mainController, this.webInterface));
-			// WebServerHelper.pageList.add(new FileDetailsPage(action, request,
-			// this.mainController, this.webInterface));
-			// WebServerHelper.pageList.add(new SearchResultsPage(action,
-			// request, this.mainController, this.webInterface));
-			// WebServerHelper.pageList.add(new SettingsPage(action, request,
-			// this.mainController, this.webInterface));
-			// WebServerHelper.pageList.add(new BrowsePage(action, request,
-			// this.mainController, this.webInterface));
-			// WebServerHelper.pageList.add(new AttributesTagsPage(action,
-			// request, this.mainController, this.webInterface));
-			// WebServerHelper.pageList.add(new AllPage(action, request,
-			// this.mainController, this.webInterface));
-		} catch (final Exception e) {
-			e.printStackTrace();
-		}
-		// }
 
 		page = WebPageFactory.getWebPage(action, action, request, this.mainController, this.webInterface);
 		if (page == null) {
@@ -165,6 +109,14 @@ public class WebServerHelper {
 				generatedContent = Template.replaceMarker(generatedContent, "searchTerm", "", Boolean.FALSE);
 			}
 		}
+		if (Template.containsMarker(generatedContent, "mainNavigation")) {
+			try {
+				final MainNavigationPartial mainNavigation = new MainNavigationPartial(null, null, this.mainController, this.webInterface);
+				generatedContent = Template.replaceMarker(generatedContent, "mainNavigation", mainNavigation.getGeneratedContent(), false);
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
 		if (Template.containsMarker(generatedContent, "lastFiveAdded")) {
 			try {
 				final LastFivePartial lastFive = new LastFivePartial(null, null, this.mainController, this.webInterface);
@@ -172,11 +124,6 @@ public class WebServerHelper {
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
-			// @SuppressWarnings("deprecation")
-			// final String listOutput =
-			// HTML.generateListOutput(lastFiveList, null, null, false);
-			// generatedContent = Template.replaceMarker(generatedContent,
-			// "lastFiveAdded", listOutput, Boolean.FALSE);
 		}
 		if (Template.containsMarker(generatedContent, "title")) {
 			generatedContent = Template.replaceMarker(generatedContent, "title", pageTitle, Boolean.FALSE);

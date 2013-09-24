@@ -23,6 +23,14 @@ public class WebPageFactory {
 
 	private static final ConcurrentHashMap<String[], Class<? extends WebPage>>	webPages	= new ConcurrentHashMap<String[], Class<? extends WebPage>>();
 
+	public static void addWebPage(final String[] identifier, final Class<? extends WebPage> webPage) {
+		WebPageFactory.webPages.put(identifier, webPage);
+	}
+
+	public static void clearWebPages() {
+		WebPageFactory.webPages.clear();
+	}
+
 	@SuppressWarnings("unchecked")
 	public static WebPage getWebPage(final String identifier,
 			final String actionname,
@@ -65,16 +73,8 @@ public class WebPageFactory {
 		return null;
 	}
 
-	public static void addWebPage(final String[] identifier, final Class<? extends WebPage> webPage) {
-		WebPageFactory.webPages.put(identifier, webPage);
-	}
-
 	public static void removeWebPage(final String[] identifier) {
 		WebPageFactory.webPages.remove(identifier);
-	}
-
-	public static void clearWebPages() {
-		WebPageFactory.webPages.clear();
 	}
 
 }

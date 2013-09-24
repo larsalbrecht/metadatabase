@@ -18,6 +18,7 @@ public class InterfaceController implements IController {
 	final ArrayList<ThreadEx>		threadList		= new ArrayList<ThreadEx>();
 	private ArrayList<AInterface>	interfaces		= null;
 
+	@SuppressWarnings("unused")
 	private MainController			mainController	= null;
 
 	public InterfaceController(final MainController mainController) {
@@ -47,7 +48,6 @@ public class InterfaceController implements IController {
 			throw new Exception("Interface Controller run failed. No interfaces specified");
 		}
 		for (final AInterface interfaze : this.interfaces) {
-			interfaze.setMainController(this.mainController);
 			interfaze.setController(this);
 			this.threadList.add(new ThreadEx(interfaze));
 			this.threadList.get(this.threadList.size() - 1).start();

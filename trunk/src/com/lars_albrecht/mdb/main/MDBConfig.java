@@ -12,6 +12,7 @@ import com.lars_albrecht.mdb.main.core.collector.abstracts.ACollector;
 import com.lars_albrecht.mdb.main.core.exporter.abstracts.AExporter;
 import com.lars_albrecht.mdb.main.core.interfaces.abstracts.AInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.abstracts.AbstractFileDetailsOutputItem;
+import com.lars_albrecht.mdb.main.core.interfaces.web.pages.config.WebPageConfig;
 import com.lars_albrecht.mdb.main.core.typer.abstracts.ATyper;
 
 /**
@@ -36,6 +37,8 @@ public class MDBConfig {
 	private File										systemTrayInterfaceIconImageFile	= null;
 
 	private final ConcurrentHashMap<String, String[]>	itemTitleExtraction					= new ConcurrentHashMap<String, String[]>();
+
+	private ArrayList<WebPageConfig>					webInterfacePageConfigs				= new ArrayList<WebPageConfig>();
 
 	public final void addTitleExtraction(final String fileType, final String infoType, final String section, final String key) {
 		this.itemTitleExtraction.put(fileType, new String[] {
@@ -104,6 +107,13 @@ public class MDBConfig {
 	}
 
 	/**
+	 * @return the webInterfacePageConfigs
+	 */
+	public final ArrayList<WebPageConfig> getWebInterfacePageConfigs() {
+		return this.webInterfacePageConfigs;
+	}
+
+	/**
 	 * @param finderFileFilter
 	 *            the finderFileFilter to set
 	 */
@@ -133,6 +143,14 @@ public class MDBConfig {
 	 */
 	public final void setWebInterfaceFileDetailsOutputItem(final AbstractFileDetailsOutputItem webInterfaceFileDetailsOutputItem) {
 		this.webInterfaceFileDetailsOutputItem = webInterfaceFileDetailsOutputItem;
+	}
+
+	/**
+	 * @param webInterfacePageConfigs
+	 *            the webInterfacePageConfigs to set
+	 */
+	public final void setWebInterfacePageConfigs(final ArrayList<WebPageConfig> webInterfacePageConfigs) {
+		this.webInterfacePageConfigs = webInterfacePageConfigs;
 	}
 
 }

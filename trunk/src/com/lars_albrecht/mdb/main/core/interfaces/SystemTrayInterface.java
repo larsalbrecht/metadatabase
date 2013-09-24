@@ -17,6 +17,7 @@ import java.net.URL;
 import javax.swing.ImageIcon;
 
 import com.lars_albrecht.general.utilities.Helper;
+import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.interfaces.abstracts.AInterface;
 
 /**
@@ -52,8 +53,8 @@ public class SystemTrayInterface extends AInterface implements ActionListener {
 
 	private String		trayIconImagePath	= null;
 
-	public SystemTrayInterface() {
-		super();
+	public SystemTrayInterface(final MainController mainController) {
+		super(mainController);
 		this.canOpened = false;
 	}
 

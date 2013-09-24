@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 
 import javax.swing.JOptionPane;
 
+import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.interfaces.abstracts.AInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.telnet.TelnetRunner;
 
@@ -21,8 +22,8 @@ import com.lars_albrecht.mdb.main.core.interfaces.telnet.TelnetRunner;
  */
 public class TelnetInterface extends AInterface {
 
-	public TelnetInterface() {
-		super();
+	public TelnetInterface(final MainController mainController) {
+		super(mainController);
 		this.canOpened = true;
 	}
 

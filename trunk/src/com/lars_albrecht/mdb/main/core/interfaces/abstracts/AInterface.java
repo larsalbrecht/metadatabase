@@ -17,7 +17,8 @@ public abstract class AInterface implements Runnable {
 	protected IController		controller		= null;
 	public boolean				canOpened		= false;
 
-	public AInterface() {
+	public AInterface(final MainController mainController) {
+		this.mainController = mainController;
 	}
 
 	public abstract void openInterface();
@@ -34,14 +35,6 @@ public abstract class AInterface implements Runnable {
 	 */
 	public final void setController(final IController controller) {
 		this.controller = controller;
-	}
-
-	/**
-	 * @param mainController
-	 *            the mainController to set
-	 */
-	public final void setMainController(final MainController mainController) {
-		this.mainController = mainController;
 	}
 
 	/**
