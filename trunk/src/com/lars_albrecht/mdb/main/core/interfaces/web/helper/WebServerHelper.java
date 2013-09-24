@@ -200,8 +200,7 @@ public class WebServerHelper {
 		String content = null;
 		if (url != null) {
 			content = "";
-			if ((request.getParameters() != null) && (request.getParameters().size() > 0) && (request.getParameter("action") != null)
-					&& (request.getParameter("action") != null)) {
+			if ((request.getParameter("action") != null) && (request.getParameter("action") != null)) {
 				final String action = request.getParameter("action");
 				if (action.equalsIgnoreCase("getStatus")) {
 					if (this.mainController.getfController().getThreadList().size() > 0) {
