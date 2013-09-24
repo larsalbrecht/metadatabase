@@ -275,7 +275,7 @@ public class FileDetailsPage extends WebPage {
 											searchableValue = searchableValue.trim();
 
 											value += "<a href=\"?"
-													+ "action=showSearchresults&searchStr="
+													+ "action=searchresults&searchStr="
 													+ URLEncoder.encode(keyValue.getKey().getKey() + "=" + "\"" + searchableValue + "\"",
 															"utf-8") + "\">" + tempList.get(j) + "</a>";
 										} else {

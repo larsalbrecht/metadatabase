@@ -47,14 +47,18 @@ public class WebPageFactory {
 		if (clazz == null) {
 			return null;
 		}
-		clazz.getConstructors()
-		Constructor<WebPage> constructor;
+		final Constructor<WebPage>[] constructors = (Constructor<WebPage>[]) clazz.getConstructors();
+		Constructor<WebPage> webPageConstructor = null;
+		for (final Constructor<WebPage> constructor : constructors) {
+			if (constructor.getParameterTypes().length == 4) {
+				webPageConstructor = constructor;
+				break;
+			}
+		}
 		try {
-			constructor = clazz.getConstructor();
-			return constructor.newInstance(actionname, request, mainController, webInterface);
+			return webPageConstructor.newInstance(actionname, request, mainController, webInterface);
 
-		} catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
+		} catch (SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			e.printStackTrace();
 		}
 
