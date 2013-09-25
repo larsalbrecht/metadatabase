@@ -180,7 +180,7 @@ public abstract class ACollector implements Runnable {
 		try {
 			this.mainController.getDataHandler();
 			DataHandler.persist(this.keysToAdd, false);
-			// this.mainController.getDataHandler().reloadData(DataHandler.RELOAD_KEYS);
+			this.mainController.getDataHandler().reloadData(DataHandler.RELOAD_KEYS);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}
@@ -190,7 +190,7 @@ public abstract class ACollector implements Runnable {
 		try {
 			this.mainController.getDataHandler();
 			DataHandler.persist(this.valuesToAdd, false);
-			// this.mainController.getDataHandler().reloadData(DataHandler.RELOAD_VALUES);
+			this.mainController.getDataHandler().reloadData(DataHandler.RELOAD_VALUES);
 		} catch (final Exception e) {
 			e.printStackTrace();
 		}

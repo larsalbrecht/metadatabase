@@ -157,23 +157,36 @@ public class Debug implements UncaughtExceptionHandler {
 		File file = null;
 		FileWriter writer = null;
 		final ArrayList<String> logList = Debug.getListForLogLevel(level);
-		if ((logList != null) && (logList.size() > 0)) {
-			file = new File("log_" + level + ".txt");
-			try {
-				writer = new FileWriter(file, true);
-				if ((writer != null) && (logList != null) && (logList.size() > 0)) {
+		file = new File("log_" + level + "-" + new SimpleDateFormat("y-m-d").format(new Date()) + ".txt");
+		try {
+			writer = new FileWriter(file, true);
+			if ((writer != null)) {
+				writer.write("BEGIN log with loglevel " + level + " @ " + new SimpleDateFormat("y-m-d").format(new Date()));
+				writer.write("\n\n");
+				if ((logList != null) && (logList.size() > 0)) {
 					for (final String s : logList) {
 						if (s != null) {
 							writer.write(s);
 							writer.write(System.getProperty("line.separator"));
 						}
 					}
-					writer.flush();
-					writer.close();
 				}
-			} catch (final IOException e) {
-				e.printStackTrace();
+				if (Debug.getFormattedTimes().size() > 0) {
+					writer.write("\n\nTimes\n\n");
+					for (final String s : Debug.getFormattedTimes()) {
+						if (s != null) {
+							writer.write(s);
+							writer.write(System.getProperty("line.separator"));
+						}
+					}
+				}
+				writer.write("End of log");
+				writer.write("\n\n");
+				writer.flush();
+				writer.close();
 			}
+		} catch (final IOException e) {
+			e.printStackTrace();
 		}
 	}
 

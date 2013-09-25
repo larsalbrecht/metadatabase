@@ -182,6 +182,7 @@ public class DataHandler {
 
 	public DataHandler(final MainController mainController) {
 		this.newFileItems = new ArrayList<FileItem>();
+		this.reloadData(DataHandler.RELOAD_ALL);
 	}
 
 	public Integer addFileTag(final FileTag fileTag) throws Exception {
@@ -619,6 +620,9 @@ public class DataHandler {
 	 * @return the fileAttributes
 	 */
 	public ArrayList<FileAttributes> getFileAttributes() {
+		if (this.fileAttributes == null) {
+			this.loadFileAttributes();
+		}
 		return this.fileAttributes;
 	}
 
@@ -634,16 +638,18 @@ public class DataHandler {
 
 	public ArrayList<FileItem> getFileItemsForPaging(final int startIndex,
 			final int maxElems,
+			final String where,
 			final String orderBy,
 			final String[] handlerArr) {
 		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
 		HashMap<String, Object> tempMap = null;
 		final FileItem fileItem = new FileItem();
 		if (fileItem != null) {
-			final String order = (orderBy == null ? "" : " ORDER BY " + orderBy);
+			final String inOrderBy = (orderBy == null ? "" : " ORDER BY " + orderBy);
+			final String inWhere = (where == null ? "" : " WHERE " + where);
 			final String limit = (maxElems > 0 ? " LIMIT " + startIndex + ", " + maxElems : "");
 			ResultSet rs = null;
-			final String sql = "SELECT * FROM " + fileItem.getDatabaseTable() + order + limit;
+			final String sql = "SELECT * FROM " + fileItem.getDatabaseTable() + inWhere + inOrderBy + limit;
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 			FileItem tempFileItem = null;
 			try {
@@ -733,14 +739,14 @@ public class DataHandler {
 	public ConcurrentHashMap<String, Object> getInfoFromDatabase() {
 		final ConcurrentHashMap<String, Object> resultMap = new ConcurrentHashMap<String, Object>();
 
-		resultMap.put("fileCount", this.getRowCount(new FileItem()));
-		resultMap.put("keyCount", this.getRowCount(new Key<Object>()));
-		resultMap.put("valueCount", this.getRowCount(new Value<Object>()));
+		resultMap.put("fileCount", this.getRowCount(new FileItem(), null));
+		resultMap.put("keyCount", this.getRowCount(new Key<Object>(), null));
+		resultMap.put("valueCount", this.getRowCount(new Value<Object>(), null));
 		resultMap.put("filetypes", this.getFiletypesFromDatabase());
 		resultMap.put("filesWithFiletype", this.getFilesWithFiletypeFromDatabase());
 		resultMap.put("missingCount", this.getMissingFileItems().size());
-		resultMap.put("tagCount", this.getRowCount(new Tag()));
-		resultMap.put("fileTagCount", this.getRowCount(new FileTag()));
+		resultMap.put("tagCount", this.getRowCount(new Tag(), null));
+		resultMap.put("fileTagCount", this.getRowCount(new FileTag(), null));
 
 		return resultMap;
 	}
@@ -793,10 +799,10 @@ public class DataHandler {
 		}
 	}
 
-	public Integer getRowCount(final IPersistable object) {
+	public Integer getRowCount(final IPersistable object, final String where) {
 		Integer result = null;
 		ResultSet rs = null;
-		final String sql = "SELECT COUNT(id) AS count FROM " + object.getDatabaseTable();
+		final String sql = "SELECT COUNT(id) AS count FROM " + object.getDatabaseTable() + (where != null ? " WHERE " + where : "");
 
 		try {
 			rs = DB.query(sql);
@@ -825,6 +831,9 @@ public class DataHandler {
 	 * @return the values
 	 */
 	public ArrayList<Value<?>> getValues() {
+		if (this.values == null) {
+			this.loadValues();
+		}
 		return this.values;
 	}
 
@@ -868,7 +877,9 @@ public class DataHandler {
 	 * @return
 	 */
 	private DataHandler loadFileAttributes() {
+		Debug.startTimer("loadFileAttributes");
 		this.fileAttributes = ObjectHandler.castObjectListToFileAttributesList(this.findAll(new FileAttributes(), null, null));
+		Debug.stopTimer("loadFileAttributes");
 		return this;
 	}
 
@@ -879,12 +890,16 @@ public class DataHandler {
 	 * @return
 	 */
 	private DataHandler loadFileItems() {
+		Debug.startTimer("loadFileItems");
 		this.fileItems = ObjectHandler.castObjectListToFileItemList(this.findAll(new FileItem(), null, null));
+		Debug.stopTimer("loadFileItems");
 		return this;
 	}
 
 	private DataHandler loadFileTags() {
+		Debug.startTimer("loadFileTags");
 		this.fileTags = ObjectHandler.castObjectListToFileTagList(this.findAll(new FileTag(), null, null));
+		Debug.stopTimer("loadFileTags");
 		return this;
 	}
 
@@ -894,22 +909,30 @@ public class DataHandler {
 	 * @return
 	 */
 	private DataHandler loadKeys() {
+		Debug.startTimer("loadKeys");
 		this.keys = ObjectHandler.castObjectListToKeyList(this.findAll(new Key<String>(), null, null));
+		Debug.stopTimer("loadKeys");
 		return this;
 	}
 
 	private DataHandler loadMissingFileItems() {
+		Debug.startTimer("loadMissingFileItems");
 		this.missingFileItems = this.getAllMissingFileItems();
+		Debug.stopTimer("loadMissingFileItems");
 		return this;
 	}
 
 	private DataHandler loadNoInfoFileItems() {
+		Debug.startTimer("loadNoInfoFileItems");
 		this.noInfoFileItems = this.getAllFileItemsWithNoCollectorinfo();
+		Debug.stopTimer("loadNoInfoFileItems");
 		return this;
 	}
 
 	private DataHandler loadTags() {
+		Debug.startTimer("loadTags");
 		this.tags = ObjectHandler.castObjectListToTagList(this.findAll(new Tag(), null, null));
+		Debug.stopTimer("loadTags");
 		return this;
 	}
 
@@ -919,7 +942,9 @@ public class DataHandler {
 	 * @return
 	 */
 	private DataHandler loadValues() {
+		Debug.startTimer("loadValues");
 		this.values = ObjectHandler.castObjectListToValueList(this.findAll(new Value<Object>(), null, null));
+		Debug.stopTimer("loadValues");
 		return this;
 	}
 

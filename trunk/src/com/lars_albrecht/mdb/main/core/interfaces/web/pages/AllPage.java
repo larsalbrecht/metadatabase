@@ -75,8 +75,8 @@ public class AllPage extends WebPage {
 				new MediaHandler<>().getClass().getCanonicalName(), new AttributeHandler<>().getClass().getCanonicalName()
 		};
 
-		final ArrayList<FileItem> fileItems = this.mainController.getDataHandler().getFileItemsForPaging(startIndex, maxElems, sortOrder,
-				additionalHandlerData);
+		final ArrayList<FileItem> fileItems = this.mainController.getDataHandler().getFileItemsForPaging(startIndex, maxElems, null,
+				sortOrder, additionalHandlerData);
 
 		// pagination start
 		final boolean showPagination = (fileItems.size() > 0) && (maxItemsForPagingOption > 0)
