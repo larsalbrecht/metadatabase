@@ -35,13 +35,12 @@ import com.lars_albrecht.mdb.main.core.utilities.Paths;
  */
 public class WebServerHelper {
 
-	private MainController					mainController			= null;
-	private WebInterface					webInterface			= null;
+	private MainController	mainController			= null;
+	private WebInterface	webInterface			= null;
 
-	public final static int					SEARCHTYPE_MIXED		= 0;
-	public final static int					SEARCHTYPE_TEXTALL		= 1;
-	public final static int					SEARCHTYPE_ATTRIBUTE	= 2;
-	private final static ArrayList<WebPage>	pageList				= new ArrayList<WebPage>();
+	public final static int	SEARCHTYPE_MIXED		= 0;
+	public final static int	SEARCHTYPE_TEXTALL		= 1;
+	public final static int	SEARCHTYPE_ATTRIBUTE	= 2;
 
 	public WebServerHelper(final MainController mainController, final WebInterface webInterface) {
 		this.mainController = mainController;
