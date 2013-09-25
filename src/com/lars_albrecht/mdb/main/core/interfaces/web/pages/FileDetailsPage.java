@@ -15,6 +15,7 @@ import org.eclipse.jetty.server.Request;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
+import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.AttributeHandler;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.MediaHandler;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.TagHandler;
@@ -44,7 +45,14 @@ public class FileDetailsPage extends WebPage {
 			final Integer fileId = Integer.parseInt(request.getParameter("fileId"));
 
 			if ((fileId != null) && (fileId > 0)) {
-				final FileItem tempFileItem = this.mainController.getDataHandler().findAllInfoForAllByFileId(fileId);
+
+				FileItem tempFileItem = this.mainController.getDataHandler().findAllInfoForAllByFileId(fileId);
+				if (request.getParameter("do") != null && request.getParameter("do").equalsIgnoreCase("reloadFileInformation")) {
+					tempFileItem.setStatus(DataHandler.FILEITEMSTATUS_RELOAD);
+					this.mainController.getDataHandler().removeMetadataFromFileItem(fileId);
+					this.mainController.getcController().collectInfos(tempFileItem);
+				}
+				tempFileItem = this.mainController.getDataHandler().findAllInfoForAllByFileId(fileId);
 				this.setPageTemplate(this.generateDetailView(tempFileItem));
 			}
 		} else {
@@ -60,6 +68,7 @@ public class FileDetailsPage extends WebPage {
 		// if file is set
 		if ((item != null) && (item.getId() != null)) {
 			// set default infos
+			detailViewTemplate.replaceMarker("fileid", item.getId().toString(), Boolean.FALSE);
 			detailViewTemplate.replaceMarker("content", detailViewTemplate.getSubMarkerContent("file"), Boolean.FALSE);
 
 			detailViewTemplate.replaceMarker("title", item.getName() + " (" + item.getId() + ")", Boolean.TRUE);
