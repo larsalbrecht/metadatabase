@@ -65,6 +65,12 @@ public class FinderController implements IController {
 		}
 	}
 
+	public void findFiles(final File file) throws Exception {
+		final ArrayList<File> fileList = new ArrayList<File>();
+		fileList.add(file);
+		this.findFiles(fileList);
+	}
+
 	public FinderEventMulticaster getFinderMulticaster() {
 		return this.finderMulticaster;
 	}

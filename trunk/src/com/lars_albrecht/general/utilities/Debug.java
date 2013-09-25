@@ -157,7 +157,7 @@ public class Debug implements UncaughtExceptionHandler {
 		File file = null;
 		FileWriter writer = null;
 		final ArrayList<String> logList = Debug.getListForLogLevel(level);
-		file = new File("log_" + level + "-" + new SimpleDateFormat("y-m-d").format(new Date()) + ".txt");
+		file = new File("log_" + level + "-" + new SimpleDateFormat("yyyy-M-d").format(new Date()) + ".txt");
 		try {
 			writer = new FileWriter(file, true);
 			if ((writer != null)) {

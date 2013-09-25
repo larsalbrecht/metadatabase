@@ -43,6 +43,12 @@ public class CollectorController implements IController, ICollectorListener {
 		this.collectorMulticaster.add(listener);
 	}
 
+	public void collectInfos(final FileItem fileItem) throws Exception {
+		final ArrayList<FileItem> fileItemList = new ArrayList<FileItem>();
+		fileItemList.add(fileItem);
+		this.collectInfos(fileItemList);
+	}
+
 	public void collectInfos(final ArrayList<FileItem> fileItems) throws Exception {
 		if ((this.collectors == null) || (this.collectors.size() == 0)) {
 			throw new Exception("Collector Controller collect failed. No collectors specified");

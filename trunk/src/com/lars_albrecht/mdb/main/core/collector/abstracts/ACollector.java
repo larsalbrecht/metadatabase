@@ -242,6 +242,8 @@ public abstract class ACollector implements Runnable {
 						noInfo = this.mainController.getDataHandler().getNoInfoFileItems(this.getInfoType()).contains(fileItems.get(i));
 						// new files
 						noInfo = noInfo ? noInfo : this.mainController.getDataHandler().getNewFileItems().contains(fileItems.get(i));
+						// reload files
+						noInfo = noInfo ? noInfo : (fileItems.get(i).getStatus() == DataHandler.FILEITEMSTATUS_RELOAD ? true : false);
 						if (!noInfo) {
 							Debug.log(Debug.LEVEL_DEBUG, "Element collected already: " + fileItems.get(i));
 						} else {
