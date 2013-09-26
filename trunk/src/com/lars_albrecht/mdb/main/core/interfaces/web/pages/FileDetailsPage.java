@@ -47,7 +47,7 @@ public class FileDetailsPage extends WebPage {
 			if ((fileId != null) && (fileId > 0)) {
 
 				FileItem tempFileItem = this.mainController.getDataHandler().findAllInfoForAllByFileId(fileId);
-				if (request.getParameter("do") != null && request.getParameter("do").equalsIgnoreCase("reloadFileInformation")) {
+				if ((request.getParameter("do") != null) && request.getParameter("do").equalsIgnoreCase("reloadFileInformation")) {
 					tempFileItem.setStatus(DataHandler.FILEITEMSTATUS_RELOAD);
 					this.mainController.getDataHandler().removeMetadataFromFileItem(fileId);
 					this.mainController.getcController().collectInfos(tempFileItem);

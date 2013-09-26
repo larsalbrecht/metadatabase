@@ -1010,6 +1010,28 @@ public class DataHandler {
 		Debug.stopTimer("DataHandler reloadData time");
 	}
 
+	/**
+	 * Removes all fileAttributes from database with file_id id.
+	 * 
+	 * @param id
+	 */
+	public void removeAttributesFromFileItem(final Integer id) {
+		if ((id != null) && (id > 0)) {
+			final String sql = "DELETE FROM fileAttributes " + " WHERE file_id = ?";
+			System.out.println(sql);
+			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
+			values.put(1, id);
+			try {
+				DB.updatePS(sql, values);
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+			this.reloadData(DataHandler.RELOAD_FILEATTRIBUTES);
+		}
+	}
+
 	public void removeFileTag(final int fileTagId) {
 		final String sql = "DELETE FROM fileTags WHERE id = '" + fileTagId + "'";
 
@@ -1018,6 +1040,93 @@ public class DataHandler {
 		} catch (final SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Removes all attributes_key from database with file_id id that are not
+	 * used by other files.
+	 * 
+	 * @param id
+	 */
+	public void removeKeysFromFileItem(final Integer id) {
+		if ((id != null) && (id > 0)) {
+			final String sql = "DELETE FROM attributes_key " + " WHERE id IN ( " + "SELECT ak.id " + "FROM attributes_key AS ak "
+					+ "LEFT JOIN fileAttributes AS fa " + "ON ak.id = fa.key_id " + "WHERE fa.file_id = ? "
+					+ "AND (SELECT COUNT(*) FROM fileAttributes WHERE key_id = ak.id) = 1)";
+			System.out.println(sql);
+			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
+			values.put(1, id);
+			try {
+				DB.updatePS(sql, values);
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+			this.reloadData(DataHandler.RELOAD_KEYS);
+		}
+	}
+
+	/**
+	 * Removes all fileMedia from database with file_id id.
+	 * 
+	 * @param id
+	 */
+	public void removeMediaFromFileItem(final Integer id) {
+		if ((id != null) && (id > 0)) {
+			final String sql = "DELETE FROM fileMedia " + " WHERE file_id = ?";
+			System.out.println(sql);
+			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
+			values.put(1, id);
+			try {
+				DB.updatePS(sql, values);
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Removes all mediaItems from database with file_id id that are not used by
+	 * other files.
+	 * 
+	 * @param id
+	 */
+	public void removeMediaItemsFromFileItem(final Integer id) {
+		if ((id != null) && (id > 0)) {
+			final String sql = "DELETE FROM mediaItems " + " WHERE id IN ( " + "SELECT mi.id " + "FROM mediaItems AS mi "
+					+ "LEFT JOIN fileMedia AS fm " + "ON mi.id = fm.media_id " + "WHERE fm.file_id = ? "
+					+ "AND (SELECT COUNT(*) FROM mediaItems WHERE media_id = mi.id) = 1)";
+			System.out.println(sql);
+			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
+			values.put(1, id);
+			try {
+				DB.updatePS(sql, values);
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Removes all meta-data from database for files with file_id = id.
+	 * 
+	 * @param id
+	 */
+	public void removeMetadataFromFileItem(final Integer id) {
+		this.removeValuesFromFileItem(id);
+		this.removeKeysFromFileItem(id);
+		this.removeAttributesFromFileItem(id);
+
+		this.removeMediaItemsFromFileItem(id);
+		this.removeMediaFromFileItem(id);
+
+		this.removeTagItemsFromFileItem(id);
+		this.removeTagsFromFileItem(id);
 	}
 
 	public int removeMissingFilesFromDatabase() {
@@ -1057,6 +1166,76 @@ public class DataHandler {
 		}
 
 		return resultValue;
+	}
+
+	/**
+	 * Removes all tags from database with file_id id that are not used by other
+	 * files.
+	 * 
+	 * @param id
+	 */
+	public void removeTagItemsFromFileItem(final Integer id) {
+		if ((id != null) && (id > 0)) {
+			final String sql = "DELETE FROM tags " + " WHERE id IN ( " + "SELECT t.id " + "FROM tags AS t " + "LEFT JOIN fileTags AS ft "
+					+ "ON t.id = ft.tag_id " + "WHERE ft.file_id = ?" + " AND (SELECT COUNT(*) FROM fileTags WHERE tag_id = t.id) = 1)";
+			System.out.println(sql);
+			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
+			values.put(1, id);
+			try {
+				DB.updatePS(sql, values);
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+			this.reloadData(DataHandler.RELOAD_TAGS);
+		}
+	}
+
+	/**
+	 * Removes all fileTags from database with file_id id.
+	 * 
+	 * @param id
+	 */
+	public void removeTagsFromFileItem(final Integer id) {
+		if ((id != null) && (id > 0)) {
+			final String sql = "DELETE FROM fileTags " + " WHERE file_id = ?";
+			System.out.println(sql);
+			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
+			values.put(1, id);
+			try {
+				DB.updatePS(sql, values);
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+			this.reloadData(DataHandler.RELOAD_FILETAGS);
+		}
+	}
+
+	/**
+	 * Removes all attributes_value from database with file_id id that are not
+	 * used by other files.
+	 * 
+	 * @param id
+	 */
+	public void removeValuesFromFileItem(final Integer id) {
+		if ((id != null) && (id > 0)) {
+			final String sql = "DELETE FROM attributes_value " + " WHERE id IN ( " + "SELECT av.id " + "FROM attributes_value AS av "
+					+ "LEFT JOIN fileAttributes AS fa " + "ON av.id = fa.value_id " + "WHERE fa.file_id = ?)";
+			System.out.println(sql);
+			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
+			values.put(1, id);
+			try {
+				DB.updatePS(sql, values);
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+			this.reloadData(DataHandler.RELOAD_VALUES);
+		}
 	}
 
 	public void setNoInformationFoundFlag(final FileItem fileItem, final String infoType) {
@@ -1108,138 +1287,6 @@ public class DataHandler {
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
-		}
-	}
-
-	public void removeMetadataFromFileItem(final Integer id) {
-		this.removeValuesFromFileItem(id);
-		// this.removeKeysFromFileItem(id);
-		this.removeAttributesFromFileItem(id);
-
-		// this.removeMediaItemsFromFileItem(id);
-		this.removeMediaFromFileItem(id);
-
-		// this.removeTagItemsFromFileItem(id);
-		this.removeTagsFromFileItem(id);
-	}
-
-	public void removeKeysFromFileItem(final Integer id) {
-		// TODO check if there are keys double used. If it is, dont delete the
-		// keys
-		if ((id != null) && (id > 0)) {
-			final String sql = "DELETE FROM attributes_key " + " WHERE id IN ( " + "SELECT ak.id " + "FROM attributes_key AS ak "
-					+ "LEFT JOIN fileAttributes AS fa " + "ON ak.id = fa.key_id " + "WHERE fa.file_id = ?)";
-			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
-			values.put(1, id);
-			try {
-				DB.updatePS(sql, values);
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-			this.reloadData(DataHandler.RELOAD_KEYS);
-		}
-	}
-
-	public void removeValuesFromFileItem(final Integer id) {
-		if ((id != null) && (id > 0)) {
-			final String sql = "DELETE FROM attributes_value " + " WHERE id IN ( " + "SELECT av.id " + "FROM attributes_value AS av "
-					+ "LEFT JOIN fileAttributes AS fa " + "ON av.id = fa.value_id " + "WHERE fa.file_id = ?)";
-			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
-			values.put(1, id);
-			try {
-				DB.updatePS(sql, values);
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-			this.reloadData(DataHandler.RELOAD_VALUES);
-		}
-	}
-
-	public void removeAttributesFromFileItem(final Integer id) {
-		if ((id != null) && (id > 0)) {
-			final String sql = "DELETE FROM fileAttributes " + " WHERE file_id = ?";
-			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
-			values.put(1, id);
-			try {
-				DB.updatePS(sql, values);
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-			this.reloadData(DataHandler.RELOAD_FILEATTRIBUTES);
-		}
-	}
-
-	public void removeMediaItemsFromFileItem(final Integer id) {
-		if ((id != null) && (id > 0)) {
-			// TODO check if there are medias double used. If it is, dont delete
-			// the mediaItems
-			final String sql = "DELETE FROM mediaItems " + " WHERE id IN ( " + "SELECT mi.id " + "FROM mediaItems AS mi "
-					+ "LEFT JOIN fileMedia AS fm " + "ON mi.id = fm.media_id " + "WHERE fm.file_id = ?)";
-			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
-			values.put(1, id);
-			try {
-				DB.updatePS(sql, values);
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void removeMediaFromFileItem(final Integer id) {
-		if ((id != null) && (id > 0)) {
-			final String sql = "DELETE FROM fileMedia " + " WHERE file_id = ?";
-			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
-			values.put(1, id);
-			try {
-				DB.updatePS(sql, values);
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void removeTagItemsFromFileItem(final Integer id) {
-		if ((id != null) && (id > 0)) {
-			// TODO check if there are tags double used. If it is, dont delete
-			// the tags
-			final String sql = "DELETE FROM tags " + " WHERE id IN ( " + "SELECT t.id " + "FROM tags AS t " + "LEFT JOIN fileTags AS ft "
-					+ "ON t.id = ft.tag_id " + "WHERE ft.file_id = ?)";
-			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
-			values.put(1, id);
-			try {
-				DB.updatePS(sql, values);
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-			this.reloadData(DataHandler.RELOAD_TAGS);
-		}
-	}
-
-	public void removeTagsFromFileItem(final Integer id) {
-		if ((id != null) && (id > 0)) {
-			final String sql = "DELETE FROM fileTags " + " WHERE file_id = ?";
-			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
-			values.put(1, id);
-			try {
-				DB.updatePS(sql, values);
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			} catch (final Exception e) {
-				e.printStackTrace();
-			}
-			this.reloadData(DataHandler.RELOAD_FILETAGS);
 		}
 	}
 
