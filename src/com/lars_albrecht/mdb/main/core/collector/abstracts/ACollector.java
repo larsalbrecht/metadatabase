@@ -43,6 +43,8 @@ public abstract class ACollector implements Runnable {
 	private CollectorEventMulticaster									collectorMulticaster	= null;
 	private ArrayList<String>											types					= null;
 
+	private static Object												lockObject					= new Object();
+
 	/**
 	 * Default constructor.
 	 * 
@@ -287,14 +289,20 @@ public abstract class ACollector implements Runnable {
 		this.valuesToAdd = this.getValuesToAdd();
 		this.fileAttributeListToAdd = this.getFileAttributeListToAdd();
 		this.preparePersist();
-		Debug.startTimer("Collector persist time: " + this.getInfoType());
-		this.persist();
-		try {
-			ADataHandler.persistAllDataHandler();
-		} catch (final Exception e) {
-			e.printStackTrace();
+		Debug.startTimer("Collector wait for persist time: " + this.getInfoType());
+		synchronized (ACollector.lockObject) {
+			Debug.stopTimer("Collector wait for persist time: " + this.getInfoType());
+			Debug.startTimer("Collector persist time: " + this.getInfoType());
+			this.persist();
+
+			try {
+				ADataHandler.persistAllDataHandler();
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+			ACollector.lockObject.notify();
+			Debug.stopTimer("Collector persist time: " + this.getInfoType());
 		}
-		Debug.stopTimer("Collector persist time: " + this.getInfoType());
 		OptionsHandler.setOption("collectorEndRunLast" + Helper.ucfirst(this.getInfoType()),
 				(new Timestamp(System.currentTimeMillis()).getTime() / 1000));
 		if (this.controller != null) {
