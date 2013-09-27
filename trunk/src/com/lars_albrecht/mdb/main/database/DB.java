@@ -511,6 +511,23 @@ public class DB implements IDatabase {
 		DB.update(sql);
 		sql = "CREATE INDEX IF NOT EXISTS idx_collectorinformation_collectorname_file_id ON collectorInformation (collectorName, file_id);";
 		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_collectorinformation ON collectorInformation (collectorName, file_id, key, value);";
+		DB.update(sql);
+	}
+
+	private void createTableCollectorTypes() throws SQLException {
+		String sql = null;
+		// collectorInformation
+		sql = "CREATE TABLE IF NOT EXISTS 'collectorTypes' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'collectorName' VARCHAR(255), ";
+		sql += "'type' VARCHAR(255) ";
+		sql += ");";
+		DB.update(sql);
+		sql = "CREATE INDEX IF NOT EXISTS idx_collectortypes_collectorname_type ON collectorTypes (collectorName, type);";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_collectortypes ON collectorTypes (collectorName, type);";
+		DB.update(sql);
 	}
 
 	private void createTableFileAttributes() throws SQLException {
@@ -646,6 +663,7 @@ public class DB implements IDatabase {
 
 			this.createTableFileInformation();
 			this.createTableCollectorInformation();
+			this.createTableCollectorTypes();
 			this.createTableAttributesKey();
 			this.createTableAttributesValue();
 			this.createTableFileAttributes();
@@ -668,7 +686,7 @@ public class DB implements IDatabase {
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean updateDBWithVersion() {
-		final int newDBVersion = 4;
+		final int newDBVersion = 5;
 		// INSERT A DATABASE VERSION
 		String sql = "";
 		ResultSet rs = null;
@@ -808,6 +826,12 @@ public class DB implements IDatabase {
 						DB.update(sql);
 						sql = "DELETE FROM fileAttributes WHERE id IN (" + Helper.implode(fileAttributeListToDelete, ",", "'", "'") + ")";
 						DB.update(sql);
+					} else if (i == 5) { // added unique index to
+											// collectorInformation
+						sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_collectorInformation ON collectorInformation (collectorName, file_id, key, value);";
+						DB.update(sql);
+
+						this.createTableCollectorTypes();
 					}
 				}
 				DB.endTransaction();
