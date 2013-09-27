@@ -187,6 +187,24 @@ public class DataHandler {
 		this.reloadData(DataHandler.RELOAD_ALL);
 	}
 
+	public void addControllerTypes(final String collectorName, final ArrayList<String> types) {
+		if ((collectorName != null) && (types != null) && (types.size() > 0)) {
+			for (final String type : types) {
+				final String sql = "REPLACE INTO collectorTypes (collectorName, type) VALUES(?,?)";
+				final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
+				values.put(1, collectorName);
+				values.put(2, type);
+				try {
+					DB.updatePS(sql, values);
+				} catch (final SQLException e) {
+					e.printStackTrace();
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
 	public Integer addFileTag(final FileTag fileTag) throws Exception {
 		this.reloadData(DataHandler.RELOAD_FILETAGS);
 		if ((fileTag != null) && (fileTag.getTag() != null) && (fileTag.getFileId() != null)) {
@@ -520,6 +538,56 @@ public class DataHandler {
 		return resultList;
 	}
 
+	// TODO FIX THIS. The ct table is not correct integrated
+	/*
+	 * SELECT fi.name, fi.filetype, ct.type, ct.collectorName, ak.infoType,
+	 * COUNT(fa.id) AS 'count' FROM attributes_key AS ak, fileInformation AS fi
+	 * LEFT JOIN collectorTypes AS ct ON ct.collectorName = ak.infoType AND
+	 * ct.type = fi.filetype LEFT JOIN fileAttributes AS fa ON fa.key_id = ak.id
+	 * AND fa.file_id = fi.id GROUP BY fi.name, ak.infoType
+	 */
+	public ConcurrentHashMap<String, ArrayList<FileItem>> getAllFileItemsWithCollectorinfocount() {
+		final ConcurrentHashMap<String, ArrayList<FileItem>> resultList = new ConcurrentHashMap<String, ArrayList<FileItem>>();
+		final FileItem fileItem = new FileItem();
+		HashMap<String, Object> tempMap = null;
+		if (fileItem != null) {
+			// TODO move to helper function "getSearchresultOrder" or something
+			// like that
+			String searchResultOrderOption = (String) OptionsHandler.getOption("searchResultOrder");
+			if (searchResultOrderOption == null) {
+				searchResultOrderOption = "fileInformation.name";
+				OptionsHandler.setOption("searchResultOrder", searchResultOrderOption);
+			}
+
+			final String order = " ORDER BY '" + searchResultOrderOption + "'";
+
+			ResultSet rs = null;
+			final String sql = "SELECT fi.name, ak.infoType, COUNT(fa.id) AS 'count' "
+					+ "FROM fileInformation AS fi, attributes_key AS ak "
+					+ "LEFT JOIN fileAttributes AS fa ON fa.key_id = ak.id AND fa.file_id = fi.id " + "GROUP BY fi.name, ak.infoType "
+					+ order;
+			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
+			try {
+				rs = DB.query(sql);
+				final ResultSetMetaData rsmd = rs.getMetaData();
+				for (; rs.next();) {
+					tempMap = new HashMap<String, Object>();
+					for (int i = 2; i <= rsmd.getColumnCount(); i++) {
+						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
+					}
+					if (!resultList.containsKey(rs.getString("collectorName"))) {
+						resultList.put(rs.getString("collectorName"), new ArrayList<FileItem>());
+					}
+					resultList.get(rs.getString("collectorName")).add((FileItem) fileItem.fromHashMap(tempMap));
+				}
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return resultList;
+	}
+
 	private ConcurrentHashMap<String, ArrayList<FileItem>> getAllFileItemsWithNoCollectorinfo() {
 		final ConcurrentHashMap<String, ArrayList<FileItem>> resultList = new ConcurrentHashMap<String, ArrayList<FileItem>>();
 		final FileItem fileItem = new FileItem();
@@ -581,6 +649,54 @@ public class DataHandler {
 			ResultSet rs = null;
 			where = " WHERE status = '1'";
 			final String sql = "SELECT * FROM " + fileItem.getDatabaseTable() + where + order;
+			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
+			try {
+				rs = DB.query(sql);
+				final ResultSetMetaData rsmd = rs.getMetaData();
+				for (; rs.next();) {
+					tempMap = new HashMap<String, Object>();
+					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
+					}
+					resultList.add((FileItem) fileItem.fromHashMap(tempMap));
+				}
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return resultList;
+	}
+
+	/**
+	 * Returns a list of fileItems where NO informations are found in database.
+	 * 
+	 * @return
+	 */
+	public ArrayList<FileItem> getAllNoInfoFileItems() {
+		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
+		HashMap<String, Object> tempMap = null;
+		final FileItem fileItem = new FileItem();
+		if (fileItem != null) {
+			// TODO move to helper function "getSearchresultOrder" or something
+			// like that
+			String searchResultOrderOption = (String) OptionsHandler.getOption("searchResultOrder");
+			if (searchResultOrderOption == null) {
+				searchResultOrderOption = "fileInformation.name";
+				OptionsHandler.setOption("searchResultOrder", searchResultOrderOption);
+			}
+
+			final String order = " ORDER BY '" + searchResultOrderOption + "'";
+
+			ResultSet rs = null;
+
+			final String sql = "SELECT fi.id, fi.name, COUNT(fa.id) AS 'attributesCount', COUNT(ft.id) AS 'tagCount', COUNT(fm.id) AS 'mediaCount' FROM fileInformation AS fi "
+					+ "LEFT JOIN fileAttributes AS fa ON fi.id = fa.file_id "
+					+ "LEFT JOIN fileTags AS ft ON fi.id = ft.file_id "
+					+ "LEFT JOIN fileMedia AS fm ON fi.id = fm.file_id "
+					+ "GROUP BY fi.id "
+					+ "HAVING COUNT(fa.id) = 0 AND COUNT(ft.id) = 0 AND COUNT(fm.id) = 0 " + order;
+
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 			try {
 				rs = DB.query(sql);

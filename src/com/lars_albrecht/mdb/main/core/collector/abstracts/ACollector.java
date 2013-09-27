@@ -43,7 +43,7 @@ public abstract class ACollector implements Runnable {
 	private CollectorEventMulticaster									collectorMulticaster	= null;
 	private ArrayList<String>											types					= null;
 
-	private static Object												lockObject					= new Object();
+	private static final Object											lockObject				= new Object();
 
 	/**
 	 * Default constructor.
@@ -117,6 +117,13 @@ public abstract class ACollector implements Runnable {
 	 * @return ArrayList<Key<String>>
 	 */
 	public abstract ArrayList<Key<String>> getKeysToAdd();
+
+	/**
+	 * @return the types
+	 */
+	public final ArrayList<String> getTypes() {
+		return this.types;
+	}
 
 	/**
 	 * Returns the values to add.

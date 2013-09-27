@@ -5,6 +5,7 @@ package com.lars_albrecht.mdb.main;
 
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.RessourceBundleEx;
+import com.lars_albrecht.mdb.main.core.collector.abstracts.ACollector;
 import com.lars_albrecht.mdb.main.core.controller.CollectorController;
 import com.lars_albrecht.mdb.main.core.controller.ExportController;
 import com.lars_albrecht.mdb.main.core.controller.FinderController;
@@ -67,10 +68,12 @@ public class MDB {
 		this.mainController.seteController(this.eController);
 		this.mainController.setiController(this.iController);
 		this.mainController.setcController(this.cController);
-
 	}
 
 	private void initCollectorController() {
+		for (final ACollector collector : this.mdbConfig.getListOfCollectors()) {
+			this.mainController.getDataHandler().addControllerTypes(collector.getInfoType(), collector.getTypes());
+		}
 		this.cController = new CollectorController(this.mainController);
 		this.cController.setCollectors(this.mdbConfig.getListOfCollectors());
 	}
