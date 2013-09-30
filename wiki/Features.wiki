@@ -29,4 +29,6 @@
  * Better implementation of functions like searching, tagging and exporting to use this in own projects
  * Possibility to change filenames
  * Possibility to remove collector-information
- * Fix to delete unfound files
+ * Possibility to make stats
+ * Possibility to display average page creation
+ * Add UserHandler to handle users if enabled
