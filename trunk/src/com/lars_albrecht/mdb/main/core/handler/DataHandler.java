@@ -124,7 +124,7 @@ public class DataHandler {
 	 * @param doReplace
 	 * @throws Exception
 	 */
-	public static void persist(final ArrayList<?> objects, final boolean doReplace) throws Exception {
+	public static synchronized void persist(final ArrayList<?> objects, final boolean doReplace) throws Exception {
 		if ((objects != null) && (objects.size() > 0)) {
 			DB.beginTransaction();
 			final IPersistable tempPersistable = (IPersistable) objects.get(0);
@@ -387,6 +387,66 @@ public class DataHandler {
 			}
 		}
 		return tempList;
+	}
+
+	public ArrayList<FileItem> findAllFileItemForStringInAttributesByKey(final String key, final boolean exact, final String[] handlerArr) {
+		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
+
+		if ((key != null)) {
+			final FileItem fileItem = new FileItem();
+			HashMap<String, Object> tempMap = null;
+			if (fileItem != null) {
+				String where = "";
+				ResultSet rs = null;
+				if (exact) {
+					where = " WHERE (tiKey.key = '" + key + "' )";
+				} else {
+					where = " WHERE (tiKey.key LIKE '%" + key + "%' )";
+				}
+
+				String searchResultOrderOption = (String) OptionsHandler.getOption("searchResultOrder");
+				if (searchResultOrderOption == null) {
+					searchResultOrderOption = "fileInformation.name";
+					OptionsHandler.setOption("searchResultOrder", searchResultOrderOption);
+				}
+
+				final String order = " ORDER BY '" + searchResultOrderOption + "'";
+
+				final String sql = "SELECT fi.* FROM '" + fileItem.getDatabaseTable() + "' AS fi LEFT JOIN " + " 	"
+						+ new FileAttributes().getDatabaseTable() + " as ti " + "ON " + " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	"
+						+ new Key<>().getDatabaseTable() + " AS tiKey " + "ON " + " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	"
+						+ new Value<>().getDatabaseTable() + " AS tiValue " + "ON " + "	tiValue.id = ti.value_id " + where + order;
+				Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
+				System.out.println(sql);
+				try {
+					rs = DB.query(sql);
+					final ResultSetMetaData rsmd = rs.getMetaData();
+					for (; rs.next();) {
+						tempMap = new HashMap<String, Object>();
+						for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+							tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
+						}
+						resultList.add((FileItem) fileItem.fromHashMap(tempMap));
+					}
+				} catch (final SQLException e) {
+					e.printStackTrace();
+				}
+			}
+
+			// loads all additional data of the handler
+			if ((resultList != null) && (resultList.size() > 0)) {
+				for (final String handlerName : handlerArr) {
+					// load data from handlers
+					for (final ADataHandler<?> dataHandler : ADataHandler.getDataHandlers()) {
+						if (dataHandler.getClass().getCanonicalName().equalsIgnoreCase(handlerName)) {
+							dataHandler.setHandlerDataToFileItems(dataHandler.getHandlerDataForFileItems(resultList));
+						}
+					}
+				}
+			}
+
+		}
+		return resultList;
 	}
 
 	/**
@@ -1166,9 +1226,7 @@ public class DataHandler {
 	 */
 	public void removeKeysFromFileItem(final Integer id) {
 		if ((id != null) && (id > 0)) {
-			final String sql = "DELETE FROM attributes_key " + " WHERE id IN ( " + "SELECT ak.id " + "FROM attributes_key AS ak "
-					+ "LEFT JOIN fileAttributes AS fa " + "ON ak.id = fa.key_id " + "WHERE fa.file_id = ? "
-					+ "AND (SELECT COUNT(*) FROM fileAttributes WHERE key_id = ak.id) = 1)";
+			final String sql = "DELETE FROM attributes_key WHERE id IN ( SELECT ak.id FROM attributes_key AS ak LEFT JOIN fileAttributes AS fa ON ak.id = fa.key_id WHERE fa.file_id = ? AND (SELECT COUNT(*) FROM fileAttributes WHERE key_id = ak.id) = 1)";
 			System.out.println(sql);
 			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
 			values.put(1, id);
@@ -1190,7 +1248,7 @@ public class DataHandler {
 	 */
 	public void removeMediaFromFileItem(final Integer id) {
 		if ((id != null) && (id > 0)) {
-			final String sql = "DELETE FROM fileMedia " + " WHERE file_id = ?";
+			final String sql = "DELETE FROM fileMedia WHERE file_id = ?";
 			System.out.println(sql);
 			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
 			values.put(1, id);
@@ -1212,9 +1270,8 @@ public class DataHandler {
 	 */
 	public void removeMediaItemsFromFileItem(final Integer id) {
 		if ((id != null) && (id > 0)) {
-			final String sql = "DELETE FROM mediaItems " + " WHERE id IN ( " + "SELECT mi.id " + "FROM mediaItems AS mi "
-					+ "LEFT JOIN fileMedia AS fm " + "ON mi.id = fm.media_id " + "WHERE fm.file_id = ? "
-					+ "AND (SELECT COUNT(*) FROM mediaItems WHERE media_id = mi.id) = 1)";
+			final String sql = "DELETE FROM mediaItems WHERE id IN ( SELECT mi.id FROM mediaItems AS mi LEFT JOIN fileMedia AS fm "
+					+ "ON mi.id = fm.media_id WHERE fm.file_id = ? AND (SELECT COUNT(*) FROM mediaItems WHERE media_id = mi.id) = 1)";
 			System.out.println(sql);
 			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
 			values.put(1, id);
@@ -1338,8 +1395,7 @@ public class DataHandler {
 	 */
 	public void removeValuesFromFileItem(final Integer id) {
 		if ((id != null) && (id > 0)) {
-			final String sql = "DELETE FROM attributes_value " + " WHERE id IN ( " + "SELECT av.id " + "FROM attributes_value AS av "
-					+ "LEFT JOIN fileAttributes AS fa " + "ON av.id = fa.value_id " + "WHERE fa.file_id = ?)";
+			final String sql = "DELETE FROM attributes_value WHERE id IN (SELECT av.id FROM attributes_value AS av LEFT JOIN fileAttributes AS fa ON av.id = fa.value_id WHERE fa.file_id = ? AND (SELECT COUNT(*) FROM fileAttributes WHERE value_id = av.id) = 1)";
 			System.out.println(sql);
 			final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
 			values.put(1, id);

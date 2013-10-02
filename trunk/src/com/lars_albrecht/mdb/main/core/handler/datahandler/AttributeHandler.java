@@ -27,6 +27,20 @@ import com.lars_albrecht.mdb.main.database.DB;
  */
 public class AttributeHandler<E> extends ADataHandler<E> {
 
+	public static Object getAttributeValueByKey(final FileItem fileItem, final String key) {
+		@SuppressWarnings("unchecked")
+		final ArrayList<FileAttributeList> attributes = (ArrayList<FileAttributeList>) ADataHandler.getHandlerDataFromFileItem(fileItem,
+				AttributeHandler.class);
+		for (final FileAttributeList fileAttributeList : attributes) {
+			for (final KeyValue<String, Object> fileAttributeListItem : fileAttributeList.getKeyValues()) {
+				if (fileAttributeListItem.getKey().getKey().equalsIgnoreCase(key)) {
+					return fileAttributeListItem.getValue().getValue();
+				}
+			}
+		}
+		return null;
+	}
+
 	public AttributeHandler() {
 		this.data.put("keys", new ConcurrentHashMap<FileItem, ArrayList<?>>());
 		this.data.put("values", new ConcurrentHashMap<FileItem, ArrayList<?>>());
