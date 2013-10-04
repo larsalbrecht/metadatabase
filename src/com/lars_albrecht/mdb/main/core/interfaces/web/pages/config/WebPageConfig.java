@@ -21,12 +21,27 @@ public class WebPageConfig {
 	}
 
 	/**
+	 * Constructor for pages that are not in menu.
+	 * 
 	 * @param pageClass
-	 * @param menuTitle
 	 * @param urlNames
-	 * @param showInMenu
 	 */
-	public WebPageConfig(final Class<? extends WebPage> pageClass, final String menuTitle, final String[] urlNames,
+	public WebPageConfig(final Class<? extends WebPage> pageClass, final String[] urlNames) {
+		super();
+		this.pageClass = pageClass;
+		this.urlNames = urlNames;
+	}
+
+	/**
+	 * Full constructor.
+	 * 
+	 * @param pageClass
+	 * @param urlNames
+	 * @param menuTitle
+	 * @param showInMenu
+	 * @param menuSorting
+	 */
+	public WebPageConfig(final Class<? extends WebPage> pageClass, final String[] urlNames, final String menuTitle,
 			final boolean showInMenu, final int menuSorting) {
 		super();
 		this.pageClass = pageClass;

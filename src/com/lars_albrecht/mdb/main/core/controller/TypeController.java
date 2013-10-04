@@ -13,8 +13,6 @@ import com.lars_albrecht.mdb.main.core.typer.abstracts.ATyper;
  * 
  * @author lalbrecht
  * 
- *         TODO TYPES must be controlled by collectors!
- * 
  */
 public class TypeController {
 
@@ -93,14 +91,4 @@ public class TypeController {
 			}
 		}
 	}
-
-	/**
-	 * @param typers
-	 *            the typers to set
-	 */
-	@SuppressWarnings("unused")
-	private final void setTypers(final ArrayList<ATyper> typers) {
-		this.typers = typers;
-	}
-
 }
