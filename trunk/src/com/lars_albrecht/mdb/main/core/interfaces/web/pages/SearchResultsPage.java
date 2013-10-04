@@ -74,6 +74,8 @@ public class SearchResultsPage extends WebPage {
 				final ArrayList<FileItem> foundList = (ArrayList<FileItem>) searchResults.get("resultlist");
 				final int searchType = (int) searchResults.get("searchtype");
 
+				// TODO if foundList is only 1, the page must redirect to
+				// fileDetailsPage
 				if (foundList.size() > 0) {
 					String searchResultContainer = searchResultsTemplate.getSubMarkerContent("results");
 					String searchResultItemContainer = "";
