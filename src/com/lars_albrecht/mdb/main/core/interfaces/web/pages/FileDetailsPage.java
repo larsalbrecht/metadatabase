@@ -133,6 +133,7 @@ public class FileDetailsPage extends WebPage {
 			detailViewTemplate.replaceMarker("tags", tagsContainer, false);
 
 			// add media
+			// TODO do it like by attributes
 			final ArrayList<MediaItem> fileMediaItems = ((MediaHandler<?>) ADataHandler.getDataHandler(MediaHandler.class))
 					.getHandlerDataForFileItem(item);
 			final ArrayList<MediaItem> fileMediaItemsImages = new ArrayList<MediaItem>();
