@@ -82,6 +82,17 @@ public class MediaHandler<E> extends ADataHandler<E> {
 		return resultList;
 	}
 
+	public static MediaItem getMediaItemByName(final ArrayList<MediaItem> fileMediaItems, final String name) {
+		if ((fileMediaItems != null) && (fileMediaItems.size() > 0)) {
+			for (final MediaItem mediaItem : fileMediaItems) {
+				if (mediaItem.getName().equalsIgnoreCase(name)) {
+					return mediaItem;
+				}
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Returns a list of persisted MediaItems for a list of non-persisted
 	 * MediaItems.
@@ -276,4 +287,5 @@ public class MediaHandler<E> extends ADataHandler<E> {
 			this.data.get("mediaItems").clear();
 		}
 	}
+
 }

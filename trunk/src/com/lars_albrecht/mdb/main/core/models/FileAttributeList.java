@@ -54,6 +54,18 @@ public class FileAttributeList {
 		return tempList;
 	}
 
+	public boolean containsKey(final String key) {
+		if (key == null) {
+			throw new NullPointerException("Key cannot be null");
+		}
+		for (final KeyValue<String, Object> keyValueItem : this.keyValues) {
+			if (keyValueItem.getKey().getKey().equalsIgnoreCase(key)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public FileAttributeList generateHash() {
 		this.hash = this.keyValues.hashCode();
 		return this;
@@ -94,6 +106,18 @@ public class FileAttributeList {
 		return this.sectionName;
 	}
 
+	public Object getValueByKey(final String key) {
+		if (key == null) {
+			throw new NullPointerException("Key cannot be null");
+		}
+		for (final KeyValue<String, Object> keyValueItem : this.keyValues) {
+			if (keyValueItem.getKey().getKey().equalsIgnoreCase(key)) {
+				return keyValueItem.getValue().getValue();
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * @param fileId
 	 *            the fileId to set
@@ -132,30 +156,6 @@ public class FileAttributeList {
 	 */
 	public void setSectionName(final String sectionName) {
 		this.sectionName = sectionName;
-	}
-
-	public boolean containsKey(final String key) {
-		if (key == null) {
-			throw new NullPointerException("Key cannot be null");
-		}
-		for (final KeyValue<String, Object> keyValueItem : this.keyValues) {
-			if (keyValueItem.getKey().getKey().equalsIgnoreCase(key)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public Object getValueByKey(final String key) {
-		if (key == null) {
-			throw new NullPointerException("Key cannot be null");
-		}
-		for (final KeyValue<String, Object> keyValueItem : this.keyValues) {
-			if (keyValueItem.getKey().getKey().equalsIgnoreCase(key)) {
-				return keyValueItem.getValue().getValue();
-			}
-		}
-		return null;
 	}
 
 	@Override
