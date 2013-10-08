@@ -134,6 +134,30 @@ public class FileAttributeList {
 		this.sectionName = sectionName;
 	}
 
+	public boolean containsKey(final String key) {
+		if (key == null) {
+			throw new NullPointerException("Key cannot be null");
+		}
+		for (final KeyValue<String, Object> keyValueItem : this.keyValues) {
+			if (keyValueItem.getKey().getKey().equalsIgnoreCase(key)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public Object getValueByKey(final String key) {
+		if (key == null) {
+			throw new NullPointerException("Key cannot be null");
+		}
+		for (final KeyValue<String, Object> keyValueItem : this.keyValues) {
+			if (keyValueItem.getKey().getKey().equalsIgnoreCase(key)) {
+				return keyValueItem.getValue().getValue();
+			}
+		}
+		return null;
+	}
+
 	@Override
 	public String toString() {
 		return "KeyValues: " + this.keyValues + " | " + "Hash: " + this.hash;
