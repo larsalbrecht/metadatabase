@@ -389,7 +389,10 @@ public class DataHandler {
 		return tempList;
 	}
 
-	public ArrayList<FileItem> findAllFileItemForStringInAttributesByKey(final String key, final boolean exact, final String[] handlerArr) {
+	public ArrayList<FileItem> findAllFileItemForStringInAttributesByKey(final String key,
+			final boolean exact,
+			String order,
+			final String[] handlerArr) {
 		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
 
 		if ((key != null)) {
@@ -410,7 +413,11 @@ public class DataHandler {
 					OptionsHandler.setOption("searchResultOrder", searchResultOrderOption);
 				}
 
-				final String order = " ORDER BY '" + searchResultOrderOption + "'";
+				if (order == null) {
+					order = " ORDER BY '" + searchResultOrderOption + "'";
+				} else {
+					order = " ORDER BY " + order;
+				}
 
 				final String sql = "SELECT fi.* FROM '" + fileItem.getDatabaseTable() + "' AS fi LEFT JOIN " + " 	"
 						+ new FileAttributes().getDatabaseTable() + " as ti " + "ON " + " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	"
