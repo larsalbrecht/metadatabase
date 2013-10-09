@@ -853,4 +853,141 @@ public class Helper {
 		}
 	}
 
+	/**
+	 * @see "https://code.google.com/p/a9cipher/source/browse/src/cosc385final/A9Utility.java"
+	 * @param i
+	 * @return
+	 */
+	public static byte[] intToBytes(final int i) {
+		final byte[] b = new byte[4];
+		for (int c = 0; c < 4; c++) {
+			b[c] = (byte) ((i >>> (56 - 8 * c)) & 0xff);
+		}
+		return b;
+	}
+
+	/**
+	 * @see "https://code.google.com/p/a9cipher/source/browse/src/cosc385final/A9Utility.java"
+	 * @param b
+	 * @return
+	 */
+	public static String bytesToHex(final byte[] b) {
+		String s = "";
+		for (int i = 0; i < b.length; i++) {
+			if (i > 0 && i % 4 == 0) {
+				s += " ";
+			}
+			s += Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1);
+		}
+		return s;
+	}
+
+	/**
+	 * @see "https://code.google.com/p/a9cipher/source/browse/src/cosc385final/A9Utility.java"
+	 * @param s
+	 * @return
+	 */
+	public static byte[] hexToBytes(final String s) {
+		final byte[] b = new byte[s.length() / 2];
+		for (int i = 0; i < s.length(); i += 2) {
+			b[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4) + Character.digit(s.charAt(i + 1), 16));
+		}
+		return b;
+	}
+
+	/**
+	 * @see "https://code.google.com/p/a9cipher/source/browse/src/cosc385final/A9Utility.java"
+	 * @param b
+	 * @return
+	 */
+	public static int bytesToInt(final byte[] b) {
+		return ((b[0] << 24) & 0xff000000) | ((b[1] << 16) & 0xff0000) | ((b[2] << 8) & 0xff00) | (b[3] & 0xff);
+	}
+
+	/**
+	 * @see "https://code.google.com/p/a9cipher/source/browse/src/cosc385final/A9Utility.java"
+	 * @param l
+	 * @return
+	 */
+	public static byte[] longToBytes(final long l) {
+		final byte[] b = new byte[8];
+		for (int c = 0; c < 8; c++) {
+			b[c] = (byte) ((l >>> (56 - 8 * c)) & 0xffL);
+		}
+		return b;
+	}
+
+	/**
+	 * @see "https://code.google.com/p/a9cipher/source/browse/src/cosc385final/A9Utility.java"
+	 * @param b
+	 * @return
+	 */
+	public static boolean[] byteToBits(final byte b) {
+		final boolean[] bits = new boolean[8];
+		for (int i = 0; i < 8; i++) {
+			bits[7 - i] = ((b & (1 << i)) != 0);
+		}
+		return bits;
+	}
+
+	/**
+	 * @see "https://code.google.com/p/a9cipher/source/browse/src/cosc385final/A9Utility.java"
+	 * @param bits
+	 * @return
+	 */
+	public static byte[] bitsTo8Bytes(final boolean[] bits) {
+		final byte[] b = new byte[8];
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				b[i] += (((bits[(8 * i) + j]) ? 1 : 0) << (7 - j));
+			}
+		}
+
+		return b;
+	}
+
+	/**
+	 * @see "https://code.google.com/p/a9cipher/source/browse/src/cosc385final/A9Utility.java"
+	 * @param x
+	 * @param i
+	 * @return
+	 */
+	public static int getBit(final int x, final int i) {
+		return (x >>> i) & 0x01;
+	}
+
+	/**
+	 * @see "https://code.google.com/p/a9cipher/source/browse/src/cosc385final/A9Utility.java"
+	 * @param x
+	 * @param i
+	 * @return
+	 */
+	public static int getBit(final int[] x, final int i) {
+		return (x[i / 32] >>> (i % 32)) & 0x01;
+	}
+
+	/**
+	 * @see "https://code.google.com/p/a9cipher/source/browse/src/cosc385final/A9Utility.java"
+	 * @param x
+	 * @param i
+	 * @param v
+	 */
+	public static void setBit(final int[] x, final int i, final int v) {
+		if ((v & 0x01) == 1) {
+			x[i / 32] |= 1 << (i % 32); // set it
+		} else {
+			x[i / 32] &= ~(1 << (i % 32)); // clear it
+		}
+	}
+
+	/**
+	 * @see "https://code.google.com/p/a9cipher/source/browse/src/cosc385final/A9Utility.java"
+	 * @param x
+	 * @param i
+	 * @return
+	 */
+	public static int getNibble(final int x, final int i) {
+		return (x >>> (4 * i)) & 0x0F;
+	}
+
 }
