@@ -39,23 +39,30 @@ import com.lars_albrecht.mdb.main.core.controller.MainController;
 /**
  * @author lalbrecht
  * 
+ *         TODO refactor
  */
 public class JChartServlet extends HttpServlet {
 
-	public static final int				TYPE_ADDSPERDAY		= 10;
-	private int							type				= -1;
+	/**
+	 * 
+	 */
+	private static final long					serialVersionUID		= -5540792818589675356L;
 
-	private MainController				mainController		= null;
+	public static final int						TYPE_ADDSPERDAY			= 10;
+	public static final int						TYPE_UPDATESPERDAY		= 11;
+	private int									type					= -1;
 
-	private BarChartProperties			barChartProperties	= null;
+	private MainController						mainController			= null;
 
-	private AxisProperties				axisProperties		= null;
-	private ChartProperties				chartProperties		= null;
+	private BarChartProperties					barChartProperties		= null;
 
-	private final int					width				= 500;
-	private final int					height				= 600;
+	private AxisProperties						axisProperties			= null;
+	private ChartProperties						chartProperties			= null;
 
-	ConcurrentHashMap<Integer, Integer>	valuesAddsPerDay	= null;
+	private final int							width					= 500;
+	private final int							height					= 600;
+
+	private ConcurrentHashMap<Integer, Integer>	valuesAddsUpdatesPerDay	= null;
 
 	public JChartServlet(final MainController mainController, final int type) {
 		this.mainController = mainController;
@@ -68,9 +75,10 @@ public class JChartServlet extends HttpServlet {
 			response.setStatus(HttpServletResponse.SC_OK);
 
 			switch (this.type) {
+				case TYPE_UPDATESPERDAY:
 				case TYPE_ADDSPERDAY:
-					this.initTypeAddsPerDay(request, response);
-					this.generateTypeAddsPerDay(request, response);
+					this.initTypeAddsUpdatesPerDay(request, response);
+					this.generateTypeAddsUpdatesPerDay(request, response);
 					break;
 				default:
 					response.setStatus(HttpServletResponse.SC_NOT_FOUND);
@@ -80,7 +88,7 @@ public class JChartServlet extends HttpServlet {
 		}
 	}
 
-	private void generateTypeAddsPerDay(final HttpServletRequest request, final HttpServletResponse response) {
+	private void generateTypeAddsUpdatesPerDay(final HttpServletRequest request, final HttpServletResponse response) {
 		try {
 			final ConcurrentHashMap<Integer, Integer> valueList = this.mainController.getDataHandler().getUpdatedCountByDay();
 
@@ -92,9 +100,9 @@ public class JChartServlet extends HttpServlet {
 				i++;
 			}
 
-			final String xAxisTitle = "Hinzugefügte Dateien";
+			final String xAxisTitle = "Dateien";
 			final String yAxisTitle = "Tage";
-			final String title = "Hinzugefügte Dateien pro Tag";
+			final String title = "Dateien pro Tag";
 			final IAxisDataSeries dataSeries = new DataSeries(xAxisLabels, xAxisTitle, yAxisTitle, title);
 
 			final double[][] data = new double[1][valueList.size()];
@@ -119,9 +127,17 @@ public class JChartServlet extends HttpServlet {
 		}
 	}
 
-	private void initTypeAddsPerDay(final HttpServletRequest request, final HttpServletResponse response) {
+	private void initTypeAddsUpdatesPerDay(final HttpServletRequest request, final HttpServletResponse response) {
 		// get data
-		this.valuesAddsPerDay = this.mainController.getDataHandler().getCreatedCountByDay();
+		switch (this.type) {
+			default:
+			case TYPE_ADDSPERDAY:
+				this.valuesAddsUpdatesPerDay = this.mainController.getDataHandler().getCreatedCountByDay();
+				break;
+			case TYPE_UPDATESPERDAY:
+				this.valuesAddsUpdatesPerDay = this.mainController.getDataHandler().getUpdatedCountByDay();
+				break;
+		}
 
 		this.chartProperties = new ChartProperties();
 		this.axisProperties = new AxisProperties(true);
@@ -145,7 +161,7 @@ public class JChartServlet extends HttpServlet {
 		dataXAxisProperties.setShowTicks(AxisTypeProperties.TICKS_ALL);
 		dataXAxisProperties.setUseCommas(false);
 		int maxValue = 0;
-		for (final Integer value : this.valuesAddsPerDay.values()) {
+		for (final Integer value : this.valuesAddsUpdatesPerDay.values()) {
 			if (value > maxValue) {
 				maxValue = value;
 			}
