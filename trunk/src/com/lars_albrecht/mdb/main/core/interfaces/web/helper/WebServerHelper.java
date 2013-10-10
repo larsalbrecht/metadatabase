@@ -21,6 +21,7 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.factory.WebPageFactory;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.DefaultErrorPage;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.LastFivePartial;
+import com.lars_albrecht.mdb.main.core.interfaces.web.pages.LoginBoxPartial;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.MainNavigationPartial;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
 import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
@@ -120,6 +121,14 @@ public class WebServerHelper {
 			try {
 				final LastFivePartial lastFive = new LastFivePartial(null, null, this.mainController, this.webInterface);
 				generatedContent = Template.replaceMarker(generatedContent, "lastFiveAdded", lastFive.getGeneratedContent(), false);
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (Template.containsMarker(generatedContent, "loginbox")) {
+			try {
+				final LoginBoxPartial loginBox = new LoginBoxPartial(null, null, this.mainController, this.webInterface);
+				generatedContent = Template.replaceMarker(generatedContent, "loginbox", loginBox.getGeneratedContent(), false);
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}

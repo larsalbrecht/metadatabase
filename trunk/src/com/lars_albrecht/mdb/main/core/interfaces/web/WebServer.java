@@ -77,6 +77,8 @@ public class WebServer {
 		final ServletContextHandler servletContextHandler = new ServletContextHandler();
 		servletContextHandler.addServlet(new ServletHolder(new JChartServlet(this.mainController, JChartServlet.TYPE_ADDSPERDAY)),
 				"/statistics/addsPerDay.jpg");
+		servletContextHandler.addServlet(new ServletHolder(new JChartServlet(this.mainController, JChartServlet.TYPE_UPDATESPERDAY)),
+				"/statistics/updatesPerDay.jpg");
 
 		final ResourceHandler resource_handler = new ResourceHandler();
 		resource_handler.setDirectoriesListed(false);

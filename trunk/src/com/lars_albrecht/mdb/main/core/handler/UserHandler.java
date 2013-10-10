@@ -21,6 +21,14 @@ public class UserHandler {
 
 	private static final User	exampleUserObject	= new User(0, "email@example.com", "example", null);
 
+	/**
+	 * Do a login for a user. The password will be salted, peppered and than
+	 * hashed.
+	 * 
+	 * @param email
+	 * @param password
+	 * @return
+	 */
 	public static User doLogin(final String email, final String password) {
 		final String salt = ""; // get salt for user
 		final String saltedPassword = UserHandler.saltPassword(password, salt);
@@ -53,7 +61,7 @@ public class UserHandler {
 	 * Hash a string.
 	 * 
 	 * @param password
-	 * @return
+	 * @return hashed password
 	 */
 	public static String hashPassword(final String password) {
 		try {
@@ -69,7 +77,7 @@ public class UserHandler {
 	 * passwords. The pepper is saved on a secure place, not in the database.
 	 * 
 	 * @param password
-	 * @return
+	 * @return peppered password (password + pepper)
 	 */
 	public static String pepperPassword(final String password) {
 		return password + "mysecret from secure place";
@@ -95,10 +103,21 @@ public class UserHandler {
 	 * 
 	 * @param password
 	 * @param salt
-	 * @return
+	 * @return salted password (password + salt)
 	 */
 	public static String saltPassword(final String password, final String salt) {
 		return password + salt;
+	}
+
+	public static boolean isLoggedIn() {
+		return false;
+	}
+
+	public static User getCurrentUser() {
+		if (!UserHandler.isLoggedIn()) {
+			return null;
+		}
+		return UserHandler.exampleUserObject;
 	}
 
 }
