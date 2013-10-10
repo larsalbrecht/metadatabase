@@ -7,8 +7,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
@@ -87,10 +85,8 @@ public class JChartServlet extends HttpServlet {
 			final String[] xAxisLabels = new String[valueList.size()];
 			int i = 0;
 
-			Date tempDate = null;
 			for (final Integer valueEntry : valueList.keySet()) {
-				tempDate = new Date(valueEntry * 1000L);
-				xAxisLabels[i] = new SimpleDateFormat("dd.MM.yyyy").format(tempDate);
+				xAxisLabels[i] = Helper.getFormattedTimestamp(valueEntry.longValue(), "dd.MM.yyyy");
 				i++;
 			}
 
