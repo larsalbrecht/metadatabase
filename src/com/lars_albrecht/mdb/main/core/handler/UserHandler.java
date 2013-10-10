@@ -41,27 +41,12 @@ public class UserHandler {
 		}
 	}
 
-	/**
-	 * Pepper a string. "pepper" is a global string, that is used to pepper all
-	 * passwords. The pepper is saved on a secure place, not in the database.
-	 * 
-	 * @param password
-	 * @return
-	 */
-	public static String pepperPassword(final String password) {
-		return password + "mysecret from secure place";
-	}
-
-	/**
-	 * Salt a string. "salt" is a user string, that is used to salt the user
-	 * password. The salt is saved in the database for every user.
-	 * 
-	 * @param password
-	 * @param salt
-	 * @return
-	 */
-	public static String saltPassword(final String password, final String salt) {
-		return password + salt;
+	public static User getUser(final String identifier, final String hashedPassword) {
+		if (identifier.equalsIgnoreCase(UserHandler.exampleUserObject.getIdentifier())) {
+			return UserHandler.exampleUserObject;
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -80,6 +65,17 @@ public class UserHandler {
 	}
 
 	/**
+	 * Pepper a string. "pepper" is a global string, that is used to pepper all
+	 * passwords. The pepper is saved on a secure place, not in the database.
+	 * 
+	 * @param password
+	 * @return
+	 */
+	public static String pepperPassword(final String password) {
+		return password + "mysecret from secure place";
+	}
+
+	/**
 	 * Register a user.
 	 * 
 	 * @param user
@@ -93,12 +89,16 @@ public class UserHandler {
 		return UserHandler.exampleUserObject;
 	}
 
-	public static User getUser(final String identifier, final String hashedPassword) {
-		if (identifier.equalsIgnoreCase(UserHandler.exampleUserObject.getIdentifier())) {
-			return UserHandler.exampleUserObject;
-		} else {
-			return null;
-		}
+	/**
+	 * Salt a string. "salt" is a user string, that is used to salt the user
+	 * password. The salt is saved in the database for every user.
+	 * 
+	 * @param password
+	 * @param salt
+	 * @return
+	 */
+	public static String saltPassword(final String password, final String salt) {
+		return password + salt;
 	}
 
 }

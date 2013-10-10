@@ -72,10 +72,6 @@ public class User implements IPersistable {
 		return "user";
 	}
 
-	public final String getIdentifier() {
-		return this.email;
-	}
-
 	/**
 	 * @return the email
 	 */
@@ -86,6 +82,10 @@ public class User implements IPersistable {
 	@Override
 	public Integer getId() {
 		return this.id;
+	}
+
+	public final String getIdentifier() {
+		return this.email;
 	}
 
 	/**

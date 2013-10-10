@@ -224,6 +224,14 @@ public class InfoControlPage extends WebPage {
 		return templateWithNoInfoContainer;
 	}
 
+	private Template fillStatisticsContainer(final Template template) {
+		final Template templateWithStatisticsContainer = template;
+		String statisticsContainer = templateWithStatisticsContainer.getSubMarkerContent("statistics");
+		statisticsContainer = Template.replaceMarker(statisticsContainer, "addPerDayData", "TEST", false);
+		templateWithStatisticsContainer.replaceMarker("statisticscontainer", statisticsContainer, false);
+		return templateWithStatisticsContainer;
+	}
+
 	private Template generateInfoControlView() {
 		Template infoControlTemplate = this.getPageTemplate();
 
@@ -232,6 +240,7 @@ public class InfoControlPage extends WebPage {
 		infoControlTemplate = this.fillDuplicateContainer(infoControlTemplate);
 		infoControlTemplate = this.fillNoInfoContainer(infoControlTemplate);
 		infoControlTemplate = this.fillMissingContainer(infoControlTemplate);
+		infoControlTemplate = this.fillStatisticsContainer(infoControlTemplate);
 
 		return infoControlTemplate;
 	}

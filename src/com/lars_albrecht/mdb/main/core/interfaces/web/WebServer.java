@@ -12,6 +12,8 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.lars_albrecht.mdb.main.core.controller.MainController;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
@@ -19,6 +21,7 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseAjaxHa
 import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseDefaultHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseHTMLHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.web.handler.MetadatabaseJSONHandler;
+import com.lars_albrecht.mdb.main.core.interfaces.web.servlets.JChartServlet;
 import com.lars_albrecht.mdb.main.core.utilities.Paths;
 
 public class WebServer {
@@ -71,6 +74,10 @@ public class WebServer {
 		final MetadatabaseJSONHandler jsonHandler = new MetadatabaseJSONHandler(this.mainController, this.webInterface);
 		final MetadatabaseHTMLHandler mdbHTMLHandler = new MetadatabaseHTMLHandler(this.mainController, this.webInterface);
 
+		final ServletContextHandler servletContextHandler = new ServletContextHandler();
+		servletContextHandler.addServlet(new ServletHolder(new JChartServlet(this.mainController, JChartServlet.TYPE_ADDSPERDAY)),
+				"/statistics/addsPerDay.jpg");
+
 		final ResourceHandler resource_handler = new ResourceHandler();
 		resource_handler.setDirectoriesListed(false);
 		resource_handler.setWelcomeFiles(new String[] {
@@ -88,7 +95,7 @@ public class WebServer {
 		}
 		final HandlerList handlers = new HandlerList();
 		handlers.setHandlers(new Handler[] {
-				mdbDefaultHandler, resource_handler, ajaxHandler, jsonHandler, mdbHTMLHandler, new DefaultHandler()
+				servletContextHandler, mdbDefaultHandler, resource_handler, ajaxHandler, jsonHandler, mdbHTMLHandler, new DefaultHandler()
 		});
 		this.server.setHandler(handlers);
 

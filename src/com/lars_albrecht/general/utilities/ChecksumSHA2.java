@@ -12,37 +12,8 @@ import java.security.NoSuchAlgorithmException;
  */
 public class ChecksumSHA2 {
 
-	private String	ALGORITHM;
-	private int		DIGEST_SIZE;
-
-	public ChecksumSHA2(final String algorithm) throws NoSuchAlgorithmException {
-		if (algorithm.toUpperCase() == "SHA-224") {
-			this.ALGORITHM = algorithm;
-			this.DIGEST_SIZE = 224;
-		} else if (algorithm.toUpperCase() == "SHA-256") {
-			this.ALGORITHM = algorithm;
-			this.DIGEST_SIZE = 256;
-		} else if (algorithm.toUpperCase() == "SHA-384") {
-			this.ALGORITHM = algorithm;
-			this.DIGEST_SIZE = 384;
-		} else if (algorithm.toUpperCase() == "SHA-512") {
-			this.ALGORITHM = algorithm;
-			this.DIGEST_SIZE = 512;
-		} else {
-			throw new NoSuchAlgorithmException("algorithm must be one of SHA-256, SHA-384, or SHA-512");
-		}
-	}
-
-	public byte[] digest(final byte[] message) {
-		if (this.ALGORITHM == "SHA-224") {
-			return ChecksumSHA2.digest224(message);
-		} else if (this.ALGORITHM == "SHA-256") {
-			return ChecksumSHA2.digest256(message);
-		} else if (this.ALGORITHM == "SHA-384") {
-			return ChecksumSHA2.digest384(message);
-		} else {
-			return ChecksumSHA2.digest512(message);
-		}
+	private static long Ch(final long e, final long f, final long g) {
+		return (e & f) ^ ((~e) & g);
 	}
 
 	private static byte[] digest224(final byte[] message) {
@@ -60,7 +31,7 @@ public class ChecksumSHA2 {
 				0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939, 0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4
 		};
 
-		for (int i = 0; i < padded.length / 64; i++) {
+		for (int i = 0; i < (padded.length / 64); i++) {
 			final int[] words = new int[64];
 			int a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7], s0, s1, maj, t1, t2, ch;
 
@@ -68,7 +39,7 @@ public class ChecksumSHA2 {
 			for (int j = 0; j < 16; j++) {
 				words[j] = 0;
 				for (int k = 0; k < 4; k++) {
-					words[j] |= ((block[j * 4 + k] & 0x000000FF) << (24 - k * 8));
+					words[j] |= ((block[(j * 4) + k] & 0x000000FF) << (24 - (k * 8)));
 				}
 			}
 
@@ -128,7 +99,7 @@ public class ChecksumSHA2 {
 				0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19
 		};
 
-		for (int i = 0; i < padded.length / 64; i++) {
+		for (int i = 0; i < (padded.length / 64); i++) {
 			final int[] words = new int[64];
 			int a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7], s0, s1, maj, t1, t2, ch;
 
@@ -136,7 +107,7 @@ public class ChecksumSHA2 {
 			for (int j = 0; j < 16; j++) {
 				words[j] = 0;
 				for (int k = 0; k < 4; k++) {
-					words[j] |= ((block[j * 4 + k] & 0x000000FF) << (24 - k * 8));
+					words[j] |= ((block[(j * 4) + k] & 0x000000FF) << (24 - (k * 8)));
 				}
 			}
 
@@ -206,7 +177,7 @@ public class ChecksumSHA2 {
 				0x8eb44a8768581511L, 0xdb0c2e0d64f98fa7L, 0x47b5481dbefa4fa4L
 		};
 
-		for (int i = 0; i < padded.length / 128; i++) {
+		for (int i = 0; i < (padded.length / 128); i++) {
 			final long[] words = new long[80];
 			long a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7], T1, T2;
 
@@ -214,7 +185,7 @@ public class ChecksumSHA2 {
 			for (int j = 0; j < 16; j++) {
 				words[j] = 0;
 				for (int k = 0; k < 8; k++) {
-					words[j] |= ((block[j * 8 + k] & 0x00000000000000FFL) << (56 - k * 8));
+					words[j] |= ((block[(j * 8) + k] & 0x00000000000000FFL) << (56 - (k * 8)));
 				}
 			}
 
@@ -278,7 +249,7 @@ public class ChecksumSHA2 {
 				0x9B05688C2B3E6C1FL, 0x1F83D9ABFB41BD6BL, 0x5BE0CD19137E2179L
 		};
 
-		for (int i = 0; i < padded.length / 128; i++) {
+		for (int i = 0; i < (padded.length / 128); i++) {
 			final long[] words = new long[80];
 			long a = H[0], b = H[1], c = H[2], d = H[3], e = H[4], f = H[5], g = H[6], h = H[7], T1, T2;
 
@@ -286,7 +257,7 @@ public class ChecksumSHA2 {
 			for (int j = 0; j < 16; j++) {
 				words[j] = 0;
 				for (int k = 0; k < 8; k++) {
-					words[j] |= ((block[j * 8 + k] & 0x00000000000000FFL) << (56 - k * 8));
+					words[j] |= ((block[(j * 8) + k] & 0x00000000000000FFL) << (56 - (k * 8)));
 				}
 			}
 
@@ -325,26 +296,6 @@ public class ChecksumSHA2 {
 		return hashed;
 	}
 
-	private static long Sigma0(final long l) {
-		return Long.rotateRight(l, 1) ^ Long.rotateRight(l, 8) ^ (l >>> 7);
-	}
-
-	private static long Sigma1(final long l) {
-		return Long.rotateRight(l, 19) ^ Long.rotateRight(l, 61) ^ (l >>> 6);
-	}
-
-	private static long Sum0(final long a) {
-		return Long.rotateRight(a, 28) ^ Long.rotateRight(a, 34) ^ Long.rotateRight(a, 39);
-	}
-
-	private static long Sum1(final long e) {
-		return Long.rotateRight(e, 14) ^ Long.rotateRight(e, 18) ^ Long.rotateRight(e, 41);
-	}
-
-	private static long Ch(final long e, final long f, final long g) {
-		return (e & f) ^ ((~e) & g);
-	}
-
 	private static long Maj(final long a, final long b, final long c) {
 		return (a & b) ^ (a & c) ^ (b & c);
 	}
@@ -353,7 +304,7 @@ public class ChecksumSHA2 {
 		final int origLength = data.length;
 		final int tailLength = origLength % 64;
 		int padLength = 0;
-		if ((64 - tailLength >= 9)) {
+		if (((64 - tailLength) >= 9)) {
 			padLength = 64 - tailLength;
 		} else {
 			padLength = 128 - tailLength;
@@ -376,7 +327,7 @@ public class ChecksumSHA2 {
 		final int origLength = data.length;
 		final int tailLength = origLength % 128;
 		int padLength = 0;
-		if ((64 - tailLength >= 9)) {
+		if (((64 - tailLength) >= 9)) {
 			padLength = 128 - tailLength;
 		} else {
 			padLength = 128 - tailLength;
@@ -393,6 +344,56 @@ public class ChecksumSHA2 {
 		System.arraycopy(data, 0, output, 0, origLength);
 		System.arraycopy(thePad, 0, output, origLength, thePad.length);
 		return output;
+	}
+
+	private static long Sigma0(final long l) {
+		return Long.rotateRight(l, 1) ^ Long.rotateRight(l, 8) ^ (l >>> 7);
+	}
+
+	private static long Sigma1(final long l) {
+		return Long.rotateRight(l, 19) ^ Long.rotateRight(l, 61) ^ (l >>> 6);
+	}
+
+	private static long Sum0(final long a) {
+		return Long.rotateRight(a, 28) ^ Long.rotateRight(a, 34) ^ Long.rotateRight(a, 39);
+	}
+
+	private static long Sum1(final long e) {
+		return Long.rotateRight(e, 14) ^ Long.rotateRight(e, 18) ^ Long.rotateRight(e, 41);
+	}
+
+	private String	ALGORITHM;
+
+	private int		DIGEST_SIZE;
+
+	public ChecksumSHA2(final String algorithm) throws NoSuchAlgorithmException {
+		if (algorithm.toUpperCase() == "SHA-224") {
+			this.ALGORITHM = algorithm;
+			this.DIGEST_SIZE = 224;
+		} else if (algorithm.toUpperCase() == "SHA-256") {
+			this.ALGORITHM = algorithm;
+			this.DIGEST_SIZE = 256;
+		} else if (algorithm.toUpperCase() == "SHA-384") {
+			this.ALGORITHM = algorithm;
+			this.DIGEST_SIZE = 384;
+		} else if (algorithm.toUpperCase() == "SHA-512") {
+			this.ALGORITHM = algorithm;
+			this.DIGEST_SIZE = 512;
+		} else {
+			throw new NoSuchAlgorithmException("algorithm must be one of SHA-256, SHA-384, or SHA-512");
+		}
+	}
+
+	public byte[] digest(final byte[] message) {
+		if (this.ALGORITHM == "SHA-224") {
+			return ChecksumSHA2.digest224(message);
+		} else if (this.ALGORITHM == "SHA-256") {
+			return ChecksumSHA2.digest256(message);
+		} else if (this.ALGORITHM == "SHA-384") {
+			return ChecksumSHA2.digest384(message);
+		} else {
+			return ChecksumSHA2.digest512(message);
+		}
 	}
 
 	public String getAlgorithm() {
