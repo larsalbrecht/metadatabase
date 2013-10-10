@@ -27,7 +27,7 @@ import org.jCharts.properties.AxisTypeProperties;
 import org.jCharts.properties.BarChartProperties;
 import org.jCharts.properties.ChartProperties;
 import org.jCharts.properties.DataAxisProperties;
-import org.jCharts.properties.LegendProperties;
+import org.jCharts.properties.LabelAxisProperties;
 import org.jCharts.properties.PropertyException;
 import org.jCharts.properties.util.ChartFont;
 import org.jCharts.properties.util.ChartStroke;
@@ -49,7 +49,6 @@ public class JChartServlet extends HttpServlet {
 
 	private BarChartProperties			barChartProperties	= null;
 
-	private LegendProperties			legendProperties	= null;
 	private AxisProperties				axisProperties		= null;
 	private ChartProperties				chartProperties		= null;
 
@@ -112,7 +111,6 @@ public class JChartServlet extends HttpServlet {
 				Helper.hex2Rgb("#49B3FF")
 			};
 			dataSeries.addIAxisPlotDataSet(new AxisChartDataSet(data, legendLabels, paints, ChartType.BAR, this.barChartProperties));
-
 			final AxisChart axisChart = new AxisChart(dataSeries, this.chartProperties, this.axisProperties, null, this.width, this.height);
 
 			ServletEncoderHelper.encodeJPEG13(axisChart, 1.0f, response);
@@ -125,32 +123,39 @@ public class JChartServlet extends HttpServlet {
 		// get data
 		this.valuesAddsPerDay = this.mainController.getDataHandler().getCreatedCountByDay();
 
-		this.legendProperties = new LegendProperties();
 		this.chartProperties = new ChartProperties();
 		this.axisProperties = new AxisProperties(true);
 
 		// set scale fonts
-		final ChartFont axisScaleFont = new ChartFont(new Font("Verdana", Font.PLAIN, 13), Color.black);
+		final ChartFont axisScaleFont = new ChartFont(new Font("Verdana", Font.PLAIN, 10), Color.black);
 		this.axisProperties.getXAxisProperties().setScaleChartFont(axisScaleFont);
 		this.axisProperties.getYAxisProperties().setScaleChartFont(axisScaleFont);
 
 		// set title fonts
-		final ChartFont axisTitleFont = new ChartFont(new Font("Verdana", Font.PLAIN, 14), Color.black);
+		final ChartFont axisTitleFont = new ChartFont(new Font("Verdana", Font.PLAIN, 12), Color.black);
 		this.axisProperties.getXAxisProperties().setTitleChartFont(axisTitleFont);
 		this.axisProperties.getYAxisProperties().setTitleChartFont(axisTitleFont);
 
 		//
+
+		final LabelAxisProperties dataYLabeProperties = (LabelAxisProperties) this.axisProperties.getYAxisProperties();
+		dataYLabeProperties.setShowEndBorder(false);
+
 		final DataAxisProperties dataXAxisProperties = (DataAxisProperties) this.axisProperties.getXAxisProperties();
 		dataXAxisProperties.setShowTicks(AxisTypeProperties.TICKS_ALL);
 		dataXAxisProperties.setUseCommas(false);
+		int maxValue = 0;
+		for (final Integer value : this.valuesAddsPerDay.values()) {
+			if (value > maxValue) {
+				maxValue = value;
+			}
+		}
 
 		try {
 			dataXAxisProperties.setUserDefinedScale(0, 10);
 		} catch (final PropertyException propertyException) {
 			propertyException.printStackTrace();
 		}
-
-		dataXAxisProperties.setRoundToNearest(1);
 
 		final ChartStroke xAxisGridLines = new ChartStroke(new BasicStroke(1.0f), Color.LIGHT_GRAY);
 		this.axisProperties.getXAxisProperties().setGridLineChartStroke(xAxisGridLines);
