@@ -111,7 +111,8 @@ public class WebServerHelper {
 		}
 		if (Template.containsMarker(generatedContent, "mainNavigation")) {
 			try {
-				final MainNavigationPartial mainNavigation = new MainNavigationPartial(null, null, this.mainController, this.webInterface);
+				final MainNavigationPartial mainNavigation = new MainNavigationPartial(action, request, this.mainController,
+						this.webInterface);
 				generatedContent = Template.replaceMarker(generatedContent, "mainNavigation", mainNavigation.getGeneratedContent(), false);
 			} catch (final Exception e) {
 				e.printStackTrace();
@@ -119,7 +120,7 @@ public class WebServerHelper {
 		}
 		if (Template.containsMarker(generatedContent, "lastFiveAdded")) {
 			try {
-				final LastFivePartial lastFive = new LastFivePartial(null, null, this.mainController, this.webInterface);
+				final LastFivePartial lastFive = new LastFivePartial(action, request, this.mainController, this.webInterface);
 				generatedContent = Template.replaceMarker(generatedContent, "lastFiveAdded", lastFive.getGeneratedContent(), false);
 			} catch (final Exception e) {
 				e.printStackTrace();
@@ -127,7 +128,7 @@ public class WebServerHelper {
 		}
 		if (Template.containsMarker(generatedContent, "loginbox")) {
 			try {
-				final LoginBoxPartial loginBox = new LoginBoxPartial(null, null, this.mainController, this.webInterface);
+				final LoginBoxPartial loginBox = new LoginBoxPartial(action, request, this.mainController, this.webInterface);
 				generatedContent = Template.replaceMarker(generatedContent, "loginbox", loginBox.getGeneratedContent(), false);
 			} catch (final Exception e) {
 				e.printStackTrace();

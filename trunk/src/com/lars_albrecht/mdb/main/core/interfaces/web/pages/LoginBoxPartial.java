@@ -3,6 +3,9 @@
  */
 package com.lars_albrecht.mdb.main.core.interfaces.web.pages;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import org.eclipse.jetty.server.Request;
 
 import com.lars_albrecht.general.utilities.Template;
@@ -34,8 +37,24 @@ public class LoginBoxPartial extends WebPartial {
 
 			content = loginBoxText;
 		} else {
-			final String loginBoxForm = loginBoxPartialTemplate.getSubMarkerContent("loginBoxForm");
+			final String fullRequestUrl = this.request.getRootURL() + this.request.getRequestURI() + "?" + this.request.getQueryString();
+			String loginBoxForm = loginBoxPartialTemplate.getSubMarkerContent("loginBoxForm");
 
+			final String identifier = this.request.getParameter("loginBoxEmail");
+			final String password = this.request.getParameter("loginBoxPassword");
+
+			System.out.println(identifier);
+			System.out.println(password);
+
+			loginBoxForm = Template.replaceMarker(loginBoxForm, "identifier", (identifier != null ? identifier : ""), false);
+			loginBoxForm = Template.replaceMarker(loginBoxForm, "password", (password != null ? password : ""), false);
+
+			try {
+				loginBoxForm = Template.replaceMarker(loginBoxForm, "action",
+						"/index.html?action=login&do=login&req=" + URLEncoder.encode(fullRequestUrl, "UTF-8"), false);
+			} catch (final UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
 			content = loginBoxForm;
 		}
 		loginBoxPartialTemplate.replaceMarker("content", content, false);
