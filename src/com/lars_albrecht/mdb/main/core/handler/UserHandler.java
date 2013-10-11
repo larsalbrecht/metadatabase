@@ -19,36 +19,99 @@ public class UserHandler {
 
 	public static boolean		usersEnabled		= Boolean.TRUE;
 
+	/**
+	 * Only a var to test the login
+	 */
+	public static boolean		isLoggedIn			= Boolean.FALSE;
+
 	private static final User	exampleUserObject	= new User(0, "email@example.com", "example", null);
 
 	/**
 	 * Do a login for a user. The password will be salted, peppered and than
 	 * hashed.
 	 * 
-	 * @param email
+	 * @param identifier
 	 * @param password
 	 * @return
 	 */
-	public static User doLogin(final String email, final String password) {
-		final String salt = ""; // get salt for user
-		final String saltedPassword = UserHandler.saltPassword(password, salt);
-		final String pepperedPassword = UserHandler.pepperPassword(saltedPassword);
-		final String hashedPassword = UserHandler.hashPassword(pepperedPassword);
+	public static User doLogin(final String identifier, final String password) {
+		final String hashedPassword = UserHandler.getPreparedPassword(identifier, password);
 		if (hashedPassword == null) {
-			return null;
+			return null; // no user available (no salt for identifier found)
 		}
 
 		// search for email / saltedHashedPassword in database and return the
 		// complete user-object.
-		final User databaseUser = UserHandler.getUser(email, hashedPassword);
+		final User databaseUser = UserHandler.getUser(identifier, hashedPassword);
 
 		if (databaseUser != null) {
+			UserHandler.isLoggedIn = Boolean.TRUE;
 			return databaseUser;
 		} else {
 			return null;
 		}
 	}
 
+	public static boolean doLogout(final String identifier) {
+		UserHandler.isLoggedIn = false;
+
+		return !UserHandler.isLoggedIn;
+	}
+
+	public static User getCurrentUser() {
+		if (!UserHandler.isLoggedIn()) {
+			return null;
+		}
+		return UserHandler.exampleUserObject;
+	}
+
+	/**
+	 * Returns the hashed password.
+	 * 
+	 * @param identifier
+	 * @param password
+	 * @return hashed password
+	 */
+	public static String getPreparedPassword(final String identifier, final String password) {
+		final String salt = UserHandler.getSaltForIdentifier(identifier);
+		if (salt == null) {
+			return null;
+		}
+		final String saltedPassword = UserHandler.saltPassword(password, salt);
+		final String pepperedPassword = UserHandler.pepperPassword(saltedPassword);
+		final String hashedPassword = UserHandler.hashPassword(pepperedPassword);
+
+		if (hashedPassword == null) {
+			try {
+				throw new Exception("\"hashedPassword\" could not be null, null found.");
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		return hashedPassword;
+	}
+
+	/**
+	 * Fetch the salt from the db for the given identifier.
+	 * 
+	 * @param identifier
+	 * @return salt
+	 */
+	public static String getSaltForIdentifier(final String identifier) {
+		if (identifier.equalsIgnoreCase(UserHandler.exampleUserObject.getIdentifier())) {
+			return "mysalt";
+		}
+		return null;
+	}
+
+	/**
+	 * Get the whole user from the database.
+	 * 
+	 * @param identifier
+	 * @param hashedPassword
+	 * @return User
+	 */
 	public static User getUser(final String identifier, final String hashedPassword) {
 		if (identifier.equalsIgnoreCase(UserHandler.exampleUserObject.getIdentifier())) {
 			return UserHandler.exampleUserObject;
@@ -70,6 +133,10 @@ public class UserHandler {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static boolean isLoggedIn() {
+		return UserHandler.isLoggedIn;
 	}
 
 	/**
@@ -107,17 +174,6 @@ public class UserHandler {
 	 */
 	public static String saltPassword(final String password, final String salt) {
 		return password + salt;
-	}
-
-	public static boolean isLoggedIn() {
-		return false;
-	}
-
-	public static User getCurrentUser() {
-		if (!UserHandler.isLoggedIn()) {
-			return null;
-		}
-		return UserHandler.exampleUserObject;
 	}
 
 }

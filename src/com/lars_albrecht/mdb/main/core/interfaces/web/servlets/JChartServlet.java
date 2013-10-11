@@ -8,7 +8,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
 import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.LinkedHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -46,23 +46,23 @@ public class JChartServlet extends HttpServlet {
 	/**
 	 * 
 	 */
-	private static final long					serialVersionUID		= -5540792818589675356L;
+	private static final long				serialVersionUID		= -5540792818589675356L;
 
-	public static final int						TYPE_ADDSPERDAY			= 10;
-	public static final int						TYPE_UPDATESPERDAY		= 11;
-	private int									type					= -1;
+	public static final int					TYPE_ADDSPERDAY			= 10;
+	public static final int					TYPE_UPDATESPERDAY		= 11;
+	private int								type					= -1;
 
-	private MainController						mainController			= null;
+	private MainController					mainController			= null;
 
-	private BarChartProperties					barChartProperties		= null;
+	private BarChartProperties				barChartProperties		= null;
 
-	private AxisProperties						axisProperties			= null;
-	private ChartProperties						chartProperties			= null;
+	private AxisProperties					axisProperties			= null;
+	private ChartProperties					chartProperties			= null;
 
-	private final int							width					= 500;
-	private final int							height					= 600;
+	private final int						width					= 500;
+	private final int						height					= 600;
 
-	private ConcurrentHashMap<Integer, Integer>	valuesAddsUpdatesPerDay	= null;
+	private LinkedHashMap<Integer, Integer>	valuesAddsUpdatesPerDay	= null;
 
 	public JChartServlet(final MainController mainController, final int type) {
 		this.mainController = mainController;
@@ -90,12 +90,11 @@ public class JChartServlet extends HttpServlet {
 
 	private void generateTypeAddsUpdatesPerDay(final HttpServletRequest request, final HttpServletResponse response) {
 		try {
-			final ConcurrentHashMap<Integer, Integer> valueList = this.mainController.getDataHandler().getUpdatedCountByDay();
 
-			final String[] xAxisLabels = new String[valueList.size()];
+			final String[] xAxisLabels = new String[this.valuesAddsUpdatesPerDay.size()];
 			int i = 0;
 
-			for (final Integer valueEntry : valueList.keySet()) {
+			for (final Integer valueEntry : this.valuesAddsUpdatesPerDay.keySet()) {
 				xAxisLabels[i] = Helper.getFormattedTimestamp(valueEntry.longValue(), "dd.MM.yyyy");
 				i++;
 			}
@@ -105,9 +104,9 @@ public class JChartServlet extends HttpServlet {
 			final String title = "Dateien pro Tag";
 			final IAxisDataSeries dataSeries = new DataSeries(xAxisLabels, xAxisTitle, yAxisTitle, title);
 
-			final double[][] data = new double[1][valueList.size()];
+			final double[][] data = new double[1][this.valuesAddsUpdatesPerDay.size()];
 			i = 0;
-			for (final Integer dataEntry : valueList.values()) {
+			for (final Integer dataEntry : this.valuesAddsUpdatesPerDay.values()) {
 				data[0][i] = dataEntry;
 				i++;
 			}

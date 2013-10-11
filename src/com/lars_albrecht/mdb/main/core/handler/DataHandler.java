@@ -801,8 +801,8 @@ public class DataHandler {
 		return result;
 	}
 
-	public ConcurrentHashMap<Integer, Integer> getCreatedCountByDay() {
-		final ConcurrentHashMap<Integer, Integer> resultList = new ConcurrentHashMap<Integer, Integer>();
+	public LinkedHashMap<Integer, Integer> getCreatedCountByDay() {
+		final LinkedHashMap<Integer, Integer> resultList = new LinkedHashMap<Integer, Integer>();
 		final String sql = "SELECT strftime('%d', createTS) AS 'dateDay', strftime('%m', createTS) AS 'dateMonth', strftime('%Y', createTS) AS 'dateYear', strftime('%s', strftime('%Y-%m-%d', createTS)) AS 'dayDateTS', COUNT(id) AS 'count' FROM fileInformation GROUP BY dateDay, dateMonth, dateYear ORDER BY dayDateTS";
 		ResultSet rs = null;
 
@@ -1030,8 +1030,8 @@ public class DataHandler {
 		return this.tags;
 	}
 
-	public ConcurrentHashMap<Integer, Integer> getUpdatedCountByDay() {
-		final ConcurrentHashMap<Integer, Integer> resultList = new ConcurrentHashMap<Integer, Integer>();
+	public LinkedHashMap<Integer, Integer> getUpdatedCountByDay() {
+		final LinkedHashMap<Integer, Integer> resultList = new LinkedHashMap<Integer, Integer>();
 		final String sql = "SELECT strftime('%d', updateTS) AS 'dateDay', strftime('%m', updateTS) AS 'dateMonth', strftime('%Y', updateTS) AS 'dateYear', strftime('%s', strftime('%Y-%m-%d', updateTS)) AS 'dayDateTS', COUNT(id) AS 'count' FROM fileInformation GROUP BY dateDay, dateMonth, dateYear ORDER BY dayDateTS";
 		ResultSet rs = null;
 
