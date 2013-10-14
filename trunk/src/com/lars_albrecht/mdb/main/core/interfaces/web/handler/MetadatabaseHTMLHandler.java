@@ -35,6 +35,11 @@ public class MetadatabaseHTMLHandler extends AbstractHandler {
 	public void
 			handle(final String str, final Request req, final HttpServletRequest httpReq, final HttpServletResponse httpRes) throws IOException,
 					ServletException {
+		if (this.webInterface.isLoggedIn(req)) {
+			// logged in
+		} else {
+			// not logged in
+		}
 		Debug.startTimer("MetadatabaseHTMLHandler handleTime: " + str);
 		String content = new WebServerHelper(this.mainController, this.webInterface).getFileContent(req.getRequestURI().substring(1), req);
 		Debug.stopTimer("MetadatabaseHTMLHandler handleTime: " + str);

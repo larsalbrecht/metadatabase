@@ -29,10 +29,23 @@ public class ChecksumSHA1 {
 		return complete.digest();
 	}
 
-	// see this How-to for a faster way to convert
-	// a byte array to a HEX string
+	public static byte[] createChecksumString(final String string) throws Exception {
+		final MessageDigest complete = MessageDigest.getInstance("SHA1");
+		complete.update(string.getBytes());
+		return complete.digest();
+	}
+
 	public static String getSHA1Checksum(final String filename) throws Exception {
 		final byte[] b = ChecksumSHA1.createChecksum(filename);
+		String result = "";
+		for (final byte element : b) {
+			result += Integer.toString((element & 0xff) + 0x100, 16).substring(1);
+		}
+		return result;
+	}
+
+	public static String getSHA1ChecksumString(final String string) throws Exception {
+		final byte[] b = ChecksumSHA1.createChecksumString(string);
 		String result = "";
 		for (final byte element : b) {
 			result += Integer.toString((element & 0xff) + 0x100, 16).substring(1);

@@ -40,6 +40,8 @@ public class MDBConfig {
 
 	private ArrayList<WebPageConfig>					webInterfacePageConfigs				= new ArrayList<WebPageConfig>();
 
+	private boolean										useUserAuthentication				= Boolean.FALSE;
+
 	public final void addTitleExtraction(final String fileType, final String infoType, final String section, final String key) {
 		this.itemTitleExtraction.put(fileType, new String[] {
 				infoType, section, key
@@ -114,6 +116,13 @@ public class MDBConfig {
 	}
 
 	/**
+	 * @return the useUserAuthentication
+	 */
+	public final boolean isUseUserAuthentication() {
+		return this.useUserAuthentication;
+	}
+
+	/**
 	 * @param finderFileFilter
 	 *            the finderFileFilter to set
 	 */
@@ -135,6 +144,14 @@ public class MDBConfig {
 	 */
 	public final void setSystemTrayInterfaceIconImageFile(final File systemTrayInterfaceIconImageFile) {
 		this.systemTrayInterfaceIconImageFile = systemTrayInterfaceIconImageFile;
+	}
+
+	/**
+	 * @param useUserAuthentication
+	 *            the useUserAuthentication to set
+	 */
+	public final void setUseUserAuthentication(final boolean useUserAuthentication) {
+		this.useUserAuthentication = useUserAuthentication;
 	}
 
 	/**
