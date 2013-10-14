@@ -20,6 +20,8 @@ import com.lars_albrecht.mdb.main.core.models.persistable.User;
  */
 public class LoginPage extends WebPage {
 
+	public static final int	INFO_NOTRY				= -2;
+	public static final int	INFO_FAILED				= -1;
 	public static final int	INFO_OK					= 0;
 	public static final int	INFO_IDENTIFIER			= 1;
 	public static final int	INFO_PASSWORD			= 2;
@@ -33,28 +35,39 @@ public class LoginPage extends WebPage {
 		super(actionname, request, mainController, webInterface);
 
 		// try to login
-		if ((request.getParameter("do") != null) && request.getParameter("do").equalsIgnoreCase("login")) {
-			final ConcurrentHashMap<Integer, Object> loginInfos = this.checkLoginForm(request);
-			User user = null;
-			if ((loginInfos != null) && loginInfos.containsKey(LoginPage.INFO_OK)) {
-				user = UserHandler.doLogin((String) loginInfos.get(LoginPage.INFO_IDENTIFIER),
-						(String) loginInfos.get(LoginPage.INFO_PASSWORD));
-			}
-			// if logininfos == null, no login tried
-			// if logininfos OK AND user == null, login tried, but mismatch
-			if ((loginInfos == null) || (loginInfos.containsKey(LoginPage.INFO_OK) && (user == null))) {
-				this.setPageTemplate(this.generateLoginPage(this.getPageTemplate()));
-			} else {
-				// no form
-				if (request.getParameter("req") != null) {
-					// redirect to req
+		if (request.getParameter("do") != null) {
+			if (request.getParameter("do").equalsIgnoreCase("login")) {
+				final int isLoggedIn = this.doLogin(request);
+
+				if (isLoggedIn == LoginPage.INFO_NOTRY) {
+					this.setPageTemplate(this.generateLoginPage(this.getPageTemplate()));
+				} else if (isLoggedIn == LoginPage.INFO_FAILED) {
+
+				} else if (isLoggedIn == LoginPage.INFO_OK) {
+					if (request.getParameter("req") != null) { // no form
+						// redirect to req
+					}
+				}
+			} else if (request.getParameter("do").equalsIgnoreCase("logout")) {
+				if (webInterface.isLoggedIn(request)) {
+					webInterface.doLogout(request);
+				} else {
+					// no current user
 				}
 			}
-		} else if ((request.getParameter("do") != null) && request.getParameter("do").equalsIgnoreCase("logout")) {
-			UserHandler.doLogout(UserHandler.getCurrentUser().getIdentifier());
+
+			this.setPageTemplate(this.generateLoginPage(this.getPageTemplate()));
+
 		}
 	}
 
+	/**
+	 * Test a loginForm.
+	 * 
+	 * @param request
+	 * @return
+	 */
+	@SuppressWarnings("unused")
 	private ConcurrentHashMap<Integer, Object> checkLoginForm(final Request request) {
 		ConcurrentHashMap<Integer, Object> loginInfos = null;
 		loginInfos = new ConcurrentHashMap<Integer, Object>();
@@ -78,9 +91,30 @@ public class LoginPage extends WebPage {
 
 		if (loginInfos.containsKey(LoginPage.INFO_IDENTIFIER) && loginInfos.containsKey(LoginPage.INFO_PASSWORD)) {
 			loginInfos.put(LoginPage.INFO_OK, true);
+		} else if (loginInfos.containsKey(LoginPage.INFO_NOIDENTIFIER) || !loginInfos.containsKey(LoginPage.INFO_NOPASSWORD)) {
+			loginInfos.put(LoginPage.INFO_FAILED, true);
 		}
 
 		return loginInfos;
+	}
+
+	private int doLogin(final Request request) {
+		int isLoggedIn = LoginPage.INFO_NOTRY;
+		final ConcurrentHashMap<Integer, Object> loginInfos = this.checkLoginForm(request);
+		User user = null;
+		if ((loginInfos != null) && loginInfos.containsKey(LoginPage.INFO_OK)) {
+			user = UserHandler
+					.doLogin((String) loginInfos.get(LoginPage.INFO_IDENTIFIER), (String) loginInfos.get(LoginPage.INFO_PASSWORD));
+			if (user != null) {
+				isLoggedIn = this.webInterface.doLogin(request, user) ? LoginPage.INFO_OK : LoginPage.INFO_FAILED;
+				if (isLoggedIn == LoginPage.INFO_OK) {
+					// logged in
+				} else {
+					// login failed
+				}
+			}
+		}
+		return isLoggedIn;
 	}
 
 	private Template generateLoginPage(final Template pageTemplate) {

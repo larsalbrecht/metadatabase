@@ -5,7 +5,9 @@ package com.lars_albrecht.mdb.main.core.handler;
 
 import java.security.NoSuchAlgorithmException;
 
+import com.lars_albrecht.general.utilities.ChecksumSHA1;
 import com.lars_albrecht.general.utilities.ChecksumSHA2;
+import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.models.persistable.User;
 
 /**
@@ -17,12 +19,7 @@ import com.lars_albrecht.mdb.main.core.models.persistable.User;
  */
 public class UserHandler {
 
-	public static boolean		usersEnabled		= Boolean.TRUE;
-
-	/**
-	 * Only a var to test the login
-	 */
-	public static boolean		isLoggedIn			= Boolean.FALSE;
+	public static boolean		usersEnabled		= Boolean.FALSE;
 
 	private static final User	exampleUserObject	= new User(0, "email@example.com", "example", null);
 
@@ -45,7 +42,6 @@ public class UserHandler {
 		final User databaseUser = UserHandler.getUser(identifier, hashedPassword);
 
 		if (databaseUser != null) {
-			UserHandler.isLoggedIn = Boolean.TRUE;
 			return databaseUser;
 		} else {
 			return null;
@@ -53,15 +49,27 @@ public class UserHandler {
 	}
 
 	public static boolean doLogout(final String identifier) {
-		UserHandler.isLoggedIn = false;
-
-		return !UserHandler.isLoggedIn;
+		return false;
 	}
 
-	public static User getCurrentUser() {
-		if (!UserHandler.isLoggedIn()) {
-			return null;
+	public static String generateUserToken(final User user, final String[] additional) {
+		String token = null;
+		if ((user != null) && (additional.length > 0)) {
+			token = user.getIdentifier() + user.getEmail() + Helper.implode(additional, "", null, null);
+			try {
+				return ChecksumSHA1.getSHA1ChecksumString(token);
+			} catch (final Exception e) {
+				e.printStackTrace();
+			}
+
 		}
+		return token;
+	}
+
+	/**
+	 * @return the exampleuserobject
+	 */
+	public static User getExampleuserobject() {
 		return UserHandler.exampleUserObject;
 	}
 
@@ -99,10 +107,18 @@ public class UserHandler {
 	 * @return salt
 	 */
 	public static String getSaltForIdentifier(final String identifier) {
-		if (identifier.equalsIgnoreCase(UserHandler.exampleUserObject.getIdentifier())) {
+		if (identifier.equalsIgnoreCase(UserHandler.getExampleuserobject().getIdentifier())) {
 			return "mysalt";
 		}
 		return null;
+	}
+
+	public static User getUser(final int id) {
+		if ((id > -1) && (UserHandler.getExampleuserobject().getId() == id)) {
+			return UserHandler.getExampleuserobject();
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -113,8 +129,8 @@ public class UserHandler {
 	 * @return User
 	 */
 	public static User getUser(final String identifier, final String hashedPassword) {
-		if (identifier.equalsIgnoreCase(UserHandler.exampleUserObject.getIdentifier())) {
-			return UserHandler.exampleUserObject;
+		if (identifier.equalsIgnoreCase(UserHandler.getExampleuserobject().getIdentifier())) {
+			return UserHandler.getExampleuserobject();
 		} else {
 			return null;
 		}
@@ -133,10 +149,6 @@ public class UserHandler {
 			e.printStackTrace();
 		}
 		return null;
-	}
-
-	public static boolean isLoggedIn() {
-		return UserHandler.isLoggedIn;
 	}
 
 	/**
@@ -161,7 +173,7 @@ public class UserHandler {
 			return null;
 		}
 
-		return UserHandler.exampleUserObject;
+		return UserHandler.getExampleuserobject();
 	}
 
 	/**
@@ -174,6 +186,14 @@ public class UserHandler {
 	 */
 	public static String saltPassword(final String password, final String salt) {
 		return password + salt;
+	}
+
+	public static boolean useUserLogin() {
+		return UserHandler.usersEnabled;
+	}
+
+	public static boolean useUserLogin(final boolean usersEnabled) {
+		return UserHandler.usersEnabled = usersEnabled;
 	}
 
 }

@@ -10,9 +10,9 @@ import org.eclipse.jetty.server.Request;
 
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
-import com.lars_albrecht.mdb.main.core.handler.UserHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPartial;
+import com.lars_albrecht.mdb.main.core.models.persistable.User;
 
 /**
  * @author lalbrecht
@@ -31,20 +31,21 @@ public class LoginBoxPartial extends WebPartial {
 		final Template loginBoxPartialTemplate = this.getPageTemplate();
 		String content = "";
 
-		if (UserHandler.isLoggedIn()) {
+		final User currUser = this.webInterface.getCurrentUser(this.request);
+
+		// is logged in?
+		if (currUser != null) {
 			String loginBoxText = loginBoxPartialTemplate.getSubMarkerContent("loginBoxText");
-			loginBoxText = Template.replaceMarker(loginBoxText, "name", UserHandler.getCurrentUser().getName(), false);
+			loginBoxText = Template.replaceMarker(loginBoxText, "name", this.webInterface.getCurrentUser(this.request).getName(), false);
 
 			content = loginBoxText;
 		} else {
+			// fill form
 			final String fullRequestUrl = this.request.getRootURL() + this.request.getRequestURI() + "?" + this.request.getQueryString();
 			String loginBoxForm = loginBoxPartialTemplate.getSubMarkerContent("loginBoxForm");
 
 			final String identifier = this.request.getParameter("loginBoxEmail");
 			final String password = this.request.getParameter("loginBoxPassword");
-
-			System.out.println(identifier);
-			System.out.println(password);
 
 			loginBoxForm = Template.replaceMarker(loginBoxForm, "identifier", (identifier != null ? identifier : ""), false);
 			loginBoxForm = Template.replaceMarker(loginBoxForm, "password", (password != null ? password : ""), false);
