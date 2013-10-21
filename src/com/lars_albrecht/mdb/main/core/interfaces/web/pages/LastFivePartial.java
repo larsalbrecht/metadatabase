@@ -9,6 +9,7 @@ import org.eclipse.jetty.server.Request;
 
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
+import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPartial;
@@ -29,8 +30,9 @@ public class LastFivePartial extends WebPartial {
 
 	private Template generateLastFivePartial() {
 		final Template lastFivePartialTemplate = this.getPageTemplate();
-		final ArrayList<FileItem> lastFiveList = ObjectHandler.castObjectListToFileItemList(this.mainController.getDataHandler().findAll(
-				new FileItem(), 5, " ORDER BY fileInformation.createTS DESC"));
+		this.mainController.getDataHandler();
+		final ArrayList<FileItem> lastFiveList = ObjectHandler.castObjectListToFileItemList(DataHandler.findAll(new FileItem(), 5,
+				" ORDER BY fileInformation.createTS DESC"));
 
 		if (lastFiveList.size() > 0) {
 			String listContainer = lastFivePartialTemplate.getSubMarkerContent("lastfivelist");

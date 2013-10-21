@@ -590,6 +590,7 @@ public class DB implements IDatabase {
 		DB.update(sql);
 	}
 
+	// TODO add foreign key for user_id
 	private void createTableFileTags() throws SQLException {
 		String sql = null;
 		// fileTags
@@ -598,12 +599,13 @@ public class DB implements IDatabase {
 		sql += "'file_id' INTEGER, ";
 		sql += "'tag_id' INTEGER, ";
 		sql += "'isuser' INTEGER, ";
+		sql += "'user_id' INTEGER, ";
 		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE, ";
 		sql += "FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE ";
 		// sql += "'value' INTEGER ";
 		sql += "); ";
 		DB.update(sql);
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_filetags_filekey ON fileTags (file_id, tag_id, isuser);";
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_filetags_filekey ON fileTags (file_id, tag_id, isuser, user_id);";
 		DB.update(sql);
 		sql = "CREATE INDEX IF NOT EXISTS idx_filetags_id_fileid_tagid ON fileTags (id, file_id, tag_id);";
 		DB.update(sql);
@@ -637,16 +639,34 @@ public class DB implements IDatabase {
 		DB.update(sql);
 	}
 
+	// TODO add foreign key for user_id
 	private void createTableTags() throws SQLException {
 		String sql = null;
 		// tags
 		sql = "CREATE TABLE IF NOT EXISTS 'tags' ( ";
 		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
 		sql += "'name' VARCHAR(255), ";
-		sql += "'isuser' INTEGER ";
+		sql += "'isuser' INTEGER, ";
+		sql += "'user_id' INTEGER ";
 		sql += "); ";
 		DB.update(sql);
 		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_tags_name ON tags (name);";
+		DB.update(sql);
+	}
+
+	// TODO add foreign key for user_id
+	private void createTableUsers() throws SQLException {
+		String sql = null;
+		// tags
+		sql = "CREATE TABLE IF NOT EXISTS 'users' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'name' VARCHAR(255), ";
+		sql += "'email' VARCHAR(255), ";
+		sql += "'password' VARCHAR(255), ";
+		sql += "'lastLoginTS' INTEGER DEFAULT 0";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_users_email ON users (email);";
 		DB.update(sql);
 	}
 
@@ -662,6 +682,7 @@ public class DB implements IDatabase {
 			}
 
 			this.createTableFileInformation();
+			this.createTableUsers();
 			this.createTableCollectorInformation();
 			this.createTableCollectorTypes();
 			this.createTableAttributesKey();
@@ -686,7 +707,7 @@ public class DB implements IDatabase {
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean updateDBWithVersion() {
-		final int newDBVersion = 5;
+		final int newDBVersion = 6;
 		// INSERT A DATABASE VERSION
 		String sql = "";
 		ResultSet rs = null;
@@ -832,6 +853,11 @@ public class DB implements IDatabase {
 						DB.update(sql);
 
 						this.createTableCollectorTypes();
+					} else if (i == 6) { // added user_id to tags and file_tags
+						sql = "ALTER TABLE tags ADD COLUMN 'user_id' INTEGER;";
+						DB.update(sql);
+						sql = "ALTER TABLE fileTags ADD COLUMN 'user_id' INTEGER;";
+						DB.update(sql);
 					}
 				}
 				DB.endTransaction();

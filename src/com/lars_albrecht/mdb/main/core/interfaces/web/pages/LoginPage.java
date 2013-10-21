@@ -106,7 +106,7 @@ public class LoginPage extends WebPage {
 			user = UserHandler
 					.doLogin((String) loginInfos.get(LoginPage.INFO_IDENTIFIER), (String) loginInfos.get(LoginPage.INFO_PASSWORD));
 			if (user != null) {
-				isLoggedIn = this.webInterface.doLogin(request, user) ? LoginPage.INFO_OK : LoginPage.INFO_FAILED;
+				isLoggedIn = this.webInterface.doLogin(user, request) ? LoginPage.INFO_OK : LoginPage.INFO_FAILED;
 				if (isLoggedIn == LoginPage.INFO_OK) {
 					// logged in
 				} else {

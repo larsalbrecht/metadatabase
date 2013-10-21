@@ -3,8 +3,10 @@
  */
 package com.lars_albrecht.mdb.main.core.models.persistable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
 
 /**
@@ -17,6 +19,7 @@ public class FileTag implements IPersistable {
 	private Integer	fileId	= null;
 	private Tag		tag		= null;
 	private Boolean	isUser	= null;
+	private User	user	= null;
 
 	public FileTag() {
 	}
@@ -36,6 +39,22 @@ public class FileTag implements IPersistable {
 	}
 
 	/**
+	 * @param id
+	 * @param fileId
+	 * @param tag
+	 * @param isUser
+	 * @param user
+	 */
+	public FileTag(final Integer id, final Integer fileId, final Tag tag, final Boolean isUser, final User user) {
+		super();
+		this.id = id;
+		this.fileId = fileId;
+		this.tag = tag;
+		this.isUser = isUser;
+		this.user = user;
+	}
+
+	/**
 	 * @param fileId
 	 * @param tag
 	 * @param isUser
@@ -45,6 +64,20 @@ public class FileTag implements IPersistable {
 		this.fileId = fileId;
 		this.tag = tag;
 		this.isUser = isUser;
+	}
+
+	/**
+	 * @param fileId
+	 * @param tag
+	 * @param isUser
+	 * @param user
+	 */
+	public FileTag(final Integer fileId, final Tag tag, final Boolean isUser, final User user) {
+		super();
+		this.fileId = fileId;
+		this.tag = tag;
+		this.isUser = isUser;
+		this.user = user;
 	}
 
 	/*
@@ -83,6 +116,13 @@ public class FileTag implements IPersistable {
 		} else if (!this.isUser.equals(other.isUser)) {
 			return false;
 		}
+		if (this.user == null) {
+			if (other.user != null) {
+				return false;
+			}
+		} else if (!this.user.equals(other.user)) {
+			return false;
+		}
 		if (this.tag == null) {
 			if (other.tag != null) {
 				return false;
@@ -112,6 +152,14 @@ public class FileTag implements IPersistable {
 		if (map.containsKey("isuser")) {
 			result.setIsUser(map.get("isuser") instanceof Integer ? (Integer) map.get("isuser") == 0 ? false : true : (Boolean) map
 					.get("isuser"));
+		}
+		if (map.containsKey("user_id")) {
+			if (map.get("user_id") instanceof Integer) {
+				final ArrayList<Object> userList = DataHandler.findAll(new User((Integer) map.get("user_id")), 1, null);
+				if (userList.size() > 0) {
+					result.setUser((User) userList.get(0));
+				}
+			}
 		}
 
 		return result;
@@ -151,6 +199,13 @@ public class FileTag implements IPersistable {
 		return this.tag;
 	}
 
+	/**
+	 * @return the user
+	 */
+	public final User getUser() {
+		return this.user;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -164,6 +219,7 @@ public class FileTag implements IPersistable {
 			result = (prime * result) + ((this.fileId == null) ? 0 : this.fileId.hashCode());
 			result = (prime * result) + ((this.isUser == null) ? 0 : this.isUser.hashCode());
 			result = (prime * result) + ((this.tag == null) ? 0 : this.tag.hashCode());
+			result = (prime * result) + ((this.user == null) ? 0 : this.user.hashCode());
 		} else {
 			result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
 		}
@@ -203,6 +259,14 @@ public class FileTag implements IPersistable {
 		this.tag = tag;
 	}
 
+	/**
+	 * @param user
+	 *            the user to set
+	 */
+	public final void setUser(final User user) {
+		this.user = user;
+	}
+
 	@Override
 	public HashMap<String, Object> toHashMap() {
 		final HashMap<String, Object> tempHashMap = new HashMap<String, Object>();
@@ -212,13 +276,16 @@ public class FileTag implements IPersistable {
 		tempHashMap.put("file_id", this.getFileId());
 		tempHashMap.put("tag_id", this.getTag().getId());
 		tempHashMap.put("isuser", this.getIsUser());
+		if ((this.getUser() != null) && (this.getUser().getId() != null)) {
+			tempHashMap.put("user_id", this.user.getId());
+		}
 
 		return tempHashMap;
 	}
 
 	@Override
 	public String toString() {
-		return this.id + " | " + this.fileId + " | " + this.tag + " | " + this.isUser;
+		return this.id + " | " + this.fileId + " | " + this.tag + " | " + this.isUser + " | " + this.user.getIdentifier();
 	}
 
 }

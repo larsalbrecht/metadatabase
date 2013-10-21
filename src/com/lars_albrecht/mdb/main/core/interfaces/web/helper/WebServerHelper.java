@@ -25,6 +25,7 @@ import com.lars_albrecht.mdb.main.core.interfaces.web.pages.LoginBoxPartial;
 import com.lars_albrecht.mdb.main.core.interfaces.web.pages.MainNavigationPartial;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
 import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
+import com.lars_albrecht.mdb.main.core.models.persistable.User;
 import com.lars_albrecht.mdb.main.core.utilities.Cache;
 import com.lars_albrecht.mdb.main.core.utilities.Paths;
 
@@ -145,6 +146,8 @@ public class WebServerHelper {
 	}
 
 	/**
+	 * TODO modify this to add more functions from outer classes.
+	 * 
 	 * Returns the content of the file from the url. It is like "index.html".
 	 * The file must be in /web/
 	 * 
@@ -216,7 +219,15 @@ public class WebServerHelper {
 					try {
 						final Tag tempTag = new Tag(request.getParameter("value"), Boolean.TRUE);
 						final Integer fileId = Integer.parseInt(request.getParameter("fileId"));
-						final Integer id = this.mainController.getDataHandler().addFileTag(new FileTag(fileId, tempTag, Boolean.TRUE));
+						Integer id = null;
+						if (this.webInterface.isLoggedIn(request)) {
+							final User tempUser = this.webInterface.getCurrentUser(request);
+							tempTag.setUser(tempUser);
+							id = this.mainController.getDataHandler().addFileTag(new FileTag(fileId, tempTag, Boolean.TRUE, tempUser));
+						} else {
+							id = this.mainController.getDataHandler().addFileTag(new FileTag(fileId, tempTag, Boolean.TRUE));
+						}
+
 						final ArrayList<Tag> tempTagList = new ArrayList<Tag>();
 						tempTag.setId(id);
 						tempTagList.add(tempTag);

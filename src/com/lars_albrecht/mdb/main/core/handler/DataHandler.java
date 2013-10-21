@@ -40,6 +40,48 @@ import com.lars_albrecht.mdb.main.database.DB;
 public class DataHandler {
 
 	/**
+	 * Finds all items of the given IPersistable object in database and return a
+	 * list of them.
+	 * 
+	 * @param object
+	 * @param limit
+	 * @param order
+	 * @return ArrayList<Object>
+	 */
+	public static ArrayList<Object> findAll(final IPersistable object, final Integer limit, final String order) {
+		HashMap<String, Object> tempMap = null;
+		final ArrayList<Object> resultList = new ArrayList<Object>();
+		if (object != null) {
+			String where = "";
+			String limitStr = "";
+			ResultSet rs = null;
+			if (object.getId() != null) {
+				where = " WHERE id=" + object.getId();
+			}
+			if ((limit != null) && (limit > 0)) {
+				limitStr = " LIMIT " + limit;
+			}
+
+			final String sql = "SELECT * FROM " + object.getDatabaseTable() + where + (order != null ? order : "") + limitStr;
+			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
+			try {
+				rs = DB.query(sql);
+				final ResultSetMetaData rsmd = rs.getMetaData();
+				for (; rs.next();) {
+					tempMap = new HashMap<String, Object>();
+					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
+					}
+					resultList.add(object.fromHashMap(tempMap));
+				}
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return resultList;
+	}
+
+	/**
 	 * Returns a Map.Entry<String, LinkedHashMap<Integer, Object>> with the sql
 	 * part as Key and the value-set as value.
 	 * 
@@ -91,8 +133,8 @@ public class DataHandler {
 	private ArrayList<Tag>									tags					= null;
 	private ArrayList<FileTag>								fileTags				= null;
 	private ConcurrentHashMap<String, ArrayList<FileItem>>	noInfoFileItems			= null;
-	private ArrayList<FileItem>								missingFileItems		= null;
 
+	private ArrayList<FileItem>								missingFileItems		= null;
 	private ArrayList<FileItem>								newFileItems			= null;
 	public static final int									RELOAD_ALL				= 0;
 	public static final int									RELOAD_KEYS				= 1;
@@ -101,9 +143,10 @@ public class DataHandler {
 	public static final int									RELOAD_FILEITEMS		= 4;
 	public static final int									RELOAD_NOINFOFILEITEMS	= 5;
 	public static final int									RELOAD_MISSINGFILEITEMS	= 6;
-	public static final int									RELOAD_TAGS				= 7;
 
+	public static final int									RELOAD_TAGS				= 7;
 	public static final int									RELOAD_FILETAGS			= 8;
+
 	public static final int									FILEITEMSTATUS_NORMAL	= 0;
 
 	public static final int									FILEITEMSTATUS_MISSING	= 1;
@@ -228,7 +271,11 @@ public class DataHandler {
 				this.persist(tag, false);
 				this.reloadData(DataHandler.RELOAD_TAGS);
 			}
-			return this.tags.get(this.tags.indexOf(tag)).getId();
+			if (this.tags.indexOf(tag) > -1) {
+				return this.tags.get(this.tags.indexOf(tag)).getId();
+			} else {
+				throw new Exception("Tag not found");
+			}
 		}
 		return null;
 	}
@@ -267,48 +314,6 @@ public class DataHandler {
 		}
 
 		return result;
-	}
-
-	/**
-	 * Finds all items of the given IPersistable object in database and return a
-	 * list of them.
-	 * 
-	 * @param object
-	 * @param limit
-	 * @param order
-	 * @return ArrayList<Object>
-	 */
-	public ArrayList<Object> findAll(final IPersistable object, final Integer limit, final String order) {
-		HashMap<String, Object> tempMap = null;
-		final ArrayList<Object> resultList = new ArrayList<Object>();
-		if (object != null) {
-			String where = "";
-			String limitStr = "";
-			ResultSet rs = null;
-			if (object.getId() != null) {
-				where = " WHERE id=" + object.getId();
-			}
-			if ((limit != null) && (limit > 0)) {
-				limitStr = " LIMIT " + limit;
-			}
-
-			final String sql = "SELECT * FROM " + object.getDatabaseTable() + where + (order != null ? order : "") + limitStr;
-			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
-			try {
-				rs = DB.query(sql);
-				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) {
-					tempMap = new HashMap<String, Object>();
-					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
-					}
-					resultList.add(object.fromHashMap(tempMap));
-				}
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return resultList;
 	}
 
 	public ArrayList<FileItem> findAllByFileItemValue(final String fileItemValue) {
@@ -1099,7 +1104,7 @@ public class DataHandler {
 	 */
 	private DataHandler loadFileAttributes() {
 		Debug.startTimer("loadFileAttributes");
-		this.fileAttributes = ObjectHandler.castObjectListToFileAttributesList(this.findAll(new FileAttributes(), null, null));
+		this.fileAttributes = ObjectHandler.castObjectListToFileAttributesList(DataHandler.findAll(new FileAttributes(), null, null));
 		Debug.stopTimer("loadFileAttributes");
 		return this;
 	}
@@ -1112,14 +1117,14 @@ public class DataHandler {
 	 */
 	private DataHandler loadFileItems() {
 		Debug.startTimer("loadFileItems");
-		this.fileItems = ObjectHandler.castObjectListToFileItemList(this.findAll(new FileItem(), null, null));
+		this.fileItems = ObjectHandler.castObjectListToFileItemList(DataHandler.findAll(new FileItem(), null, null));
 		Debug.stopTimer("loadFileItems");
 		return this;
 	}
 
 	private DataHandler loadFileTags() {
 		Debug.startTimer("loadFileTags");
-		this.fileTags = ObjectHandler.castObjectListToFileTagList(this.findAll(new FileTag(), null, null));
+		this.fileTags = ObjectHandler.castObjectListToFileTagList(DataHandler.findAll(new FileTag(), null, null));
 		Debug.stopTimer("loadFileTags");
 		return this;
 	}
@@ -1131,7 +1136,7 @@ public class DataHandler {
 	 */
 	private DataHandler loadKeys() {
 		Debug.startTimer("loadKeys");
-		this.keys = ObjectHandler.castObjectListToKeyList(this.findAll(new Key<String>(), null, null));
+		this.keys = ObjectHandler.castObjectListToKeyList(DataHandler.findAll(new Key<String>(), null, null));
 		Debug.stopTimer("loadKeys");
 		return this;
 	}
@@ -1152,7 +1157,7 @@ public class DataHandler {
 
 	private DataHandler loadTags() {
 		Debug.startTimer("loadTags");
-		this.tags = ObjectHandler.castObjectListToTagList(this.findAll(new Tag(), null, null));
+		this.tags = ObjectHandler.castObjectListToTagList(DataHandler.findAll(new Tag(), null, null));
 		Debug.stopTimer("loadTags");
 		return this;
 	}
@@ -1164,7 +1169,7 @@ public class DataHandler {
 	 */
 	private DataHandler loadValues() {
 		Debug.startTimer("loadValues");
-		this.values = ObjectHandler.castObjectListToValueList(this.findAll(new Value<Object>(), null, null));
+		this.values = ObjectHandler.castObjectListToValueList(DataHandler.findAll(new Value<Object>(), null, null));
 		Debug.stopTimer("loadValues");
 		return this;
 	}
