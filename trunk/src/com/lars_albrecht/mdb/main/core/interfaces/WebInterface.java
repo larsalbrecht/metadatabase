@@ -54,7 +54,8 @@ public class WebInterface extends AInterface {
 		this.canOpened = true;
 	}
 
-	public boolean doLogin(final Request request, final User user) {
+	// TODO find try to move this to AInterface.
+	public boolean doLogin(final User user, final Request request) {
 		if (user == null) {
 			return false;
 		}

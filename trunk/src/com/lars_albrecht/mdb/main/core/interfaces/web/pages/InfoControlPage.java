@@ -94,8 +94,9 @@ public class InfoControlPage extends WebPage {
 
 				statusMessages.add("Collections will be refreshed ...");
 
-				final ArrayList<FileItem> fileList = ObjectHandler.castObjectListToFileItemList(this.mainController.getDataHandler()
-						.findAll(new FileItem(), null, null));
+				this.mainController.getDataHandler();
+				final ArrayList<FileItem> fileList = ObjectHandler.castObjectListToFileItemList(DataHandler.findAll(new FileItem(), null,
+						null));
 				if ((fileList != null) && (fileList.size() > 0)) {
 					statusMessages.add("Collections can be refreshed ... work in progress");
 					try {

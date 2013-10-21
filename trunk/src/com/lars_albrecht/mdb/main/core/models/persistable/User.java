@@ -29,6 +29,14 @@ public class User implements IPersistable {
 
 	/**
 	 * @param id
+	 */
+	public User(final Integer id) {
+		super();
+		this.id = id;
+	}
+
+	/**
+	 * @param id
 	 * @param email
 	 * @param name
 	 * @param lastLoginTS
@@ -69,7 +77,7 @@ public class User implements IPersistable {
 
 	@Override
 	public String getDatabaseTable() {
-		return "user";
+		return "users";
 	}
 
 	/**

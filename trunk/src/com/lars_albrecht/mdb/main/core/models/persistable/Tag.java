@@ -3,8 +3,10 @@
  */
 package com.lars_albrecht.mdb.main.core.models.persistable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.models.interfaces.IPersistable;
 
 /**
@@ -16,6 +18,7 @@ public class Tag implements IPersistable {
 	private Integer	id		= null;
 	private String	name	= null;
 	private Boolean	isUser	= null;
+	private User	user	= null;
 
 	public Tag() {
 	}
@@ -32,10 +35,25 @@ public class Tag implements IPersistable {
 		this.isUser = isUser;
 	}
 
+	public Tag(final Integer id, final String name, final Boolean isUser, final User user) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.isUser = isUser;
+		this.user = user;
+	}
+
 	public Tag(final String name, final Boolean isUser) {
 		super();
 		this.name = name;
 		this.isUser = isUser;
+	}
+
+	public Tag(final String name, final Boolean isUser, final User user) {
+		super();
+		this.name = name;
+		this.isUser = isUser;
+		this.user = user;
 	}
 
 	/*
@@ -74,6 +92,14 @@ public class Tag implements IPersistable {
 		} else if (!this.isUser.equals(other.isUser)) {
 			return false;
 		}
+		if (this.user == null) {
+			if (other.user != null) {
+				return false;
+			}
+		} else if (!this.user.equals(other.user)) {
+			return false;
+		}
+
 		return true;
 	}
 
@@ -91,6 +117,14 @@ public class Tag implements IPersistable {
 				result.setIsUser((Boolean) map.get("isuser"));
 			} else if (map.get("isuser") instanceof Integer) {
 				result.setIsUser((Integer) map.get("isuser") == 0 ? false : true);
+			}
+		}
+		if (map.containsKey("user_id")) {
+			if (map.get("user_id") instanceof Integer) {
+				final ArrayList<Object> userList = DataHandler.findAll(new User((Integer) map.get("user_id")), 1, null);
+				if (userList.size() > 0) {
+					result.setUser((User) userList.get(0));
+				}
 			}
 		}
 
@@ -124,6 +158,13 @@ public class Tag implements IPersistable {
 		return this.name;
 	}
 
+	/**
+	 * @return the user
+	 */
+	public final User getUser() {
+		return this.user;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -136,6 +177,7 @@ public class Tag implements IPersistable {
 		if (this.id == null) {
 			result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
 			result = (prime * result) + ((this.isUser == null) ? 0 : this.isUser.hashCode());
+			result = (prime * result) + ((this.user == null) ? 0 : this.user.hashCode());
 		} else {
 			result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
 		}
@@ -168,6 +210,14 @@ public class Tag implements IPersistable {
 		this.name = name;
 	}
 
+	/**
+	 * @param user
+	 *            the user to set
+	 */
+	public final void setUser(final User user) {
+		this.user = user;
+	}
+
 	@Override
 	public HashMap<String, Object> toHashMap() {
 		final HashMap<String, Object> tempHashMap = new HashMap<String, Object>();
@@ -176,13 +226,16 @@ public class Tag implements IPersistable {
 		}
 		tempHashMap.put("name", this.getName());
 		tempHashMap.put("isuser", this.getIsUser());
+		if ((this.getUser() != null) && (this.getUser().getId() != null)) {
+			tempHashMap.put("user_id", this.user.getId());
+		}
 
 		return tempHashMap;
 	}
 
 	@Override
 	public String toString() {
-		return this.id + " | " + this.name + " | " + this.isUser;
+		return this.id + " | " + this.name + " | " + this.isUser + " | " + this.user.getIdentifier();
 	}
 
 }
