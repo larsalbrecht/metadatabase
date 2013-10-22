@@ -230,7 +230,7 @@ public abstract class ACollector implements Runnable {
 
 			// if lastRun = NULL, the collector collects for all files
 			final Long lastRun = (lastRunObj == null ? null : (lastRunObj instanceof String ? Long.parseLong((String) lastRunObj)
-					: (lastRunObj instanceof java.sql.Timestamp ? ((Timestamp) lastRunObj).getTime() : (Long) lastRunObj)));
+					: (lastRunObj instanceof Timestamp ? ((Timestamp) lastRunObj).getTime() : (Long) lastRunObj)));
 			for (int i = 0; i < fileItems.size(); i++) {
 				// item for this collector?
 				if ((fileItems.get(i) != null) && this.types.contains(fileItems.get(i).getFiletype())) {

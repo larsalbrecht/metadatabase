@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.web.helper.WebServerHelper;
+import com.lars_albrecht.mdb.main.core.models.Pair;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
 /**
@@ -47,6 +48,40 @@ public class InterfaceHelper {
 		output = new SimpleEntry<String, String>(key, value);
 
 		return output;
+	}
+
+	/**
+	 * 
+	 * @param searchStrList
+	 * @param searchType
+	 * @return Pair<ArrayList<FileItem>, Integer>
+	 */
+	private static Pair<ArrayList<FileItem>, Integer>
+			getSearchResults(final ArrayList<Entry<String, String>> searchStrList, int searchType) {
+		final Pair<ArrayList<FileItem>, Integer> searchResults = new Pair<ArrayList<FileItem>, Integer>();
+		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
+		for (final Entry<String, String> searchEntry : searchStrList) {
+			searchType = WebServerHelper.SEARCHTYPE_TEXTALL;
+			if ((searchEntry.getKey() != null) && DataHandler.isKeyInKeyList(searchEntry.getKey())) {
+				searchType = WebServerHelper.SEARCHTYPE_ATTRIBUTE;
+			}
+
+			switch (searchType) {
+				default:
+				case SEARCHTYPE_TEXTALL:
+					resultList.addAll(Helper.uniqueList(DataHandler.findAllFileItemForStringInAll(searchEntry.getValue())));
+					break;
+				case SEARCHTYPE_ATTRIBUTE:
+					resultList.addAll(Helper.uniqueList(DataHandler.findAllFileItemForStringInAttributesByKeyValue(searchEntry.getKey(),
+							searchEntry.getValue())));
+					break;
+			}
+		}
+
+		searchResults.setX(resultList);
+		searchResults.setY(searchType);
+
+		return searchResults;
 	}
 
 	/**
@@ -92,26 +127,9 @@ public class InterfaceHelper {
 			}
 
 			// TODO fix search and output from searchkeys/values
-
-			for (final Entry<String, String> searchEntry : searchStrList) {
-				searchType = WebServerHelper.SEARCHTYPE_TEXTALL;
-				if (searchEntry.getKey() != null) {
-					if (dataHandler.isKeyInKeyList(searchEntry.getKey())) {
-						searchType = WebServerHelper.SEARCHTYPE_ATTRIBUTE;
-					}
-				}
-
-				switch (searchType) {
-					default:
-					case SEARCHTYPE_TEXTALL:
-						resultList.addAll(Helper.uniqueList(dataHandler.findAllFileItemForStringInAll(searchEntry.getValue())));
-						break;
-					case SEARCHTYPE_ATTRIBUTE:
-						resultList.addAll(Helper.uniqueList(dataHandler.findAllFileItemForStringInAttributesByKeyValue(
-								searchEntry.getKey(), searchEntry.getValue())));
-						break;
-				}
-			}
+			final Pair<ArrayList<FileItem>, Integer> searchResults = InterfaceHelper.getSearchResults(searchStrList, searchType);
+			resultList = searchResults.getX();
+			searchType = searchResults.getY();
 
 			resultList = Helper.uniqueList(resultList);
 			resultMap.put("resultlist", resultList); // ArrayList<FileItem>
@@ -122,5 +140,4 @@ public class InterfaceHelper {
 
 		return resultMap;
 	}
-
 }

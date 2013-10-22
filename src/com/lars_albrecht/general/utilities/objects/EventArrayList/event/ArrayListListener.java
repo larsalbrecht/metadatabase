@@ -11,10 +11,10 @@ import java.util.EventListener;
  */
 public interface ArrayListListener extends EventListener {
 
-	public void arrayListenerAdd(ArrayListEvent e);
+	void arrayListenerAdd(ArrayListEvent e);
 
-	public void arrayListenerClear(ArrayListEvent e);
+	void arrayListenerClear(ArrayListEvent e);
 
-	public void arrayListenerRemove(ArrayListEvent e);
+	void arrayListenerRemove(ArrayListEvent e);
 
 }

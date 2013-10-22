@@ -17,23 +17,23 @@ public interface IFinderListener extends EventListener {
 	 * 
 	 * @param e
 	 */
-	public void finderAddFinish(FinderEvent e);
+	void finderAddFinish(FinderEvent e);
 
 	/**
-	 * Called after found filelist is added. Event contains an ArrayList<File>
+	 * Called after found file-list is added. Event contains an ArrayList<File>
 	 * with all found files.
 	 * 
 	 * @param e
 	 */
-	public void finderAfterAdd(FinderEvent e);
+	void finderAfterAdd(FinderEvent e);
 
 	/**
 	 * Called when a directory is found. Event contains an ArrayList<File> with
-	 * the found dir.
+	 * the found directory.
 	 * 
 	 * @param e
 	 */
-	public void finderFoundDir(FinderEvent e);
+	void finderFoundDir(FinderEvent e);
 
 	/**
 	 * Called when a file is found. Event contains an ArrayList<File> with the
@@ -41,14 +41,14 @@ public interface IFinderListener extends EventListener {
 	 * 
 	 * @param e
 	 */
-	public void finderFoundFile(FinderEvent e);
+	void finderFoundFile(FinderEvent e);
 
 	/**
-	 * Called before found filelist is added. Event contains an ArrayList<File>
+	 * Called before found file-list is added. Event contains an ArrayList<File>
 	 * with the found files that will be added.
 	 * 
 	 * @param e
 	 */
-	public void finderPreAdd(FinderEvent e);
+	void finderPreAdd(FinderEvent e);
 
 }

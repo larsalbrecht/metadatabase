@@ -54,8 +54,8 @@ public class MainNavigationPartial extends WebPartial {
 	}
 
 	private String getHrefForNames(final ArrayList<String> pageNames) {
-		for (final String string : pageNames) {
-			return "?action=" + string;
+		if ((pageNames != null) && (pageNames.size() > 0)) {
+			return "?action=" + pageNames.get(0);
 		}
 		return null;
 	}

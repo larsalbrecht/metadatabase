@@ -39,6 +39,8 @@ import com.lars_albrecht.mdb.main.database.DB;
  */
 public class DataHandler {
 
+	private static ArrayList<Key<?>>	keys	= null;
+
 	/**
 	 * Finds all items of the given IPersistable object in database and return a
 	 * list of them.
@@ -69,7 +71,7 @@ public class DataHandler {
 			try {
 				rs = DB.query(sql);
 				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) {
+				while (rs.next()) {
 					tempMap = new HashMap<String, Object>();
 					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
@@ -130,6 +132,22 @@ public class DataHandler {
 	}
 
 	/**
+	 * Search key in this.keys. This method ignore the infoType/section
+	 * parameters.
+	 * 
+	 * @param key
+	 * @return boolean
+	 */
+	public static boolean isKeyInKeyList(final String key) {
+		for (final Key<?> thisKey : DataHandler.keys) {
+			if (((String) thisKey.getKey()).equalsIgnoreCase(key)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * 
 	 * @param object
 	 * @param doReplace
@@ -141,13 +159,12 @@ public class DataHandler {
 		DataHandler.persist(dummyList, doReplace);
 	}
 
-	private ArrayList<Key<?>>								keys					= null;
 	private ArrayList<Value<?>>								values					= null;
 	private ArrayList<FileItem>								fileItems				= null;
 	private ArrayList<FileAttributes>						fileAttributes			= null;
 	private ArrayList<Tag>									tags					= null;
-	private ArrayList<FileTag>								fileTags				= null;
 
+	private ArrayList<FileTag>								fileTags				= null;
 	private ConcurrentHashMap<String, ArrayList<FileItem>>	noInfoFileItems			= null;
 	private ArrayList<FileItem>								missingFileItems		= null;
 	private ArrayList<FileItem>								newFileItems			= null;
@@ -156,9 +173,10 @@ public class DataHandler {
 	public static final int									RELOAD_VALUES			= 2;
 	public static final int									RELOAD_FILEATTRIBUTES	= 3;
 	public static final int									RELOAD_FILEITEMS		= 4;
-	public static final int									RELOAD_NOINFOFILEITEMS	= 5;
 
+	public static final int									RELOAD_NOINFOFILEITEMS	= 5;
 	public static final int									RELOAD_MISSINGFILEITEMS	= 6;
+
 	public static final int									RELOAD_TAGS				= 7;
 
 	public static final int									RELOAD_FILETAGS			= 8;
@@ -168,6 +186,134 @@ public class DataHandler {
 	public static final int									FILEITEMSTATUS_MISSING	= 1;
 
 	public static final int									FILEITEMSTATUS_RELOAD	= 2;
+
+	public static ArrayList<FileItem> findAllByFileItemValue(final String fileItemValue) {
+		final FileItem fileItem = new FileItem();
+		HashMap<String, Object> tempMap = null;
+		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
+		if (fileItem != null) {
+			String where = "";
+			ResultSet rs = null;
+			where = " WHERE ((name || fullpath || dir || size || ext ) LIKE '%" + fileItemValue + "%')";
+
+			final String sql = "SELECT * FROM " + fileItem.getDatabaseTable() + where;
+			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
+			try {
+				rs = DB.query(sql);
+				final ResultSetMetaData rsmd = rs.getMetaData();
+				while (rs.next()) {
+					tempMap = new HashMap<String, Object>();
+					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
+					}
+					resultList.add((FileItem) fileItem.fromHashMap(tempMap));
+				}
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return resultList;
+	}
+
+	/**
+	 * Returns a list of FileItems which are searched by the search term
+	 * searchStr.
+	 * 
+	 * @param searchStr
+	 *            String
+	 * @return ArrayList<FileItem>
+	 */
+	public static ArrayList<FileItem> findAllFileItemForStringInAll(final String searchStr) {
+		ArrayList<FileItem> tempList = null;
+		tempList = DataHandler.findAllByFileItemValue(searchStr);
+
+		final FileItem fileItem = new FileItem();
+		HashMap<String, Object> tempMap = null;
+		if (fileItem != null) {
+			String where = "";
+			ResultSet rs = null;
+			where = " WHERE ((tiValue.value LIKE '%" + searchStr + "%') OR (t.name LIKE '%" + searchStr + "%'))";
+
+			String searchResultOrderOption = (String) OptionsHandler.getOption("searchResultOrder");
+			if (searchResultOrderOption == null) {
+				searchResultOrderOption = "fileInformation.name";
+				OptionsHandler.setOption("searchResultOrder", searchResultOrderOption);
+			}
+
+			final String order = " ORDER BY '" + searchResultOrderOption + "'";
+
+			final String sql = "SELECT fi.* FROM '" + fileItem.getDatabaseTable() + "' AS fi LEFT JOIN " + " "
+					+ new FileAttributes().getDatabaseTable() + " as ti " + "ON " + " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	"
+					+ new Key<>().getDatabaseTable() + " AS tiKey " + "ON " + " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	"
+					+ new Value<>().getDatabaseTable() + " AS tiValue " + "ON " + "	tiValue.id = ti.value_id "
+					+ "LEFT JOIN fileTags AS ft ON fi.id = ft.file_id " + "LEFT JOIN tags AS t ON ft.tag_id = t.id " + where + order;
+			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
+			try {
+				rs = DB.query(sql);
+				final ResultSetMetaData rsmd = rs.getMetaData();
+				while (rs.next()) {
+					tempMap = new HashMap<String, Object>();
+					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
+					}
+					tempList.add((FileItem) fileItem.fromHashMap(tempMap));
+				}
+			} catch (final SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return tempList;
+	}
+
+	/**
+	 * Returns a list of FileItems which are searched by the search term
+	 * searchStr.
+	 * 
+	 * @param key
+	 * @param value
+	 * @return ArrayList<Object>
+	 */
+	public static ArrayList<FileItem> findAllFileItemForStringInAttributesByKeyValue(final String key, final String value) {
+		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
+
+		if ((key != null) && (value != null)) {
+			final FileItem fileItem = new FileItem();
+			HashMap<String, Object> tempMap = null;
+			if (fileItem != null) {
+				String where = "";
+				ResultSet rs = null;
+				where = " WHERE (tiValue.value LIKE '%" + value + "%' AND tiKey.key LIKE '%" + key + "%' )";
+
+				String searchResultOrderOption = (String) OptionsHandler.getOption("searchResultOrder");
+				if (searchResultOrderOption == null) {
+					searchResultOrderOption = "fileInformation.name";
+					OptionsHandler.setOption("searchResultOrder", searchResultOrderOption);
+				}
+
+				final String order = " ORDER BY '" + searchResultOrderOption + "'";
+
+				final String sql = "SELECT fi.* FROM '" + fileItem.getDatabaseTable() + "' AS fi LEFT JOIN " + " 	"
+						+ new FileAttributes().getDatabaseTable() + " as ti " + "ON " + " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	"
+						+ new Key<>().getDatabaseTable() + " AS tiKey " + "ON " + " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	"
+						+ new Value<>().getDatabaseTable() + " AS tiValue " + "ON " + "	tiValue.id = ti.value_id " + where + order;
+				Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
+				try {
+					rs = DB.query(sql);
+					final ResultSetMetaData rsmd = rs.getMetaData();
+					while (rs.next()) {
+						tempMap = new HashMap<String, Object>();
+						for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+							tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
+						}
+						resultList.add((FileItem) fileItem.fromHashMap(tempMap));
+					}
+				} catch (final SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return resultList;
+	}
 
 	/**
 	 * Persist a list of IPersistable's into the database using the IPersistable
@@ -241,7 +387,11 @@ public class DataHandler {
 		}
 	}
 
+	@SuppressWarnings("unused")
+	private MainController	mainController	= null;
+
 	public DataHandler(final MainController mainController) {
+		this.mainController = mainController;
 		this.newFileItems = new ArrayList<FileItem>();
 		this.reloadData(DataHandler.RELOAD_ALL);
 	}
@@ -332,84 +482,6 @@ public class DataHandler {
 		return result;
 	}
 
-	public ArrayList<FileItem> findAllByFileItemValue(final String fileItemValue) {
-		final FileItem fileItem = new FileItem();
-		HashMap<String, Object> tempMap = null;
-		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
-		if (fileItem != null) {
-			String where = "";
-			ResultSet rs = null;
-			where = " WHERE ((name || fullpath || dir || size || ext ) LIKE '%" + fileItemValue + "%')";
-
-			final String sql = "SELECT * FROM " + fileItem.getDatabaseTable() + where;
-			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
-			try {
-				rs = DB.query(sql);
-				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) {
-					tempMap = new HashMap<String, Object>();
-					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
-					}
-					resultList.add((FileItem) fileItem.fromHashMap(tempMap));
-				}
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return resultList;
-	}
-
-	/**
-	 * Returns a list of FileItems which are searched by the search term
-	 * searchStr.
-	 * 
-	 * @param searchStr
-	 *            String
-	 * @return ArrayList<FileItem>
-	 */
-	public ArrayList<FileItem> findAllFileItemForStringInAll(final String searchStr) {
-		ArrayList<FileItem> tempList = null;
-		tempList = this.findAllByFileItemValue(searchStr);
-
-		final FileItem fileItem = new FileItem();
-		HashMap<String, Object> tempMap = null;
-		if (fileItem != null) {
-			String where = "";
-			ResultSet rs = null;
-			where = " WHERE ((tiValue.value LIKE '%" + searchStr + "%') OR (t.name LIKE '%" + searchStr + "%'))";
-
-			String searchResultOrderOption = (String) OptionsHandler.getOption("searchResultOrder");
-			if (searchResultOrderOption == null) {
-				searchResultOrderOption = "fileInformation.name";
-				OptionsHandler.setOption("searchResultOrder", searchResultOrderOption);
-			}
-
-			final String order = " ORDER BY '" + searchResultOrderOption + "'";
-
-			final String sql = "SELECT fi.* FROM '" + fileItem.getDatabaseTable() + "' AS fi LEFT JOIN " + " "
-					+ new FileAttributes().getDatabaseTable() + " as ti " + "ON " + " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	"
-					+ new Key<>().getDatabaseTable() + " AS tiKey " + "ON " + " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	"
-					+ new Value<>().getDatabaseTable() + " AS tiValue " + "ON " + "	tiValue.id = ti.value_id "
-					+ "LEFT JOIN fileTags AS ft ON fi.id = ft.file_id " + "LEFT JOIN tags AS t ON ft.tag_id = t.id " + where + order;
-			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
-			try {
-				rs = DB.query(sql);
-				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) {
-					tempMap = new HashMap<String, Object>();
-					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
-					}
-					tempList.add((FileItem) fileItem.fromHashMap(tempMap));
-				}
-			} catch (final SQLException e) {
-				e.printStackTrace();
-			}
-		}
-		return tempList;
-	}
-
 	public ArrayList<FileItem> findAllFileItemForStringInAttributesByKey(final String key,
 			final boolean exact,
 			String order,
@@ -449,7 +521,7 @@ public class DataHandler {
 				try {
 					rs = DB.query(sql);
 					final ResultSetMetaData rsmd = rs.getMetaData();
-					for (; rs.next();) {
+					while (rs.next()) {
 						tempMap = new HashMap<String, Object>();
 						for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 							tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
@@ -478,56 +550,6 @@ public class DataHandler {
 	}
 
 	/**
-	 * Returns a list of FileItems which are searched by the search term
-	 * searchStr.
-	 * 
-	 * @param key
-	 * @param value
-	 * @return ArrayList<Object>
-	 */
-	public ArrayList<FileItem> findAllFileItemForStringInAttributesByKeyValue(final String key, final String value) {
-		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
-
-		if ((key != null) && (value != null)) {
-			final FileItem fileItem = new FileItem();
-			HashMap<String, Object> tempMap = null;
-			if (fileItem != null) {
-				String where = "";
-				ResultSet rs = null;
-				where = " WHERE (tiValue.value LIKE '%" + value + "%' AND tiKey.key LIKE '%" + key + "%' )";
-
-				String searchResultOrderOption = (String) OptionsHandler.getOption("searchResultOrder");
-				if (searchResultOrderOption == null) {
-					searchResultOrderOption = "fileInformation.name";
-					OptionsHandler.setOption("searchResultOrder", searchResultOrderOption);
-				}
-
-				final String order = " ORDER BY '" + searchResultOrderOption + "'";
-
-				final String sql = "SELECT fi.* FROM '" + fileItem.getDatabaseTable() + "' AS fi LEFT JOIN " + " 	"
-						+ new FileAttributes().getDatabaseTable() + " as ti " + "ON " + " 	ti.file_id = fi.id " + " LEFT JOIN " + " 	"
-						+ new Key<>().getDatabaseTable() + " AS tiKey " + "ON " + " 	tiKey.id = ti.key_id " + "LEFT JOIN " + "	"
-						+ new Value<>().getDatabaseTable() + " AS tiValue " + "ON " + "	tiValue.id = ti.value_id " + where + order;
-				Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
-				try {
-					rs = DB.query(sql);
-					final ResultSetMetaData rsmd = rs.getMetaData();
-					for (; rs.next();) {
-						tempMap = new HashMap<String, Object>();
-						for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-							tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
-						}
-						resultList.add((FileItem) fileItem.fromHashMap(tempMap));
-					}
-				} catch (final SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		return resultList;
-	}
-
-	/**
 	 * Finds all information for a fileId and returns a FileItem.
 	 * 
 	 * @param fileId
@@ -546,7 +568,7 @@ public class DataHandler {
 			try {
 				rs = DB.query(sql);
 				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) {
+				while (rs.next()) {
 					tempMap = new HashMap<String, Object>();
 					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
@@ -582,7 +604,7 @@ public class DataHandler {
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 			try {
 				rs = DB.queryPS(sql, values);
-				for (; rs.next();) {
+				while (rs.next()) {
 					resultList.add(rs.getString("value"));
 				}
 			} catch (final SQLException e) {
@@ -612,7 +634,7 @@ public class DataHandler {
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 			try {
 				rs = DB.queryPS(sql, values);
-				for (; rs.next();) {
+				while (rs.next()) {
 					resultList.add(rs.getString("value"));
 				}
 			} catch (final SQLException e) {
@@ -658,7 +680,7 @@ public class DataHandler {
 			try {
 				rs = DB.query(sql);
 				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) {
+				while (rs.next()) {
 					tempMap = new HashMap<String, Object>();
 					for (int i = 2; i <= rsmd.getColumnCount(); i++) {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
@@ -700,7 +722,7 @@ public class DataHandler {
 			try {
 				rs = DB.query(sql);
 				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) {
+				while (rs.next()) {
 					tempMap = new HashMap<String, Object>();
 					for (int i = 2; i <= rsmd.getColumnCount(); i++) {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
@@ -741,7 +763,7 @@ public class DataHandler {
 			try {
 				rs = DB.query(sql);
 				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) {
+				while (rs.next()) {
 					tempMap = new HashMap<String, Object>();
 					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
@@ -789,7 +811,7 @@ public class DataHandler {
 			try {
 				rs = DB.query(sql);
 				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) {
+				while (rs.next()) {
 					tempMap = new HashMap<String, Object>();
 					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
@@ -879,7 +901,7 @@ public class DataHandler {
 			try {
 				rs = DB.query(sql);
 				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) {
+				while (rs.next()) {
 					tempMap = new HashMap<String, Object>();
 					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
@@ -979,10 +1001,10 @@ public class DataHandler {
 	 * @return the keys
 	 */
 	public ArrayList<Key<?>> getKeys() {
-		if (this.keys == null) {
+		if (DataHandler.keys == null) {
 			this.loadKeys();
 		}
-		return this.keys;
+		return DataHandler.keys;
 	}
 
 	/**
@@ -1080,22 +1102,6 @@ public class DataHandler {
 	}
 
 	/**
-	 * Search key in this.keys. This method ignore the infoType/section
-	 * parameters.
-	 * 
-	 * @param key
-	 * @return boolean
-	 */
-	public boolean isKeyInKeyList(final String key) {
-		for (final Key<?> thisKey : this.keys) {
-			if (((String) thisKey.getKey()).equalsIgnoreCase(key)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Returns the position of a key in this.keys.
 	 * 
 	 * @param searchKey
@@ -1152,7 +1158,7 @@ public class DataHandler {
 	 */
 	private DataHandler loadKeys() {
 		Debug.startTimer("loadKeys");
-		this.keys = ObjectHandler.castObjectListToKeyList(DataHandler.findAll(new Key<String>(), null, null, null));
+		DataHandler.keys = ObjectHandler.castObjectListToKeyList(DataHandler.findAll(new Key<String>(), null, null, null));
 		Debug.stopTimer("loadKeys");
 		return this;
 	}

@@ -54,6 +54,34 @@ public class DirectoryWatcher implements Runnable {
 		}
 	}
 
+	private void doEntryCreate(final File eventFile, final ArrayList<File> tempList) throws Exception {
+		System.out.println("CREATE");
+		if (eventFile.isDirectory()) {
+			System.out.println("FIND");
+			this.addDirecotry(eventFile);
+			this.mainController.getfController().findFiles(tempList);
+		} else if (eventFile.isFile()) {
+			System.out.println("FIND");
+			this.mainController.getfController().findFiles(tempList);
+		}
+	}
+
+	private void doEntryDelete(final File eventFile) {
+		System.out.println("DELETE");
+		if (this.monitoredDirectories.contains(eventFile)) {
+			System.out.println("DELETE FROM LIST");
+			this.monitoredDirectories.remove(eventFile);
+		}
+	}
+
+	private void doEntryModify(final File eventFile, final ArrayList<File> tempList) throws Exception {
+		System.out.println("MODIFY");
+		if (eventFile.isDirectory()) {
+			System.out.println("FIND");
+			this.mainController.getfController().findFiles(tempList);
+		}
+	}
+
 	@Override
 	public void run() {
 		System.out.println("RUN");
@@ -73,27 +101,11 @@ public class DirectoryWatcher implements Runnable {
 						tempList.add(eventFile);
 
 						if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-							System.out.println("CREATE");
-							if (eventFile.isDirectory()) {
-								System.out.println("FIND");
-								this.addDirecotry(eventFile);
-								this.mainController.getfController().findFiles(tempList);
-							} else if (eventFile.isFile()) {
-								System.out.println("FIND");
-								this.mainController.getfController().findFiles(tempList);
-							}
+							this.doEntryCreate(eventFile, tempList);
 						} else if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-							System.out.println("MODIFY");
-							if (eventFile.isDirectory()) {
-								System.out.println("FIND");
-								this.mainController.getfController().findFiles(tempList);
-							}
+							this.doEntryModify(eventFile, tempList);
 						} else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-							System.out.println("DELETE");
-							if (this.monitoredDirectories.contains(eventFile)) {
-								System.out.println("DELETE FROM LIST");
-								this.monitoredDirectories.remove(eventFile);
-							}
+							this.doEntryDelete(eventFile);
 						}
 					}
 					key.reset();

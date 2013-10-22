@@ -134,10 +134,8 @@ public class MediaItem implements IPersistable {
 		} else if (!this.name.equals(other.name)) {
 			return false;
 		}
-		if (this.options == null) {
-			if (other.options != null) {
-				return false;
-			}
+		if ((this.options == null) && (other.options != null)) {
+			return false;
 		}/*
 		 * else if (false && !this.options.equals(other.options)) { // TODO dont
 		 * use equals here! Write an own compare method or // something else to
