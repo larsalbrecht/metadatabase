@@ -276,6 +276,7 @@ public class FileTag implements IPersistable {
 		tempHashMap.put("file_id", this.getFileId());
 		tempHashMap.put("tag_id", this.getTag().getId());
 		tempHashMap.put("isuser", this.getIsUser());
+
 		if ((this.getUser() != null) && (this.getUser().getId() != null)) {
 			tempHashMap.put("user_id", this.user.getId());
 		}
