@@ -98,7 +98,7 @@ public class LoginPage extends WebPage {
 		return loginInfos;
 	}
 
-	private int doLogin(final Request request) {
+	private int doLogin(final Request request) throws Exception {
 		int isLoggedIn = LoginPage.INFO_NOTRY;
 		final ConcurrentHashMap<Integer, Object> loginInfos = this.checkLoginForm(request);
 		User user = null;

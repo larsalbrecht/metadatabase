@@ -19,6 +19,7 @@ public class User implements IPersistable {
 	private String	email		= null;
 	private String	name		= null;
 	private Integer	lastLoginTS	= null;
+	private String	password	= null;
 
 	/**
 	 * 
@@ -49,6 +50,20 @@ public class User implements IPersistable {
 		this.lastLoginTS = lastLoginTS;
 	}
 
+	/**
+	 * @param id
+	 * @param email
+	 * @param name
+	 * @param password
+	 */
+	public User(final Integer id, final String email, final String name, final String password) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.name = name;
+		this.password = password;
+	}
+
 	@Override
 	public Object fromHashMap(final HashMap<String, Object> map) {
 		final User resultItem = new User();
@@ -70,6 +85,10 @@ public class User implements IPersistable {
 				e.printStackTrace();
 			}
 
+		}
+
+		if (map.containsKey("password") && (map.get("password") != null) && (map.get("password") instanceof String)) {
+			resultItem.setPassword((String) map.get("password"));
 		}
 
 		return resultItem;
@@ -111,6 +130,13 @@ public class User implements IPersistable {
 	}
 
 	/**
+	 * @return the password
+	 */
+	public final String getPassword() {
+		return this.password;
+	}
+
+	/**
 	 * @param email
 	 *            the email to set
 	 */
@@ -139,6 +165,14 @@ public class User implements IPersistable {
 		this.name = name;
 	}
 
+	/**
+	 * @param password
+	 *            the password to set
+	 */
+	public final void setPassword(final String password) {
+		this.password = password;
+	}
+
 	@Override
 	public HashMap<String, Object> toHashMap() {
 		final HashMap<String, Object> tempHashMap = new HashMap<String, Object>();
@@ -150,6 +184,10 @@ public class User implements IPersistable {
 
 		if (this.getLastLoginTS() != null) {
 			tempHashMap.put("lastLogin", this.getLastLoginTS());
+		}
+
+		if (this.password != null) {
+			tempHashMap.put("password", this.password);
 		}
 
 		return tempHashMap;

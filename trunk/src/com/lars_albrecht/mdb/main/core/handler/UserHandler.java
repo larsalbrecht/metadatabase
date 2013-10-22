@@ -4,9 +4,9 @@
 package com.lars_albrecht.mdb.main.core.handler;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 
 import com.lars_albrecht.general.utilities.ChecksumSHA1;
-import com.lars_albrecht.general.utilities.ChecksumSHA2;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.models.persistable.User;
 
@@ -19,9 +19,7 @@ import com.lars_albrecht.mdb.main.core.models.persistable.User;
  */
 public class UserHandler {
 
-	public static boolean		usersEnabled		= Boolean.FALSE;
-
-	private static final User	exampleUserObject	= new User(0, "email@example.com", "example", null);
+	public static boolean	usersEnabled	= Boolean.FALSE;
 
 	/**
 	 * Do a login for a user. The password will be salted, peppered and than
@@ -30,8 +28,9 @@ public class UserHandler {
 	 * @param identifier
 	 * @param password
 	 * @return
+	 * @throws Exception
 	 */
-	public static User doLogin(final String identifier, final String password) {
+	public static User doLogin(final String identifier, final String password) throws Exception {
 		final String hashedPassword = UserHandler.getPreparedPassword(identifier, password);
 		if (hashedPassword == null) {
 			return null; // no user available (no salt for identifier found)
@@ -67,20 +66,14 @@ public class UserHandler {
 	}
 
 	/**
-	 * @return the exampleuserobject
-	 */
-	public static User getExampleuserobject() {
-		return UserHandler.exampleUserObject;
-	}
-
-	/**
 	 * Returns the hashed password.
 	 * 
 	 * @param identifier
 	 * @param password
 	 * @return hashed password
+	 * @throws Exception
 	 */
-	public static String getPreparedPassword(final String identifier, final String password) {
+	public static String getPreparedPassword(final String identifier, final String password) throws Exception {
 		final String salt = UserHandler.getSaltForIdentifier(identifier);
 		if (salt == null) {
 			return null;
@@ -107,18 +100,20 @@ public class UserHandler {
 	 * @return salt
 	 */
 	public static String getSaltForIdentifier(final String identifier) {
-		if (identifier.equalsIgnoreCase(UserHandler.getExampleuserobject().getIdentifier())) {
-			return "mysalt";
+		if (identifier.equalsIgnoreCase("email@example.com")) {
+			return "";
 		}
 		return null;
 	}
 
 	public static User getUser(final int id) {
-		if ((id > -1) && (UserHandler.getExampleuserobject().getId() == id)) {
-			return UserHandler.getExampleuserobject();
-		} else {
-			return null;
+		if (id > -1) {
+			final ArrayList<Object> tempList = DataHandler.findAll(new User(id), 1, null, null);
+			if ((tempList.size() > 0) && (tempList.get(0) instanceof User)) {
+				return (User) tempList.get(0);
+			}
 		}
+		return null;
 	}
 
 	/**
@@ -129,11 +124,14 @@ public class UserHandler {
 	 * @return User
 	 */
 	public static User getUser(final String identifier, final String hashedPassword) {
-		if (identifier.equalsIgnoreCase(UserHandler.getExampleuserobject().getIdentifier())) {
-			return UserHandler.getExampleuserobject();
-		} else {
-			return null;
+		if ((identifier != null) && (hashedPassword != null)) {
+			final ArrayList<Object> tempUserList = DataHandler.findAll(new User(), 1, "email = '" + identifier + "'", null);
+			if ((tempUserList.size() > 0) && (tempUserList.get(0) != null) && (tempUserList.get(0) instanceof User)
+					&& ((User) tempUserList.get(0)).getPassword().equals(hashedPassword)) {
+				return (User) tempUserList.get(0);
+			}
 		}
+		return null;
 	}
 
 	/**
@@ -141,10 +139,11 @@ public class UserHandler {
 	 * 
 	 * @param password
 	 * @return hashed password
+	 * @throws Exception
 	 */
-	public static String hashPassword(final String password) {
+	public static String hashPassword(final String password) throws Exception {
 		try {
-			return new String(new ChecksumSHA2("SHA-512").digest(password.getBytes()));
+			return ChecksumSHA1.getSHA1ChecksumString(password);
 		} catch (final NoSuchAlgorithmException e) {
 			e.printStackTrace();
 		}
@@ -173,7 +172,7 @@ public class UserHandler {
 			return null;
 		}
 
-		return UserHandler.getExampleuserobject();
+		return null;
 	}
 
 	/**
