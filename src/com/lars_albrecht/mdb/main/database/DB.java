@@ -22,11 +22,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.lars_albrecht.general.utilities.Debug;
 import com.lars_albrecht.general.utilities.Helper;
+import com.lars_albrecht.mdb.main.core.handler.DataHandler;
+import com.lars_albrecht.mdb.main.core.handler.UserHandler;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.MediaHandler;
 import com.lars_albrecht.mdb.main.core.handler.datahandler.abstracts.ADataHandler;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileMediaItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.MediaItem;
+import com.lars_albrecht.mdb.main.core.models.persistable.User;
 import com.lars_albrecht.mdb.main.database.interfaces.IDatabase;
 
 /**
@@ -469,6 +472,20 @@ public class DB implements IDatabase {
 		return lastInsertedId;
 	}
 
+	/**
+	 * Add system user to database. <br>
+	 * TODO change from example to something like "system".
+	 */
+	private void addDataToTableUsers() {
+		try {
+			final User user = new User(0, "email@example.com", "Example User", UserHandler.getPreparedPassword("email@example.com",
+					"example"));
+			DataHandler.persist(user, false);
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void createTableAttributesKey() throws SQLException {
 		String sql = null;
 		// attributes_key
@@ -693,6 +710,8 @@ public class DB implements IDatabase {
 			this.createTableOptions();
 			this.createTableMediaItems();
 			this.createTableFileMedia();
+
+			this.addDataToTableUsers();
 
 		} catch (final SQLException e) {
 			e.printStackTrace();

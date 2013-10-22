@@ -13,14 +13,40 @@ import java.util.HashMap;
  */
 public interface IPersistable {
 
-	Object fromHashMap(final HashMap<String, Object> map);
+	/**
+	 * Function to transform a map from the database to an object.
+	 * 
+	 * @param map
+	 * @return
+	 */
+	public Object fromHashMap(final HashMap<String, Object> map);
 
-	String getDatabaseTable();
+	/**
+	 * The name of the database table.
+	 * 
+	 * @return
+	 */
+	public String getDatabaseTable();
 
+	/**
+	 * Get the ID of the element.
+	 * 
+	 * @return
+	 */
 	public Integer getId();
 
+	/**
+	 * Set the ID of the element.
+	 * 
+	 * @param id
+	 */
 	public void setId(final Integer id);
 
-	HashMap<String, Object> toHashMap();
+	/**
+	 * Function to transform an object to a map for the database.
+	 * 
+	 * @return
+	 */
+	public HashMap<String, Object> toHashMap();
 
 }

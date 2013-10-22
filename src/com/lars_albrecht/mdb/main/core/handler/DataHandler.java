@@ -48,21 +48,23 @@ public class DataHandler {
 	 * @param order
 	 * @return ArrayList<Object>
 	 */
-	public static ArrayList<Object> findAll(final IPersistable object, final Integer limit, final String order) {
+	public static ArrayList<Object> findAll(final IPersistable object, final Integer limit, final String where, final String order) {
 		HashMap<String, Object> tempMap = null;
 		final ArrayList<Object> resultList = new ArrayList<Object>();
 		if (object != null) {
-			String where = "";
+			String whereStr = "";
 			String limitStr = "";
 			ResultSet rs = null;
 			if (object.getId() != null) {
-				where = " WHERE id=" + object.getId();
+				whereStr = " WHERE id=" + object.getId() + (where != null ? " AND " + where : "");
+			} else if (where != null) {
+				whereStr = " WHERE " + where;
 			}
 			if ((limit != null) && (limit > 0)) {
 				limitStr = " LIMIT " + limit;
 			}
 
-			final String sql = "SELECT * FROM " + object.getDatabaseTable() + where + (order != null ? order : "") + limitStr;
+			final String sql = "SELECT * FROM " + object.getDatabaseTable() + whereStr + " " + (order != null ? order : "") + limitStr;
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 			try {
 				rs = DB.query(sql);
@@ -75,6 +77,7 @@ public class DataHandler {
 					resultList.add(object.fromHashMap(tempMap));
 				}
 			} catch (final SQLException e) {
+				System.err.println("SQL Exception: " + sql);
 				e.printStackTrace();
 			}
 		}
@@ -126,14 +129,26 @@ public class DataHandler {
 		return resultEntry;
 	}
 
+	/**
+	 * 
+	 * @param object
+	 * @param doReplace
+	 * @throws Exception
+	 */
+	public static void persist(final Object object, final boolean doReplace) throws Exception {
+		final ArrayList<Object> dummyList = new ArrayList<Object>();
+		dummyList.add(object);
+		DataHandler.persist(dummyList, doReplace);
+	}
+
 	private ArrayList<Key<?>>								keys					= null;
 	private ArrayList<Value<?>>								values					= null;
 	private ArrayList<FileItem>								fileItems				= null;
 	private ArrayList<FileAttributes>						fileAttributes			= null;
 	private ArrayList<Tag>									tags					= null;
 	private ArrayList<FileTag>								fileTags				= null;
-	private ConcurrentHashMap<String, ArrayList<FileItem>>	noInfoFileItems			= null;
 
+	private ConcurrentHashMap<String, ArrayList<FileItem>>	noInfoFileItems			= null;
 	private ArrayList<FileItem>								missingFileItems		= null;
 	private ArrayList<FileItem>								newFileItems			= null;
 	public static final int									RELOAD_ALL				= 0;
@@ -142,9 +157,10 @@ public class DataHandler {
 	public static final int									RELOAD_FILEATTRIBUTES	= 3;
 	public static final int									RELOAD_FILEITEMS		= 4;
 	public static final int									RELOAD_NOINFOFILEITEMS	= 5;
-	public static final int									RELOAD_MISSINGFILEITEMS	= 6;
 
+	public static final int									RELOAD_MISSINGFILEITEMS	= 6;
 	public static final int									RELOAD_TAGS				= 7;
+
 	public static final int									RELOAD_FILETAGS			= 8;
 
 	public static final int									FILEITEMSTATUS_NORMAL	= 0;
@@ -256,7 +272,7 @@ public class DataHandler {
 					this.addTag(fileTag.getTag());
 				}
 				fileTag.setTag(this.tags.get(this.tags.indexOf(fileTag.getTag())));
-				this.persist(fileTag, false);
+				DataHandler.persist(fileTag, false);
 				this.reloadData(DataHandler.RELOAD_FILETAGS);
 			}
 			return this.fileTags.get(this.fileTags.indexOf(fileTag)).getId();
@@ -268,7 +284,7 @@ public class DataHandler {
 	public Integer addTag(final Tag tag) throws Exception {
 		if (tag != null) {
 			if (!this.getTags().contains(tag)) {
-				this.persist(tag, false);
+				DataHandler.persist(tag, false);
 				this.reloadData(DataHandler.RELOAD_TAGS);
 			}
 			if (this.tags.indexOf(tag) > -1) {
@@ -1104,7 +1120,7 @@ public class DataHandler {
 	 */
 	private DataHandler loadFileAttributes() {
 		Debug.startTimer("loadFileAttributes");
-		this.fileAttributes = ObjectHandler.castObjectListToFileAttributesList(DataHandler.findAll(new FileAttributes(), null, null));
+		this.fileAttributes = ObjectHandler.castObjectListToFileAttributesList(DataHandler.findAll(new FileAttributes(), null, null, null));
 		Debug.stopTimer("loadFileAttributes");
 		return this;
 	}
@@ -1117,14 +1133,14 @@ public class DataHandler {
 	 */
 	private DataHandler loadFileItems() {
 		Debug.startTimer("loadFileItems");
-		this.fileItems = ObjectHandler.castObjectListToFileItemList(DataHandler.findAll(new FileItem(), null, null));
+		this.fileItems = ObjectHandler.castObjectListToFileItemList(DataHandler.findAll(new FileItem(), null, null, null));
 		Debug.stopTimer("loadFileItems");
 		return this;
 	}
 
 	private DataHandler loadFileTags() {
 		Debug.startTimer("loadFileTags");
-		this.fileTags = ObjectHandler.castObjectListToFileTagList(DataHandler.findAll(new FileTag(), null, null));
+		this.fileTags = ObjectHandler.castObjectListToFileTagList(DataHandler.findAll(new FileTag(), null, null, null));
 		Debug.stopTimer("loadFileTags");
 		return this;
 	}
@@ -1136,7 +1152,7 @@ public class DataHandler {
 	 */
 	private DataHandler loadKeys() {
 		Debug.startTimer("loadKeys");
-		this.keys = ObjectHandler.castObjectListToKeyList(DataHandler.findAll(new Key<String>(), null, null));
+		this.keys = ObjectHandler.castObjectListToKeyList(DataHandler.findAll(new Key<String>(), null, null, null));
 		Debug.stopTimer("loadKeys");
 		return this;
 	}
@@ -1157,7 +1173,7 @@ public class DataHandler {
 
 	private DataHandler loadTags() {
 		Debug.startTimer("loadTags");
-		this.tags = ObjectHandler.castObjectListToTagList(DataHandler.findAll(new Tag(), null, null));
+		this.tags = ObjectHandler.castObjectListToTagList(DataHandler.findAll(new Tag(), null, null, null));
 		Debug.stopTimer("loadTags");
 		return this;
 	}
@@ -1169,21 +1185,9 @@ public class DataHandler {
 	 */
 	private DataHandler loadValues() {
 		Debug.startTimer("loadValues");
-		this.values = ObjectHandler.castObjectListToValueList(DataHandler.findAll(new Value<Object>(), null, null));
+		this.values = ObjectHandler.castObjectListToValueList(DataHandler.findAll(new Value<Object>(), null, null, null));
 		Debug.stopTimer("loadValues");
 		return this;
-	}
-
-	/**
-	 * 
-	 * @param object
-	 * @param doReplace
-	 * @throws Exception
-	 */
-	public void persist(final Object object, final boolean doReplace) throws Exception {
-		final ArrayList<Object> dummyList = new ArrayList<Object>();
-		dummyList.add(object);
-		DataHandler.persist(dummyList, doReplace);
 	}
 
 	/**
