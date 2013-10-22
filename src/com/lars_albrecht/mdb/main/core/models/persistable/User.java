@@ -64,6 +64,59 @@ public class User implements IPersistable {
 		this.password = password;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof User)) {
+			return false;
+		}
+		final User other = (User) obj;
+		if ((this.id != null) && (other.id != null) && !this.id.equals(other.id)) {
+			return false;
+		} else if ((this.id != null) && (other.id != null) && this.id.equals(other.id)) {
+			return true;
+		}
+		if (this.email == null) {
+			if (other.email != null) {
+				return false;
+			}
+		} else if (!this.email.equals(other.email)) {
+			return false;
+		}
+		if (this.lastLoginTS == null) {
+			if (other.lastLoginTS != null) {
+				return false;
+			}
+		} else if (!this.lastLoginTS.equals(other.lastLoginTS)) {
+			return false;
+		}
+		if (this.name == null) {
+			if (other.name != null) {
+				return false;
+			}
+		} else if (!this.name.equals(other.name)) {
+			return false;
+		}
+		if (this.password == null) {
+			if (other.password != null) {
+				return false;
+			}
+		} else if (!this.password.equals(other.password)) {
+			return false;
+		}
+		return true;
+	}
+
 	@Override
 	public Object fromHashMap(final HashMap<String, Object> map) {
 		final User resultItem = new User();
@@ -134,6 +187,27 @@ public class User implements IPersistable {
 	 */
 	public final String getPassword() {
 		return this.password;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		if (this.id == null) {
+			result = (prime * result) + ((this.email == null) ? 0 : this.email.hashCode());
+			result = (prime * result) + ((this.lastLoginTS == null) ? 0 : this.lastLoginTS.hashCode());
+			result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
+			result = (prime * result) + ((this.password == null) ? 0 : this.password.hashCode());
+		} else {
+			result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
+		}
+
+		return result;
 	}
 
 	/**
