@@ -188,7 +188,7 @@ public class DB implements IDatabase {
 		// assume we are pointing to BEFORE the first row
 		// rs.next() points to next row and returns true
 		// or false if there is no next row, which breaks the loop
-		for (; rs.next();) {
+		while (rs.next()) {
 			for (i = 0; i < colmax; ++i) {
 				o = rs.getObject(i + 1); // Is SQL the first column is indexed
 
@@ -288,7 +288,7 @@ public class DB implements IDatabase {
 
 		final ResultSet rs = DB.query("SELECT * FROM " + dbInfoTable + " WHERE " + dbInfoWhere + ";");
 		final ArrayList<String> temp = new ArrayList<String>();
-		for (; rs.next();) {
+		while (rs.next()) {
 			temp.add(rs.getString(dbInfoField));
 		}
 		DB.closeConnection();
@@ -368,7 +368,7 @@ public class DB implements IDatabase {
 			returnResultFromItems(final String sql, final ArrayList<String> fields) throws SQLException {
 		final ArrayList<ConcurrentHashMap<String, Object>> resultSet = new ArrayList<ConcurrentHashMap<String, Object>>();
 		final ResultSet rs = DB.query(sql);
-		for (; rs.next();) {
+		while (rs.next()) {
 			final ConcurrentHashMap<String, Object> temp = new ConcurrentHashMap<String, Object>();
 			for (final String string : fields) {
 				temp.put(string, rs.getObject(string));

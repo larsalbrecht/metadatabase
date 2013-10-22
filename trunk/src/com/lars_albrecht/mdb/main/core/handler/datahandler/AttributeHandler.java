@@ -89,7 +89,7 @@ public class AttributeHandler<E> extends ADataHandler<E> {
 			FileAttributeList tempFileAttributeList = null;
 			Integer fileId = null;
 			FileItem currentFileItem = null;
-			for (; rs.next();) { // for each line
+			while (rs.next()) { // for each line
 				KeyValue<String, Object> kv = null;
 				tempMapKey = new HashMap<String, Object>();
 				tempMapValue = new HashMap<String, Object>();
@@ -168,16 +168,15 @@ public class AttributeHandler<E> extends ADataHandler<E> {
 			final String infoType) {
 		if ((infoType != null) && (sectionName != null)) {
 			for (final FileAttributeList fileAttributeListItem : fileAttribList) {
-				if ((fileAttributeListItem != null) && (fileAttributeListItem.getSectionName() != null)) {
-					if (fileAttributeListItem.getSectionName().equalsIgnoreCase(sectionName)
-							&& (fileAttribList.indexOf(fileAttributeListItem) > -1)) {
-						final int pos = fileAttribList.indexOf(fileAttributeListItem);
-						if ((pos > -1) && (fileAttribList.get(pos) != null) && (fileAttribList.get(pos).getKeyValues() != null)
-								&& (fileAttribList.get(pos).getKeyValues().size() > 0)
-								&& (fileAttribList.get(pos).getKeyValues().get(0).getKey() != null)
-								&& fileAttribList.get(pos).getKeyValues().get(0).getKey().getInfoType().equalsIgnoreCase(infoType)) {
-							return pos;
-						}
+				if ((fileAttributeListItem != null) && (fileAttributeListItem.getSectionName() != null)
+						&& fileAttributeListItem.getSectionName().equalsIgnoreCase(sectionName)
+						&& (fileAttribList.indexOf(fileAttributeListItem) > -1)) {
+					final int pos = fileAttribList.indexOf(fileAttributeListItem);
+					if ((pos > -1) && (fileAttribList.get(pos) != null) && (fileAttribList.get(pos).getKeyValues() != null)
+							&& (fileAttribList.get(pos).getKeyValues().size() > 0)
+							&& (fileAttribList.get(pos).getKeyValues().get(0).getKey() != null)
+							&& fileAttribList.get(pos).getKeyValues().get(0).getKey().getInfoType().equalsIgnoreCase(infoType)) {
+						return pos;
 					}
 				}
 			}

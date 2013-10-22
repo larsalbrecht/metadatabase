@@ -153,12 +153,10 @@ public class FileTag implements IPersistable {
 			result.setIsUser(map.get("isuser") instanceof Integer ? (Integer) map.get("isuser") == 0 ? false : true : (Boolean) map
 					.get("isuser"));
 		}
-		if (map.containsKey("user_id")) {
-			if (map.get("user_id") instanceof Integer) {
-				final ArrayList<Object> userList = DataHandler.findAll(new User((Integer) map.get("user_id")), 1, null, null);
-				if (userList.size() > 0) {
-					result.setUser((User) userList.get(0));
-				}
+		if (map.containsKey("user_id") && (map.get("user_id") instanceof Integer)) {
+			final ArrayList<Object> userList = DataHandler.findAll(new User((Integer) map.get("user_id")), 1, null, null);
+			if (userList.size() > 0) {
+				result.setUser((User) userList.get(0));
 			}
 		}
 

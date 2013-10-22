@@ -15,6 +15,7 @@ import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.general.utilities.Template;
 import com.lars_albrecht.mdb.main.core.abstracts.ThreadEx;
 import com.lars_albrecht.mdb.main.core.controller.MainController;
+import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.handler.ObjectHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.WebInterface;
 import com.lars_albrecht.mdb.main.core.interfaces.web.abstracts.WebPage;
@@ -205,8 +206,8 @@ public class WebServerHelper {
 						// "type="
 						content = ObjectHandler.stringListToJSON(newKeyList);
 					} else {
-						content = ObjectHandler.fileItemListToJSON(this.mainController.getDataHandler().findAllFileItemForStringInAll(
-								request.getParameter("term")));
+						this.mainController.getDataHandler();
+						content = ObjectHandler.fileItemListToJSON(DataHandler.findAllFileItemForStringInAll(request.getParameter("term")));
 					}
 					if (content == null) {
 						content = "";

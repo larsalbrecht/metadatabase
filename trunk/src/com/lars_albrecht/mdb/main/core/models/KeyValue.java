@@ -8,7 +8,7 @@ import com.lars_albrecht.mdb.main.core.models.persistable.Value;
 
 /**
  * 
- * This model class holds the key values.
+ * This model class holds key value pairs.
  * 
  * @author lalbrecht
  * 

@@ -63,7 +63,7 @@ public class TagHandler<E> extends ADataHandler<E> {
 				rs = DB.query(sql);
 				Integer fileId = null;
 				FileItem currentFileItem = null;
-				for (; rs.next();) { // for each line
+				while (rs.next()) { // for each line
 					fileId = rs.getInt("fileId");
 
 					// get fileitem

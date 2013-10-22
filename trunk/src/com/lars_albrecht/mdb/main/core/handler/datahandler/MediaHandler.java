@@ -67,7 +67,7 @@ public class MediaHandler<E> extends ADataHandler<E> {
 				rs = DB.query(sql);
 				HashMap<String, Object> tempMap = null;
 				final ResultSetMetaData rsmd = rs.getMetaData();
-				for (; rs.next();) { // for each line
+				while (rs.next()) { // for each line
 					tempMap = new HashMap<String, Object>();
 					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
@@ -154,7 +154,7 @@ public class MediaHandler<E> extends ADataHandler<E> {
 			rs = DB.queryPS(sql, values);
 			HashMap<String, Object> tempMap = null;
 			final ResultSetMetaData rsmd = rs.getMetaData();
-			for (; rs.next();) { // for each line
+			while (rs.next()) { // for each line
 				tempMap = new HashMap<String, Object>();
 				for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 					tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));
@@ -218,7 +218,7 @@ public class MediaHandler<E> extends ADataHandler<E> {
 				final ResultSetMetaData rsmd = rs.getMetaData();
 				Integer fileId = null;
 				FileItem currentFileItem = null;
-				for (; rs.next();) { // for each line
+				while (rs.next()) { // for each line
 					tempMap = new HashMap<String, Object>();
 					for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 						tempMap.put(rsmd.getColumnLabel(i), rs.getObject(i));

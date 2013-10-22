@@ -13,8 +13,8 @@ import com.lars_albrecht.mdb.main.core.abstracts.ThreadEx;
  */
 public interface IController {
 
-	public ArrayList<ThreadEx> getThreadList();
+	ArrayList<ThreadEx> getThreadList();
 
-	public void run(final Object... params) throws Exception;
+	void run(final Object... params) throws Exception;
 
 }

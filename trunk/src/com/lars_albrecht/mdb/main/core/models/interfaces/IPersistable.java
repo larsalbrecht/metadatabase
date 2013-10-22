@@ -19,34 +19,34 @@ public interface IPersistable {
 	 * @param map
 	 * @return
 	 */
-	public Object fromHashMap(final HashMap<String, Object> map);
+	Object fromHashMap(final HashMap<String, Object> map);
 
 	/**
 	 * The name of the database table.
 	 * 
 	 * @return
 	 */
-	public String getDatabaseTable();
+	String getDatabaseTable();
 
 	/**
 	 * Get the ID of the element.
 	 * 
 	 * @return
 	 */
-	public Integer getId();
+	Integer getId();
 
 	/**
 	 * Set the ID of the element.
 	 * 
 	 * @param id
 	 */
-	public void setId(final Integer id);
+	void setId(final Integer id);
 
 	/**
 	 * Function to transform an object to a map for the database.
 	 * 
 	 * @return
 	 */
-	public HashMap<String, Object> toHashMap();
+	HashMap<String, Object> toHashMap();
 
 }

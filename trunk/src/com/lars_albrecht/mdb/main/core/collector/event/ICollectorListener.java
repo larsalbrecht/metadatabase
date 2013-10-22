@@ -16,13 +16,13 @@ public interface ICollectorListener extends EventListener {
 	 * 
 	 * @param e
 	 */
-	public void collectorsEndAll(CollectorEvent e);
+	void collectorsEndAll(CollectorEvent e);
 
 	/**
 	 * Called after a single collector has finished.
 	 * 
 	 * @param e
 	 */
-	public void collectorsEndSingle(CollectorEvent e);
+	void collectorsEndSingle(CollectorEvent e);
 
 }
