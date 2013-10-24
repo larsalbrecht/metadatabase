@@ -20,6 +20,7 @@ public class User implements IPersistable {
 	private String	name		= null;
 	private Integer	lastLoginTS	= null;
 	private String	password	= null;
+	private String	salt		= null;
 
 	/**
 	 * 
@@ -62,6 +63,22 @@ public class User implements IPersistable {
 		this.email = email;
 		this.name = name;
 		this.password = password;
+	}
+
+	/**
+	 * @param id
+	 * @param email
+	 * @param name
+	 * @param password
+	 * @param salt
+	 */
+	public User(final Integer id, final String email, final String name, final String password, final String salt) {
+		super();
+		this.id = id;
+		this.email = email;
+		this.name = name;
+		this.password = password;
+		this.salt = salt;
 	}
 
 	/*
@@ -112,6 +129,13 @@ public class User implements IPersistable {
 				return false;
 			}
 		} else if (!this.password.equals(other.password)) {
+			return false;
+		}
+		if (this.salt == null) {
+			if (other.salt != null) {
+				return false;
+			}
+		} else if (!this.salt.equals(other.salt)) {
 			return false;
 		}
 		return true;
@@ -189,6 +213,13 @@ public class User implements IPersistable {
 		return this.password;
 	}
 
+	/**
+	 * @return the salt
+	 */
+	public final String getSalt() {
+		return this.salt;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -203,6 +234,7 @@ public class User implements IPersistable {
 			result = (prime * result) + ((this.lastLoginTS == null) ? 0 : this.lastLoginTS.hashCode());
 			result = (prime * result) + ((this.name == null) ? 0 : this.name.hashCode());
 			result = (prime * result) + ((this.password == null) ? 0 : this.password.hashCode());
+			result = (prime * result) + ((this.salt == null) ? 0 : this.salt.hashCode());
 		} else {
 			result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
 		}
@@ -247,6 +279,14 @@ public class User implements IPersistable {
 		this.password = password;
 	}
 
+	/**
+	 * @param salt
+	 *            the salt to set
+	 */
+	public final void setSalt(final String salt) {
+		this.salt = salt;
+	}
+
 	@Override
 	public HashMap<String, Object> toHashMap() {
 		final HashMap<String, Object> tempHashMap = new HashMap<String, Object>();
@@ -262,6 +302,10 @@ public class User implements IPersistable {
 
 		if (this.password != null) {
 			tempHashMap.put("password", this.password);
+		}
+
+		if (this.salt != null) {
+			tempHashMap.put("salt", this.salt);
 		}
 
 		return tempHashMap;

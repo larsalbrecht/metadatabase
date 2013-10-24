@@ -24,6 +24,7 @@ import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileTag;
 import com.lars_albrecht.mdb.main.core.models.persistable.Key;
 import com.lars_albrecht.mdb.main.core.models.persistable.Tag;
+import com.lars_albrecht.mdb.main.core.models.persistable.User;
 import com.lars_albrecht.mdb.main.core.models.persistable.Value;
 import com.lars_albrecht.mdb.main.database.DB;
 
@@ -131,6 +132,23 @@ public class DataHandler {
 		return resultEntry;
 	}
 
+	public static String getSaltForUser(final String identifier) throws Exception {
+		if (identifier != null) {
+			ResultSet rs = null;
+
+			String sql = null;
+
+			sql = "SELECT salt FROM " + new User().getDatabaseTable() + " WHERE email = ? LIMIT 1";
+			DB.beginTransaction();
+			rs = DB.queryPS(sql, identifier);
+			DB.endTransaction();
+			if (rs.next()) {
+				return rs.getString("salt");
+			}
+		}
+		return null;
+	}
+
 	/**
 	 * Search key in this.keys. This method ignore the infoType/section
 	 * parameters.
@@ -162,8 +180,8 @@ public class DataHandler {
 	private ArrayList<Value<?>>								values					= null;
 	private ArrayList<FileItem>								fileItems				= null;
 	private ArrayList<FileAttributes>						fileAttributes			= null;
-	private ArrayList<Tag>									tags					= null;
 
+	private ArrayList<Tag>									tags					= null;
 	private ArrayList<FileTag>								fileTags				= null;
 	private ConcurrentHashMap<String, ArrayList<FileItem>>	noInfoFileItems			= null;
 	private ArrayList<FileItem>								missingFileItems		= null;
@@ -172,9 +190,10 @@ public class DataHandler {
 	public static final int									RELOAD_KEYS				= 1;
 	public static final int									RELOAD_VALUES			= 2;
 	public static final int									RELOAD_FILEATTRIBUTES	= 3;
-	public static final int									RELOAD_FILEITEMS		= 4;
 
+	public static final int									RELOAD_FILEITEMS		= 4;
 	public static final int									RELOAD_NOINFOFILEITEMS	= 5;
+
 	public static final int									RELOAD_MISSINGFILEITEMS	= 6;
 
 	public static final int									RELOAD_TAGS				= 7;
@@ -846,7 +865,7 @@ public class DataHandler {
 
 	public LinkedHashMap<Integer, Integer> getCreatedCountByDay() {
 		final LinkedHashMap<Integer, Integer> resultList = new LinkedHashMap<Integer, Integer>();
-		final String sql = "SELECT strftime('%d', createTS) AS 'dateDay', strftime('%m', createTS) AS 'dateMonth', strftime('%Y', createTS) AS 'dateYear', strftime('%s', strftime('%Y-%m-%d', createTS)) AS 'dayDateTS', COUNT(id) AS 'count' FROM fileInformation GROUP BY dateDay, dateMonth, dateYear ORDER BY dayDateTS";
+		final String sql = "SELECT strftime('%d', createTS) AS 'dateDay', strftime('%m', createTS) AS 'dateMonth', strftime('%Y', createTS) AS 'dateYear', strftime('%s', strftime('%Y-%m-%d', createTS)) AS 'dayDateTS', COUNT(id) AS 'count' FROM fileInformation GROUP BY dateDay, dateMonth, dateYear ORDER BY createTS";
 		ResultSet rs = null;
 
 		try {
@@ -1075,7 +1094,7 @@ public class DataHandler {
 
 	public LinkedHashMap<Integer, Integer> getUpdatedCountByDay() {
 		final LinkedHashMap<Integer, Integer> resultList = new LinkedHashMap<Integer, Integer>();
-		final String sql = "SELECT strftime('%d', updateTS) AS 'dateDay', strftime('%m', updateTS) AS 'dateMonth', strftime('%Y', updateTS) AS 'dateYear', strftime('%s', strftime('%Y-%m-%d', updateTS)) AS 'dayDateTS', COUNT(id) AS 'count' FROM fileInformation GROUP BY dateDay, dateMonth, dateYear ORDER BY dayDateTS";
+		final String sql = "SELECT strftime('%d', updateTS) AS 'dateDay', strftime('%m', updateTS) AS 'dateMonth', strftime('%Y', updateTS) AS 'dateYear', strftime('%s', strftime('%Y-%m-%d', updateTS)) AS 'dayDateTS', COUNT(id) AS 'count' FROM fileInformation GROUP BY dateDay, dateMonth, dateYear ORDER BY updateTS";
 		ResultSet rs = null;
 
 		try {
