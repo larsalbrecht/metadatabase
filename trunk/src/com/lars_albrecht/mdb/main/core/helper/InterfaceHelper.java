@@ -13,7 +13,7 @@ import java.util.regex.Pattern;
 import com.lars_albrecht.general.utilities.Helper;
 import com.lars_albrecht.mdb.main.core.handler.DataHandler;
 import com.lars_albrecht.mdb.main.core.interfaces.web.helper.WebServerHelper;
-import com.lars_albrecht.mdb.main.core.models.Pair;
+import com.lars_albrecht.mdb.main.core.models.Tuple;
 import com.lars_albrecht.mdb.main.core.models.persistable.FileItem;
 
 /**
@@ -56,9 +56,9 @@ public class InterfaceHelper {
 	 * @param searchType
 	 * @return Pair<ArrayList<FileItem>, Integer>
 	 */
-	private static Pair<ArrayList<FileItem>, Integer>
+	private static Tuple<ArrayList<FileItem>, Integer>
 			getSearchResults(final ArrayList<Entry<String, String>> searchStrList, int searchType) {
-		final Pair<ArrayList<FileItem>, Integer> searchResults = new Pair<ArrayList<FileItem>, Integer>();
+		final Tuple<ArrayList<FileItem>, Integer> searchResults = new Tuple<ArrayList<FileItem>, Integer>();
 		final ArrayList<FileItem> resultList = new ArrayList<FileItem>();
 		for (final Entry<String, String> searchEntry : searchStrList) {
 			searchType = WebServerHelper.SEARCHTYPE_TEXTALL;
@@ -127,7 +127,7 @@ public class InterfaceHelper {
 			}
 
 			// TODO fix search and output from searchkeys/values
-			final Pair<ArrayList<FileItem>, Integer> searchResults = InterfaceHelper.getSearchResults(searchStrList, searchType);
+			final Tuple<ArrayList<FileItem>, Integer> searchResults = InterfaceHelper.getSearchResults(searchStrList, searchType);
 			resultList = searchResults.getX();
 			searchType = searchResults.getY();
 

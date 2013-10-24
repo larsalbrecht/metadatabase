@@ -357,6 +357,13 @@ public class DB implements IDatabase {
 		return rs;
 	}
 
+	public static synchronized ResultSet queryPS(final String expression, final Object value) throws Exception {
+		final ConcurrentHashMap<Integer, Object> values = new ConcurrentHashMap<Integer, Object>();
+		values.put(1, value);
+
+		return DB.queryPS(expression, values);
+	}
+
 	/**
 	 * 
 	 * @param sql
@@ -478,8 +485,9 @@ public class DB implements IDatabase {
 	 */
 	private void addDataToTableUsers() {
 		try {
+			final String salt = UserHandler.generateSalt("email@example.com");
 			final User user = new User(0, "email@example.com", "Example User", UserHandler.getPreparedPassword("email@example.com",
-					"example"));
+					"example", salt), salt);
 			DataHandler.persist(user, false);
 		} catch (final Exception e) {
 			e.printStackTrace();
@@ -674,12 +682,13 @@ public class DB implements IDatabase {
 	// TODO add foreign key for user_id
 	private void createTableUsers() throws SQLException {
 		String sql = null;
-		// tags
+		// users
 		sql = "CREATE TABLE IF NOT EXISTS 'users' ( ";
 		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
 		sql += "'name' VARCHAR(255), ";
 		sql += "'email' VARCHAR(255), ";
 		sql += "'password' VARCHAR(255), ";
+		sql += "'salt' VARCHAR(255), ";
 		sql += "'lastLoginTS' INTEGER DEFAULT 0";
 		sql += "); ";
 		DB.update(sql);

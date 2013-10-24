@@ -10,12 +10,12 @@ package com.lars_albrecht.mdb.main.core.models;
  *         result values.
  * 
  */
-public class Pair<X, Y> {
+public class Tuple<X, Y> {
 
 	private X	x;
 	private Y	y;
 
-	public Pair() {
+	public Tuple() {
 	}
 
 	/**
@@ -23,7 +23,7 @@ public class Pair<X, Y> {
 	 * @param x
 	 * @param y
 	 */
-	public Pair(final X x, final Y y) {
+	public Tuple(final X x, final Y y) {
 		this.x = x;
 		this.y = y;
 	}

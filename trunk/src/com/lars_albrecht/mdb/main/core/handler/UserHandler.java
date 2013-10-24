@@ -5,6 +5,8 @@ package com.lars_albrecht.mdb.main.core.handler;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Random;
 
 import com.lars_albrecht.general.utilities.ChecksumSHA1;
 import com.lars_albrecht.general.utilities.Helper;
@@ -31,7 +33,7 @@ public class UserHandler {
 	 * @throws Exception
 	 */
 	public static User doLogin(final String identifier, final String password) throws Exception {
-		final String hashedPassword = UserHandler.getPreparedPassword(identifier, password);
+		final String hashedPassword = UserHandler.getPreparedPassword(identifier, password, null);
 		if (hashedPassword == null) {
 			return null; // no user available (no salt for identifier found)
 		}
@@ -51,6 +53,16 @@ public class UserHandler {
 		return false;
 	}
 
+	public static String generateSalt(final String identifier) throws Exception {
+		Long seed = new Long(0);
+		final byte[] byteArr = (identifier + UserHandler.getPepper()).getBytes();
+		for (final Byte bite : byteArr) {
+			seed += bite.longValue();
+		}
+		final Random r = new Random(new Date().getTime() + seed);
+		return ChecksumSHA1.getSHA1ChecksumString(new Long(r.nextLong()).toString());
+	}
+
 	public static String generateUserToken(final User user, final String[] additional) {
 		String token = null;
 		if ((user != null) && (additional.length > 0)) {
@@ -65,16 +77,22 @@ public class UserHandler {
 		return token;
 	}
 
+	private static String getPepper() {
+		return "mysecret from secure place";
+	}
+
 	/**
-	 * Returns the hashed password.
+	 * Returns the hashed password. If a salt is given, the salt will be used,
+	 * otherwise, the salt will be returned by the identifier from database.
 	 * 
 	 * @param identifier
 	 * @param password
+	 * @param salt
 	 * @return hashed password
 	 * @throws Exception
 	 */
-	public static String getPreparedPassword(final String identifier, final String password) throws Exception {
-		final String salt = UserHandler.getSaltForIdentifier(identifier);
+	public static String getPreparedPassword(final String identifier, final String password, String salt) throws Exception {
+		salt = (salt == null ? UserHandler.getSaltForIdentifier(identifier) : null);
 		if (salt == null) {
 			return null;
 		}
@@ -98,12 +116,10 @@ public class UserHandler {
 	 * 
 	 * @param identifier
 	 * @return salt
+	 * @throws Exception
 	 */
-	public static String getSaltForIdentifier(final String identifier) {
-		if (identifier.equalsIgnoreCase("email@example.com")) {
-			return "";
-		}
-		return null;
+	public static String getSaltForIdentifier(final String identifier) throws Exception {
+		return DataHandler.getSaltForUser(identifier);
 	}
 
 	public static User getUser(final int id) {
@@ -158,7 +174,7 @@ public class UserHandler {
 	 * @return peppered password (password + pepper)
 	 */
 	public static String pepperPassword(final String password) {
-		return password + "mysecret from secure place";
+		return password + UserHandler.getPepper();
 	}
 
 	/**
