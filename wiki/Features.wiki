@@ -16,8 +16,13 @@
  * Exporter
   * PDF (a simple output of files, but is currently unused in the interfaces)
  * SQLite to store information
+ * User login
 
 == Upcoming Features ==
+ * Add ability to enable/disable user logins
+ * Add ability to add a profile picture to user
+ * Better integration of users
+ * Add ability to add lists for users and global
  * Filter output for all interfaces with a specified interfaceclass
  * Integration of the Typer to the Collectors (collectors specify the types)
  * Better solution of configs and property-files for the internal features (this library) and the external features (own application)
@@ -31,4 +36,3 @@
  * Possibility to remove collector-information
  * Possibility to make stats
  * Possibility to display average page creation
- * Add UserHandler to handle users if enabled
