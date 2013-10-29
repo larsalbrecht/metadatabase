@@ -21,8 +21,14 @@ public class WatchlistEntry implements IPersistable {
 	private User		user		= null;
 	private Integer		createTS	= null;
 	private FileItem	fileItem	= null;
+	private Watchlist	watchlist	= null;
 
 	public WatchlistEntry() {
+	}
+
+	public WatchlistEntry(final Integer id) {
+		super();
+		this.id = id;
 	}
 
 	@Override
@@ -61,6 +67,13 @@ public class WatchlistEntry implements IPersistable {
 				return false;
 			}
 		} else if (!this.user.equals(other.user)) {
+			return false;
+		}
+		if (this.watchlist == null) {
+			if (other.watchlist != null) {
+				return false;
+			}
+		} else if (!this.watchlist.equals(other.watchlist)) {
 			return false;
 		}
 		return true;
@@ -104,6 +117,13 @@ public class WatchlistEntry implements IPersistable {
 			}
 		}
 
+		if (map.containsKey("watchlist_id") && (map.get("watchlist_id") instanceof Integer)) {
+			final ArrayList<Object> watchlist = DataHandler.findAll(new Watchlist((Integer) map.get("watchlist_id")), 1, null, null);
+			if (watchlist.size() > 0) {
+				resultItem.setWatchlist((Watchlist) watchlist.get(0));
+			}
+		}
+
 		return resultItem;
 	}
 
@@ -141,6 +161,10 @@ public class WatchlistEntry implements IPersistable {
 		return this.user;
 	}
 
+	public Watchlist getWatchlist() {
+		return this.watchlist;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -149,6 +173,7 @@ public class WatchlistEntry implements IPersistable {
 			result = (prime * result) + ((this.user == null) ? 0 : this.user.hashCode());
 			result = (prime * result) + ((this.createTS == null) ? 0 : this.createTS.hashCode());
 			result = (prime * result) + ((this.fileItem == null) ? 0 : this.fileItem.hashCode());
+			result = (prime * result) + ((this.watchlist == null) ? 0 : this.watchlist.hashCode());
 		} else {
 			result = (prime * result) + ((this.id == null) ? 0 : this.id.hashCode());
 		}
@@ -179,6 +204,14 @@ public class WatchlistEntry implements IPersistable {
 		this.user = user;
 	}
 
+	/**
+	 * @param watchlist
+	 *            the watchlist to set
+	 */
+	public void setWatchlist(final Watchlist watchlist) {
+		this.watchlist = watchlist;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -203,6 +236,10 @@ public class WatchlistEntry implements IPersistable {
 
 		if ((this.getFileItem() != null) && (this.getFileItem().getId() != null)) {
 			tempHashMap.put("file_id", this.getFileItem().getId());
+		}
+
+		if ((this.getWatchlist() != null) && (this.getWatchlist().getId() != null)) {
+			tempHashMap.put("watchlist_id", this.getWatchlist().getId());
 		}
 
 		return tempHashMap;

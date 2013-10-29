@@ -696,6 +696,39 @@ public class DB implements IDatabase {
 		DB.update(sql);
 	}
 
+	private void createTableWatchlist() throws SQLException {
+		String sql = null;
+		// watchlist
+		sql = "CREATE TABLE IF NOT EXISTS 'watchlist' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'name' VARCHAR(255), ";
+		sql += "'user_id' INTEGER, ";
+		sql += "'createTS' DATE DEFAULT (datetime('now','localtime')), ";
+		sql += "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE ";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_watchlist ON watchlist (name, user_id);";
+		DB.update(sql);
+	}
+
+	private void createTableWatchlistEntry() throws SQLException {
+		String sql = null;
+		// watchlistEntry
+		sql = "CREATE TABLE IF NOT EXISTS 'watchlistEntry' ( ";
+		sql += "'id' INTEGER PRIMARY KEY AUTOINCREMENT, ";
+		sql += "'watchlist_id' INTEGER,";
+		sql += "'user_id' INTEGER, ";
+		sql += "'file_id' INTEGER, ";
+		sql += "'createTS' DATE DEFAULT (datetime('now','localtime')), ";
+		sql += "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, ";
+		sql += "FOREIGN KEY (watchlist_id) REFERENCES watchlist(id) ON DELETE CASCADE, ";
+		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE ";
+		sql += "); ";
+		DB.update(sql);
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_watchlistentry ON watchlistEntry (watchlist_id, file_id);";
+		DB.update(sql);
+	}
+
 	@Override
 	public void init() throws Exception {
 		String sql = null;
@@ -719,6 +752,8 @@ public class DB implements IDatabase {
 			this.createTableOptions();
 			this.createTableMediaItems();
 			this.createTableFileMedia();
+			this.createTableWatchlist();
+			this.createTableWatchlistEntry();
 
 			this.addDataToTableUsers();
 
