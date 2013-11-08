@@ -30,7 +30,15 @@ public class WatchlistHandler {
 		if ((watchlist != null) && (user != null)) {
 			DataHandler.persist(watchlist, Boolean.FALSE);
 
+			final Watchlist completeWatchlist = WatchlistHandler.getFilledWatchlistFromWatchlist(watchlist);
+			watchlist.setId(completeWatchlist.getId());
+			watchlist.setCreateTS(completeWatchlist.getCreateTS());
+
 			if ((watchlist.getFileIdList() != null) && (watchlist.getFileIdList().size() > 0)) {
+				for (final WatchlistEntry entry : watchlist.getFileIdList()) {
+					entry.setWatchlist(watchlist);
+				}
+
 				WatchlistHandler.addWatchlistEntries(watchlist.getFileIdList());
 			}
 
@@ -53,6 +61,21 @@ public class WatchlistHandler {
 		}
 
 		return Boolean.FALSE;
+	}
+
+	public static Watchlist getFilledWatchlistFromWatchlist(final Watchlist watchlist) {
+		Watchlist resultList = null;
+		if ((watchlist != null) && (watchlist.getName() != null) && (watchlist.getUser() != null)) {
+			ArrayList<Object> watchlistsObj = null;
+			watchlistsObj = DataHandler.findAll(new Watchlist(), 1, "user_id = '" + watchlist.getUser().getId() + "' AND name = '"
+					+ watchlist.getName() + "'", "createTS");
+			if ((watchlistsObj != null) && (watchlistsObj.size() > 0)) {
+				resultList = (Watchlist) watchlistsObj.get(0);
+			}
+
+		}
+
+		return resultList;
 	}
 
 	/**

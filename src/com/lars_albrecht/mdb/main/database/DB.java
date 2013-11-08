@@ -725,7 +725,7 @@ public class DB implements IDatabase {
 		sql += "FOREIGN KEY (file_id) REFERENCES fileInformation(id) ON DELETE CASCADE ";
 		sql += "); ";
 		DB.update(sql);
-		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_watchlistentry ON watchlistEntry (watchlist_id, file_id);";
+		sql = "CREATE UNIQUE INDEX IF NOT EXISTS idx_unique_watchlistentry ON watchlistEntry (watchlist_id, file_id, user_id);";
 		DB.update(sql);
 	}
 
