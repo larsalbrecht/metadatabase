@@ -118,10 +118,13 @@ public class WatchlistEntry implements IPersistable {
 		}
 
 		if (map.containsKey("watchlist_id") && (map.get("watchlist_id") instanceof Integer)) {
-			final ArrayList<Object> watchlist = DataHandler.findAll(new Watchlist((Integer) map.get("watchlist_id")), 1, null, null);
-			if (watchlist.size() > 0) {
-				resultItem.setWatchlist((Watchlist) watchlist.get(0));
-			}
+			resultItem.setWatchlist(new Watchlist((Integer) map.get("watchlist_id")));
+			// TODO add caching to use this
+			// final ArrayList<Object> watchlist = DataHandler.findAll(new
+			// Watchlist((Integer) map.get("watchlist_id")), 1, null, null);
+			// if ((watchlist != null) && (watchlist.size() > 0)) {
+			// resultItem.setWatchlist((Watchlist) watchlist.get(0));
+			// }
 		}
 
 		return resultItem;
