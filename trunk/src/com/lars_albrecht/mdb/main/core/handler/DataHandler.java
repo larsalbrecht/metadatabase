@@ -67,7 +67,7 @@ public class DataHandler {
 				limitStr = " LIMIT " + limit;
 			}
 
-			final String sql = "SELECT * FROM " + object.getDatabaseTable() + whereStr + " " + (order != null ? "ORDER BY " + order : "")
+			final String sql = "SELECT * FROM " + object.getDatabaseTable() + whereStr + " " + (order != null ? " ORDER BY " + order : "")
 					+ limitStr;
 			Debug.log(Debug.LEVEL_DEBUG, "SQL: " + sql);
 			try {
