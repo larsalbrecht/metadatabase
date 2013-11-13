@@ -26,8 +26,8 @@ public class WatchlistHandler {
 	 * @return
 	 * @throws Exception
 	 */
-	public static boolean addWatchlist(final Watchlist watchlist, final User user) throws Exception {
-		if ((watchlist != null) && (user != null)) {
+	public static boolean addWatchlist(final Watchlist watchlist) throws Exception {
+		if (watchlist != null) {
 			DataHandler.persist(watchlist, Boolean.FALSE);
 
 			final Watchlist completeWatchlist = WatchlistHandler.getFilledWatchlistFromWatchlist(watchlist);

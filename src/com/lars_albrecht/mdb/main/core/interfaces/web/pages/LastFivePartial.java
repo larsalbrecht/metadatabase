@@ -32,7 +32,7 @@ public class LastFivePartial extends WebPartial {
 		final Template lastFivePartialTemplate = this.getPageTemplate();
 		this.mainController.getDataHandler();
 		final ArrayList<FileItem> lastFiveList = ObjectHandler.castObjectListToFileItemList(DataHandler.findAll(new FileItem(), 5, null,
-				" ORDER BY fileInformation.createTS DESC"));
+				" fileInformation.createTS DESC"));
 
 		if (lastFiveList.size() > 0) {
 			String listContainer = lastFivePartialTemplate.getSubMarkerContent("lastfivelist");
