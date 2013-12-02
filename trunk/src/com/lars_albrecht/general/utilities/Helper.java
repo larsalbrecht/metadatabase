@@ -386,8 +386,10 @@ public class Helper {
 	 * @return String
 	 */
 	public static String getFileNameWithoutExtension(final String filename) {
-		if (filename != null) {
+		if (filename != null && filename.contains(".")) {
 			return filename.substring(0, filename.length() - (filename.length() - filename.lastIndexOf(".")));
+		} else if (!filename.contains(".")) {
+			return filename;
 		} else {
 			return null;
 		}
